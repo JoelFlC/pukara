@@ -44,14 +44,14 @@ A continuación se registra la muestra capturada en tiempo real durante la sesi�
 
 - **Endpoint consultado:**  
   `https://api.open-meteo.com/v1/forecast?latitude=-16.5235&longitude=-68.1425&current=precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=precipitation&past_days=4&forecast_days=1&timezone=UTC`
-- **Latencia de respuesta de red:** `1346 ms - 3741 ms` (dentro del umbral seguro configurado de `timeoutMs = 8000 ms`).
-- **Timestamp de observación (`observado_en` UTC):** `2026-10-23T23:30:00.000Z`
-- **Timestamp local en La Paz (`America/La_Paz` UTC-4):** `23/10/2026, 19:30:00 (BOT)`
+- **Latencia de respuesta de red:** `3879 ms` (dentro del umbral seguro configurado de `timeoutMs = 8000 ms`).
+- **Timestamp de observación (`observado_en` UTC):** `2026-10-23T23:45:00.000Z`
+- **Timestamp local en La Paz (`America/La_Paz` UTC-4):** `23/10/2026, 19:45:00 (BOT)`
 - **Variables Meteorológicas Actuales en Llojeta:**
   - **Precipitación actual instantánea:** `0.1 mm`
   - **Temperatura a 2 metros:** `9.4 °C`
-  - **Humedad relativa:** `85 %`
-  - **Velocidad del viento a 10 metros:** `1.5 km/h`
+  - **Humedad relativa:** `86 %`
+  - **Velocidad del viento a 10 metros:** `1 km/h`
 - **Estructura de la Serie Horaria:**
   - **Total de pasos horarios recibidos:** `120 horas` (ventana histórica de 4 días pasados + día en curso con `forecast_days=1`).
   - **Valores no nulos:** `120`

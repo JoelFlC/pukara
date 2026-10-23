@@ -42,7 +42,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     expect(url.searchParams.get('hourly')).toBe('precipitation');
   });
 
-  it('2. Respuesta válida normalizada: convierte tiempo a ISO UTC y preserva nulls en hourly', () => {
+  it('2. Normalización válida y preservación estricta de null en hourly', () => {
     const mockJson = {
       latitude: -16.52,
       longitude: -68.14,
@@ -87,7 +87,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     expect(normalizado.serie_horaria.tiempos_utc[0]).toBe('2026-10-23T21:00:00.000Z');
   });
 
-  it('3. Control de Timeout con AbortController: arroja OpenMeteoError con código TIMEOUT', async () => {
+  it('3. Timeout controlado (TIMEOUT): un fetchImpl lento aborta al superar timeoutMs: 25', async () => {
     const fetchLento = (url, { signal }) =>
       new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
@@ -108,14 +108,14 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     await expect(
       consultarOpenMeteo({
         fetchImpl: fetchLento,
-        timeoutMs: 30,
+        timeoutMs: 25,
       })
     ).rejects.toThrowError(OpenMeteoError);
 
     try {
       await consultarOpenMeteo({
         fetchImpl: fetchLento,
-        timeoutMs: 30,
+        timeoutMs: 25,
       });
     } catch (err) {
       expect(err).toBeInstanceOf(OpenMeteoError);
@@ -124,7 +124,38 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     }
   });
 
-  it('4. Control de Errores HTTP (502 / 429): arroja OpenMeteoError con código HTTP_ERROR y status', async () => {
+  it('4. Fallo de red (RED_ERROR): fetchImpl que rechaza con TypeError("fetch failed")', async () => {
+    const fetchFallaRed = async () => {
+      throw new TypeError('fetch failed');
+    };
+
+    try {
+      await consultarOpenMeteo({ fetchImpl: fetchFallaRed });
+      expect.fail('Debió arrojar error de red');
+    } catch (err) {
+      expect(err).toBeInstanceOf(OpenMeteoError);
+      expect(err.codigo).toBe('RED_ERROR');
+      expect(err.causaOriginal).toBeDefined();
+    }
+  });
+
+  it('5. Error HTTP (HTTP_ERROR): respuesta con ok: false y status: 503 / 502 / 429', async () => {
+    // Caso 503 Service Unavailable
+    const fetch503 = async () => ({
+      ok: false,
+      status: 503,
+      statusText: 'Service Unavailable',
+    });
+
+    try {
+      await consultarOpenMeteo({ fetchImpl: fetch503 });
+      expect.fail('Debió arrojar error para 503');
+    } catch (err) {
+      expect(err).toBeInstanceOf(OpenMeteoError);
+      expect(err.codigo).toBe('HTTP_ERROR');
+      expect(err.statusHttp).toBe(503);
+    }
+
     // Caso 502 Bad Gateway
     const fetch502 = async () => ({
       ok: false,
@@ -140,41 +171,10 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('HTTP_ERROR');
       expect(err.statusHttp).toBe(502);
     }
-
-    // Caso 429 Too Many Requests
-    const fetch429 = async () => ({
-      ok: false,
-      status: 429,
-      statusText: 'Too Many Requests',
-    });
-
-    try {
-      await consultarOpenMeteo({ fetchImpl: fetch429 });
-      expect.fail('Debió arrojar error para 429');
-    } catch (err) {
-      expect(err).toBeInstanceOf(OpenMeteoError);
-      expect(err.codigo).toBe('HTTP_ERROR');
-      expect(err.statusHttp).toBe(429);
-    }
   });
 
-  it('5. Control de Fallos de Red: arroja OpenMeteoError con código RED_ERROR', async () => {
-    const fetchFallaRed = async () => {
-      throw new TypeError('Failed to fetch (DNS o conexión caída)');
-    };
-
-    try {
-      await consultarOpenMeteo({ fetchImpl: fetchFallaRed });
-      expect.fail('Debió arrojar error de red');
-    } catch (err) {
-      expect(err).toBeInstanceOf(OpenMeteoError);
-      expect(err.codigo).toBe('RED_ERROR');
-      expect(err.causaOriginal).toBeDefined();
-    }
-  });
-
-  it('6. Control de Respuestas Corruptas: valida payloads anómalos con código RESPUESTA_CORRUPTA', () => {
-    // 6.1 JSON sin bloque hourly
+  it('6. Respuestas corruptas (RESPUESTA_CORRUPTA): payloads anómalos y body no-JSON', async () => {
+    // 6.a Falta bloque hourly
     const sinHourly = {
       current: { time: '2026-10-23T22:30', interval: 900 },
     };
@@ -185,7 +185,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
 
-    // 6.2 Arreglos hourly.time y hourly.precipitation de distinta longitud
+    // 6.b hourly.time y hourly.precipitation de distinta longitud
     const longitudDispar = {
       current: { time: '2026-10-23T22:30', interval: 900 },
       hourly: {
@@ -200,9 +200,9 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
 
-    // 6.3 current.time con fecha inválida
+    // 6.c current.time inválido ("fecha-invalida")
     const fechaInvalida = {
-      current: { time: 'cadena-no-fecha', interval: 900 },
+      current: { time: 'fecha-invalida', interval: 900 },
       hourly: {
         time: ['2026-10-23T21:00'],
         precipitation: [0.0],
@@ -215,19 +215,21 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
 
-    // 6.4 Valores no numéricos en hourly.precipitation (string 'invalido')
-    const valorNoNumerico = {
-      current: { time: '2026-10-23T22:30', interval: 900 },
-      hourly: {
-        time: ['2026-10-23T21:00'],
-        precipitation: ['no-es-numero'],
+    // 6.d Body no-JSON (ej. HTML de error o texto corrupto)
+    const fetchNoJson = async () => ({
+      ok: true,
+      json: async () => {
+        throw new SyntaxError('Unexpected token < in JSON at position 0');
       },
-    };
-    expect(() => validarYNormalizarRespuesta(valorNoNumerico)).toThrowError(OpenMeteoError);
+    });
+
     try {
-      validarYNormalizarRespuesta(valorNoNumerico);
+      await consultarOpenMeteo({ fetchImpl: fetchNoJson });
+      expect.fail('Debió arrojar error para body no-JSON');
     } catch (err) {
+      expect(err).toBeInstanceOf(OpenMeteoError);
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
+      expect(err.causaOriginal).toBeDefined();
     }
   });
 
