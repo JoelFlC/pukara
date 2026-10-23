@@ -28,7 +28,7 @@ async function inspeccionar() {
     console.log('1. RESOLUCIÓN ESPACIAL Y CELDA DEL MODELO:');
     console.log(`   - Coordenada solicitada:  Lat ${data.coordenada_consultada.latitud}, Lon ${data.coordenada_consultada.longitud}`);
     console.log(`   - Coordenada del modelo:  Lat ${data.coordenada_modelo.latitud}, Lon ${data.coordenada_modelo.longitud}`);
-    console.log(`   - Elevación del modelo:   ${data.elevacion_m} msnm`);
+    console.log(`   - Elevación del modelo:   ${data.coordenada_modelo.elevacion_m} msnm`);
     console.log(`   - Nota: Evidencia empírica de la limitación N°3 (resolución de celda de modelo ~11km vs pluviómetro puntual).\n`);
 
     // 2. Tiempos y Zonas Horarias
@@ -64,7 +64,7 @@ async function inspeccionar() {
     console.log(`   - Implicación en diseño:    Respalda "separacion_minima_minutos = 15" para muestras independientes y "t_max_minutos = 60" para frescura de lecturas.\n`);
 
     // 3. Serie Horaria de Precipitación
-    const totalHoras = data.serie_horaria.total_horas;
+    const totalHoras = data.serie_horaria.tiempos_utc.length;
     let nulos = 0;
     let noNulos = 0;
     let sumaPrecip = 0;
@@ -89,8 +89,8 @@ async function inspeccionar() {
     console.log('4. CONDICIONES METEOROLÓGICAS ACTUALES (Llojeta):');
     console.log(`   - Precipitación actual:     ${data.actual.precipitacion_mm ?? 'Sin dato'} mm`);
     console.log(`   - Temperatura (2m):         ${data.actual.temperatura_c ?? 'Sin dato'} °C`);
-    console.log(`   - Humedad relativa:         ${data.actual.humedad_relativa_pct ?? 'Sin dato'} %`);
-    console.log(`   - Viento a 10m:             ${data.actual.viento_km_h ?? 'Sin dato'} km/h`);
+    console.log(`   - Humedad relativa:         ${data.actual.humedad_pct ?? 'Sin dato'} %`);
+    console.log(`   - Viento a 10m:             ${data.actual.viento_kmh ?? 'Sin dato'} km/h`);
     console.log('='.repeat(70));
     console.log('Diagnóstico finalizado exitosamente (Código 0).');
   } catch (error) {

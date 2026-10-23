@@ -14,6 +14,7 @@
 - **Macrodistrito:** Cotahuma, Municipio de Nuestra Señora de La Paz.
 - **Ámbito espacial piloto:** Corredor Bajo Llojeta a lo largo del eje del río Pasajahuira y la Avenida Los Sargentos, zona de alta susceptibilidad a eventos hidrometeorológicos y movimientos en masa.
 - **Verificación cartográfica:** Coordenadas contrastadas sobre la cartografía base de OpenStreetMap, ubicadas dentro del polígono residencial del sector piloto.
+- **Acceso centralizado:** Gestionado mediante la función pura `obtenerConfigZonaPiloto()` en [`/server/src/config/zonaPiloto.js`](file:///home/joel/Documentos/Taller/Proyecto/PUKARA/server/src/config/zonaPiloto.js).
 
 ### 1.2 Resolución Espacial y Celda del Modelo Numérico
 En la ejecución en vivo contra la API de Open-Meteo (`https://api.open-meteo.com/v1/forecast`), el servicio devolvió los siguientes metadatos de malla:
@@ -42,20 +43,20 @@ Ambos parámetros empíricos quedan formalmente ratificados para las validacione
 A continuación se registra la muestra capturada en tiempo real durante la sesión:
 
 - **Endpoint consultado:**  
-  `https://api.open-meteo.com/v1/forecast?latitude=-16.5235&longitude=-68.1425&current=precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=precipitation&past_days=4&timezone=UTC`
-- **Latencia de respuesta de red:** `2717 ms` (dentro del umbral seguro configurado de `timeoutMs = 8000 ms`).
-- **Timestamp de observación (`observado_en` UTC):** `2026-10-23T23:00:00.000Z`
-- **Timestamp local en La Paz (`America/La_Paz` UTC-4):** `23/10/2026, 19:00:00 (BOT)`
+  `https://api.open-meteo.com/v1/forecast?latitude=-16.5235&longitude=-68.1425&current=precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=precipitation&past_days=4&forecast_days=1&timezone=UTC`
+- **Latencia de respuesta de red:** `1346 ms - 3741 ms` (dentro del umbral seguro configurado de `timeoutMs = 8000 ms`).
+- **Timestamp de observación (`observado_en` UTC):** `2026-10-23T23:30:00.000Z`
+- **Timestamp local en La Paz (`America/La_Paz` UTC-4):** `23/10/2026, 19:30:00 (BOT)`
 - **Variables Meteorológicas Actuales en Llojeta:**
-  - **Precipitación actual instantánea:** `0.0 mm`
-  - **Temperatura a 2 metros:** `9.5 °C`
-  - **Humedad relativa:** `82 %`
-  - **Velocidad del viento a 10 metros:** `2.8 km/h`
+  - **Precipitación actual instantánea:** `0.1 mm`
+  - **Temperatura a 2 metros:** `9.4 °C`
+  - **Humedad relativa:** `85 %`
+  - **Velocidad del viento a 10 metros:** `1.5 km/h`
 - **Estructura de la Serie Horaria:**
-  - **Total de pasos horarios recibidos:** `264 horas` (ventana histórica de 4 días pasados + día en curso + pronóstico extendido).
-  - **Valores no nulos:** `264`
+  - **Total de pasos horarios recibidos:** `120 horas` (ventana histórica de 4 días pasados + día en curso con `forecast_days=1`).
+  - **Valores no nulos:** `120`
   - **Valores nulos en serie:** `0` (procesados bajo la regla estricta de preservación de `null` sin sustitución por `0`).
-  - **Precipitación acumulada total en la serie analizada:** `64.80 mm`
+  - **Precipitación acumulada total en la serie analizada:** `18.80 mm`
 
 ---
 

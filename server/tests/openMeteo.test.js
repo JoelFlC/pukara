@@ -2,10 +2,27 @@ import { describe, it, expect } from 'vitest';
 import {
   OpenMeteoError,
   construirUrlOpenMeteo,
+  normalizarMarcaIsoUtc,
   normalizarFechaIsoUtc,
   validarYNormalizarRespuesta,
   consultarOpenMeteo,
 } from '../src/services/openMeteo.js';
+import { obtenerConfigZonaPiloto } from '../src/config/zonaPiloto.js';
+
+describe('Servicio Open-Meteo: Configuración de Zona Piloto', () => {
+  it('debe retornar la configuración de Llojeta con números finitos y dentro de rango geográfico', () => {
+    const config = obtenerConfigZonaPiloto();
+    expect(config.nombre).toBe(
+      'Sector Llojeta / Bajo Llojeta (Macrodistrito Cotahuma, La Paz)'
+    );
+    expect(config.latitud).toBe(-16.5235);
+    expect(config.longitud).toBe(-68.1425);
+    expect(config.latitud).toBeGreaterThanOrEqual(-90);
+    expect(config.latitud).toBeLessThanOrEqual(90);
+    expect(config.longitud).toBeGreaterThanOrEqual(-180);
+    expect(config.longitud).toBeLessThanOrEqual(180);
+  });
+});
 
 describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
   it('1. Construcción correcta de URL con coordenadas y parámetros canónicos', () => {
@@ -17,6 +34,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     expect(url.searchParams.get('latitude')).toBe('-16.5235');
     expect(url.searchParams.get('longitude')).toBe('-68.1425');
     expect(url.searchParams.get('past_days')).toBe('4');
+    expect(url.searchParams.get('forecast_days')).toBe('1');
     expect(url.searchParams.get('timezone')).toBe('UTC');
     expect(url.searchParams.get('current')).toBe(
       'precipitation,temperature_2m,relative_humidity_2m,wind_speed_10m'
@@ -43,19 +61,26 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       },
     };
 
-    const normalizado = validarYNormalizarRespuesta(mockJson);
+    const normalizado = validarYNormalizarRespuesta(mockJson, {
+      latitud: -16.5235,
+      longitud: -68.1425,
+    });
 
-    expect(normalizado.fuente).toBe('open-meteo');
+    expect(normalizado.fuente).toBe('Open-Meteo');
     expect(normalizado.observado_en).toBe('2026-10-23T22:30:00.000Z');
     expect(normalizado.intervalo_actual_segundos).toBe(900);
+    expect(normalizado.coordenada_consultada.latitud).toBe(-16.5235);
+    expect(normalizado.coordenada_consultada.longitud).toBe(-68.1425);
     expect(normalizado.coordenada_modelo.latitud).toBe(-16.52);
     expect(normalizado.coordenada_modelo.longitud).toBe(-68.14);
-    expect(normalizado.elevacion_m).toBe(3650);
+    expect(normalizado.coordenada_modelo.elevacion_m).toBe(3650);
     expect(normalizado.actual.precipitacion_mm).toBe(1.5);
     expect(normalizado.actual.temperatura_c).toBe(13.2);
+    expect(normalizado.actual.humedad_pct).toBe(78);
+    expect(normalizado.actual.viento_kmh).toBe(10.4);
 
     // CRÍTICO: El índice 1 debe preservar estrictamente null y NO convertirse en 0
-    expect(normalizado.serie_horaria.total_horas).toBe(3);
+    expect(normalizado.serie_horaria.precipitacion_mm.length).toBe(3);
     expect(normalizado.serie_horaria.precipitacion_mm[0]).toBe(0.0);
     expect(normalizado.serie_horaria.precipitacion_mm[1]).toBeNull();
     expect(normalizado.serie_horaria.precipitacion_mm[2]).toBe(2.4);
@@ -63,7 +88,6 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
   });
 
   it('3. Control de Timeout con AbortController: arroja OpenMeteoError con código TIMEOUT', async () => {
-    // Mock de fetch que respeta signal pero tarda más que el timeout configurado
     const fetchLento = (url, { signal }) =>
       new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
@@ -96,7 +120,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(OpenMeteoError);
       expect(err.codigo).toBe('TIMEOUT');
-      expect(err.detalles.timeoutMs).toBe(30);
+      expect(err.causaOriginal).toBeDefined();
     }
   });
 
@@ -134,8 +158,23 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     }
   });
 
-  it('5. Control de Respuestas Corruptas: valida payloads anómalos con código RESPUESTA_CORRUPTA', () => {
-    // 5.1 JSON sin bloque hourly
+  it('5. Control de Fallos de Red: arroja OpenMeteoError con código RED_ERROR', async () => {
+    const fetchFallaRed = async () => {
+      throw new TypeError('Failed to fetch (DNS o conexión caída)');
+    };
+
+    try {
+      await consultarOpenMeteo({ fetchImpl: fetchFallaRed });
+      expect.fail('Debió arrojar error de red');
+    } catch (err) {
+      expect(err).toBeInstanceOf(OpenMeteoError);
+      expect(err.codigo).toBe('RED_ERROR');
+      expect(err.causaOriginal).toBeDefined();
+    }
+  });
+
+  it('6. Control de Respuestas Corruptas: valida payloads anómalos con código RESPUESTA_CORRUPTA', () => {
+    // 6.1 JSON sin bloque hourly
     const sinHourly = {
       current: { time: '2026-10-23T22:30', interval: 900 },
     };
@@ -146,7 +185,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
 
-    // 5.2 Arreglos hourly.time y hourly.precipitation de distinta longitud
+    // 6.2 Arreglos hourly.time y hourly.precipitation de distinta longitud
     const longitudDispar = {
       current: { time: '2026-10-23T22:30', interval: 900 },
       hourly: {
@@ -161,7 +200,7 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
 
-    // 5.3 current.time con fecha inválida
+    // 6.3 current.time con fecha inválida
     const fechaInvalida = {
       current: { time: 'cadena-no-fecha', interval: 900 },
       hourly: {
@@ -175,5 +214,30 @@ describe('Servicio Open-Meteo: Construcción de URL y Normalización', () => {
     } catch (err) {
       expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
     }
+
+    // 6.4 Valores no numéricos en hourly.precipitation (string 'invalido')
+    const valorNoNumerico = {
+      current: { time: '2026-10-23T22:30', interval: 900 },
+      hourly: {
+        time: ['2026-10-23T21:00'],
+        precipitation: ['no-es-numero'],
+      },
+    };
+    expect(() => validarYNormalizarRespuesta(valorNoNumerico)).toThrowError(OpenMeteoError);
+    try {
+      validarYNormalizarRespuesta(valorNoNumerico);
+    } catch (err) {
+      expect(err.codigo).toBe('RESPUESTA_CORRUPTA');
+    }
+  });
+
+  it('7. Helper normalizarMarcaIsoUtc: formatea ISO UTC o arroja RESPUESTA_CORRUPTA', () => {
+    expect(normalizarMarcaIsoUtc('2026-10-23T22:45')).toBe('2026-10-23T22:45:00.000Z');
+    expect(normalizarMarcaIsoUtc('2026-10-23T22:45Z')).toBe('2026-10-23T22:45:00.000Z');
+    expect(normalizarFechaIsoUtc('2026-10-23T22:00')).toBe('2026-10-23T22:00:00.000Z');
+
+    expect(() => normalizarMarcaIsoUtc('')).toThrowError(OpenMeteoError);
+    expect(() => normalizarMarcaIsoUtc(null)).toThrowError(OpenMeteoError);
+    expect(() => normalizarMarcaIsoUtc('invalido')).toThrowError(OpenMeteoError);
   });
 });
