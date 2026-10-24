@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { pool } from './pool.js';
+import { seedCapas } from './seedCapas.js';
 
 dotenv.config();
 
@@ -173,6 +174,9 @@ export async function seed() {
     } else {
       console.log(`[SEED] - Registro de auditoría en bitácora de cambios ya presente`);
     }
+
+    // 6. Capas y Puntos de Referencia Semilla
+    await seedCapas(client);
 
     await client.query('COMMIT');
     console.log('[SEED] Proceso de datos semilla completado exitosamente.');
