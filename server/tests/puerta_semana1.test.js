@@ -71,16 +71,19 @@ function removerComentarios(codigo) {
 describe('PUERTA DE CALIDAD SEMANA 1 (S1D7 - Fase B)', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 

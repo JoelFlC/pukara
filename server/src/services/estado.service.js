@@ -1,49 +1,135 @@
 /**
  * @file estado.service.js
- * @description Servicio que consolida el estado público integral (v1) del sistema PUKARA:
- * última lectura meteorológica, calidad de datos, metadatos de zona piloto, capas y puntos
- * de referencia cartográfica de demostración, recomendaciones y contactos de emergencia.
+ * @description Servicio que consolida el estado público integral del sistema PUKARA:
+ * orquestación del motor de reglas, lectura meteorológica, calidad de datos,
+ * metadatos de zona piloto, capas y puntos de referencia de demostración,
+ * recomendaciones preventivas y contactos de emergencia.
  */
 
 import { pool } from '../db/pool.js';
 import { obtenerConfigZonaPiloto } from '../config/zonaPiloto.js';
-import { consultarYRegistrarLecturaReal } from './lecturas.service.js';
+import {
+  consultarYRegistrarLecturaReal,
+  obtenerUltimaLecturaRegistrada,
+} from './lecturas.service.js';
 import { obtenerConfiguracionVigente } from './configuracion.service.js';
+import {
+  evaluarLecturaConConfiguracionVigente,
+  obtenerHistorialEvaluaciones,
+} from './evaluaciones.service.js';
+import { derivarEstadoAlConsultar } from '../engine/estado.js';
+import { obtenerUltimaEvaluacionPorModalidad } from './simulacion.service.js';
 
 export const AVISO_PERMANENTE_OFICIAL =
   'Los niveles Normal, Precaución, Alerta y Emergencia son niveles informativos de lluvia: niveles meteorológicos simulados, calculados con umbrales académicos. No sustituyen alertas ni instrucciones de las autoridades oficiales. PUKARA muestra información bajo consulta y no avisa activamente a la población. Ante una emergencia, atienda las indicaciones oficiales y contacte a los servicios de emergencia.';
 
+export const BANNER_SIMULACION =
+  'DATOS SIMULADOS DE DEMOSTRACIÓN ACADÉMICA';
+
 /**
- * Obtiene el estado público v1 para la consulta en cliente web/PWA.
+ * Obtiene el estado actual consolidado del sistema para la modalidad especificada ('real' o 'simulada').
  *
  * @param {Object} [opciones]
- * @param {Object} [opciones.db=pool] Cliente o Pool de PostgreSQL
- * @param {Function} [opciones.consultarMeteoFn] Inyección de función de consulta a Open-Meteo
- * @param {Function} [opciones.ahoraFn=() => Date.now()] Inyección de función de reloj
- * @param {boolean} [opciones.forzarConsultaExterna=false]
- * @returns {Promise<Object>} Payload JSON de estado público v1
+ * @param {string} [opciones.modalidad='real'] 'real' o 'simulada'
+ * @param {Date|string|number} [opciones.ahora=new Date()] Marca de tiempo de consulta
+ * @param {Function} [opciones.ahoraFn] Función inyectable de reloj
+ * @param {boolean} [opciones.forzar=false] Forzar consulta externa
+ * @param {boolean} [opciones.forzarConsultaExterna=false] Alias de forzar
+ * @param {Function} [opciones.fetcher] Función inyectable de consulta meteorológica
+ * @param {Function} [opciones.consultarMeteoFn] Alias de fetcher
+ * @param {Object} [opciones.db=pool]
+ * @returns {Promise<Object>} Payload JSON de estado público
  */
-export async function obtenerEstadoPublicoV1(opciones = {}) {
+export async function obtenerEstadoActualSistema(opciones = {}) {
   const {
+    modalidad = 'real',
+    ahora = new Date(),
+    forzar = false,
+    forzarConsultaExterna = forzar,
+    fetcher,
+    consultarMeteoFn = fetcher,
     db = pool,
-    consultarMeteoFn,
-    ahoraFn = () => Date.now(),
-    forzarConsultaExterna = false,
   } = opciones;
+
+  if (modalidad !== 'real' && modalidad !== 'simulada') {
+    const err = new Error(
+      `Modalidad inválida: "${modalidad}". Debe ser "real" o "simulada".`
+    );
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const ahoraFn =
+    opciones.ahoraFn ||
+    (() =>
+      ahora instanceof Date
+        ? ahora.getTime()
+        : typeof ahora === 'number'
+          ? ahora
+          : Date.parse(ahora));
 
   const ahoraMs = ahoraFn();
   const configPiloto = obtenerConfigZonaPiloto();
 
-  // 1. Obtener última lectura meteorológica (con gestión de caché en servidor y resiliencia T5)
-  const resultadoLectura = await consultarYRegistrarLecturaReal({
+  // 1. Obtener configuración vigente
+  const configVigente = await obtenerConfiguracionVigente({ db });
+
+  let lectura = null;
+  let origenRespuesta = 'ninguno';
+  let falloApiReciente = false;
+  let banderasCalidad = null;
+  let resEvaluacion = null;
+
+  if (modalidad === 'real') {
+    // 2. Consulta y registro de lectura real con resiliencia T5
+    const resultadoLectura = await consultarYRegistrarLecturaReal({
+      db,
+      consultarMeteoFn,
+      ahoraFn,
+      forzarConsultaExterna,
+    });
+
+    lectura = resultadoLectura.lectura;
+    origenRespuesta = resultadoLectura.origen_respuesta;
+    falloApiReciente = resultadoLectura.fallo_api;
+    banderasCalidad = resultadoLectura.banderas_calidad;
+
+    // 3. Orquestar evaluación con motor de reglas
+    if (lectura) {
+      resEvaluacion = await evaluarLecturaConConfiguracionVigente(lectura, {
+        db,
+      });
+    }
+  } else {
+    // Modalidad simulada
+    lectura = await obtenerUltimaLecturaRegistrada({
+      modalidad: 'simulada',
+      db,
+    });
+    origenRespuesta = 'simulacion_academica';
+    falloApiReciente = false;
+
+    if (lectura) {
+      resEvaluacion = await evaluarLecturaConConfiguracionVigente(lectura, {
+        db,
+      });
+    }
+  }
+
+  // 4. Obtener última evaluación registrada y derivar estado actual ante T_max (P15 / T6)
+  const ultimaEval = await obtenerUltimaEvaluacionPorModalidad({
+    modalidad,
     db,
-    consultarMeteoFn,
-    ahoraFn,
-    forzarConsultaExterna,
   });
 
-  // 2. Consulta paralela de catálogos, capas geográficas y reglas vigentes en PostgreSQL
-  const [zonasRes, puntosRes, contactosRes, recomendacionesRes, configVigente] =
+  const estadoDerivado = derivarEstadoAlConsultar(ultimaEval, {
+    ahora: new Date(ahoraMs),
+    t_max_minutos: configVigente?.parametros?.t_max_minutos ?? 60,
+    modalidad,
+  });
+
+  // 5. Consulta paralela de capas geográficas, recomendaciones y contactos
+  const [zonasRes, puntosRes, contactosRes, recomendacionesRes] =
     await Promise.all([
       db.query(
         'SELECT id, nombre, geometria, fuente, fecha_dato, vigente_hasta, verificada, advertencia FROM zonas_referencia ORDER BY id ASC;'
@@ -57,10 +143,8 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
       db.query(
         "SELECT id, nivel, titulo, contenido, version, estado_publicacion, origen, fuente FROM recomendaciones_preventivas WHERE estado_publicacion = 'publicado' ORDER BY id ASC;"
       ),
-      obtenerConfiguracionVigente({ db }).catch(() => null),
     ]);
 
-  // Mapeo seguro con números finitos para coordenadas e IDs
   const zonasMapeadas = zonasRes.rows.map((z) => ({
     id: Number(z.id),
     nombre: z.nombre,
@@ -103,12 +187,22 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
     fuente: r.fuente,
   }));
 
-  const tieneLectura = resultadoLectura.lectura !== null;
+  const tieneLectura = lectura !== null;
+  const nivelVigenteActual = estadoDerivado.nivel_vigente;
+  const nivelRecom = nivelVigenteActual || 'NORMAL';
+  const recomendacionesNivelVigente = recomendacionesMapeadas.filter(
+    (r) => r.nivel === nivelRecom
+  );
+
+  const clasificacion = resEvaluacion?.clasificacion || null;
 
   return {
     ok: true,
     version_esquema_api: 'v1',
-    modalidad: 'real',
+    modalidad,
+    es_simulacion: modalidad === 'simulada',
+    banner_simulacion:
+      modalidad === 'simulada' ? BANNER_SIMULACION : null,
     aviso_permanente: AVISO_PERMANENTE_OFICIAL,
     zona_piloto: {
       nombre: configPiloto.nombre,
@@ -118,18 +212,45 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
         'El nivel informativo se calcula con una sola consulta para toda la zona piloto y no varía espacialmente.',
     },
     estado_operativo: tieneLectura ? 'LECTURA_DISPONIBLE_V1' : 'SIN_DATOS',
+    estado_sistema: estadoDerivado.estado_sistema,
+    nivel_vigente: estadoDerivado.nivel_vigente,
+    nivel_calculado:
+      ultimaEval?.nivel_calculado ?? clasificacion?.nivel_calculado ?? null,
+    contador_descenso: estadoDerivado.contador_descenso ?? 0,
+    clasificacion_parcial: Boolean(clasificacion?.clasificacion_parcial),
+    regla_saturacion_aplicada: Boolean(
+      clasificacion?.regla_saturacion_aplicada
+    ),
+    antiguedad_minutos: estadoDerivado.antiguedad_minutos,
+    datos_desactualizados: Boolean(estadoDerivado.datos_desactualizados),
+    t_max_minutos: estadoDerivado.t_max_minutos,
+    version_reglas: {
+      configuracion_id: configVigente?.id ?? 1,
+      version: configVigente?.version ?? 1,
+      estado: configVigente?.estado ?? 'vigente',
+      parametros: configVigente?.parametros ?? {},
+    },
     clasificacion: {
       estado_motor: 'PENDIENTE_MOTOR_SEMANA_2',
-      nivel_vigente: null,
+      nivel_vigente: estadoDerivado.nivel_vigente,
+      nivel_calculado:
+        ultimaEval?.nivel_calculado ?? clasificacion?.nivel_calculado ?? null,
+      contador_descenso: estadoDerivado.contador_descenso ?? 0,
       mensaje:
-        'Vista v1 (Semana 1): motor de clasificación por umbrales e histéresis programado para Semana 2.',
+        'Motor de clasificación por umbrales e histéresis temporal activo en Semana 2.',
     },
+    evaluacion: ultimaEval,
+    lectura,
     meteorologia: {
       disponible: tieneLectura,
-      origen_respuesta: resultadoLectura.origen_respuesta,
-      fallo_api_reciente: resultadoLectura.fallo_api,
-      lectura: resultadoLectura.lectura,
-      banderas_calidad: resultadoLectura.banderas_calidad,
+      origen_respuesta: origenRespuesta,
+      fallo_api_reciente: falloApiReciente,
+      lectura,
+      banderas_calidad: banderasCalidad || {
+        horas_completas_24h: lectura?.horas_validas_24h === 24,
+        horas_completas_72h: lectura?.horas_validas_72h === 72,
+        clasificacion_parcial: Boolean(clasificacion?.clasificacion_parcial),
+      },
       nota_modelo:
         'Datos provenientes de modelo meteorológico (Open-Meteo), no equivalen a mediciones de estación pluviométrica local.',
     },
@@ -138,7 +259,11 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
       zonas: zonasMapeadas,
       puntos: puntosMapeados,
     },
+    puntos_referencia: puntosMapeados,
+    zonas_referencia: zonasMapeadas,
+    recomendaciones: recomendacionesMapeadas,
     recomendaciones_publicadas: recomendacionesMapeadas,
+    recomendaciones_nivel_vigente: recomendacionesNivelVigente,
     contactos_emergencia: contactosMapeados,
     parametros_vigentes_resumen: {
       version_reglas: configVigente?.version ?? 1,
@@ -150,7 +275,19 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
   };
 }
 
+/**
+ * Función pública retrocompatible v1 para consulta en cliente web/PWA.
+ *
+ * @param {Object} [opciones]
+ * @returns {Promise<Object>}
+ */
+export async function obtenerEstadoPublicoV1(opciones = {}) {
+  return obtenerEstadoActualSistema(opciones);
+}
+
 export default {
   AVISO_PERMANENTE_OFICIAL,
+  BANNER_SIMULACION,
+  obtenerEstadoActualSistema,
   obtenerEstadoPublicoV1,
 };

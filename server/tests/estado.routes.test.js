@@ -56,16 +56,19 @@ describe('Rutas HTTP: GET /api/estado (v1)', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
     vi.clearAllMocks();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 

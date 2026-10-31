@@ -51,16 +51,19 @@ function crearRespuestaMeteoMock({
 describe('Servicio de Lecturas Meteorológicas: Caché, Persistencia y Resiliencia (lecturas.service.js)', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 

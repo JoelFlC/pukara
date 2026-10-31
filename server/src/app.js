@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { saludRouter } from './routes/salud.routes.js';
 import { estadoRouter } from './routes/estado.routes.js';
+import { historialRouter } from './routes/historial.routes.js';
+import { simulacionRouter } from './routes/simulacion.routes.js';
 
 dotenv.config();
 
@@ -56,19 +58,30 @@ app.use(express.json());
 // Montaje de rutas
 app.use('/api/salud', saludRouter);
 app.use('/api/estado', estadoRouter);
+app.use('/api/historial', historialRouter);
+app.use('/api/simulacion', simulacionRouter);
 
 // Manejador para rutas no encontradas
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Manejador global de errores (captura limpia de rechazo CORS y HTTP 500 para fallas imprevistas)
+// Manejador global de errores (captura limpia de rechazo CORS y errores con statusCode)
 app.use((err, req, res, next) => {
   if (err && err.message && err.message.includes('CORS')) {
     return res.status(403).json({ error: 'Origen no permitido por política CORS' });
   }
-  console.error('Error no controlado en la API:', err.message);
-  res.status(500).json({ error: 'Error interno del servidor' });
+
+  const status = err.statusCode || err.status || 500;
+  if (status >= 500) {
+    console.error('Error no controlado en la API:', err.message);
+    return res.status(status).json({ error: 'Error interno del servidor' });
+  }
+
+  res.status(status).json({
+    error: err.message,
+    detalles: err.detalles || undefined,
+  });
 });
 
 export default app;
