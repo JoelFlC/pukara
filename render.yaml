@@ -1,0 +1,36 @@
+# Blueprint de Infraestructura como Código (IaC) para Render
+# Proyecto PUKARA — Backend Monolito en Capas (Sector Llojeta, La Paz)
+# Despliegue de servicio web pukara-api conectable a Neon / Supabase
+
+services:
+  - type: web
+    name: pukara-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_SSL
+        value: "true"
+      - key: CORS_ORIGIN
+        value: "http://localhost:5173,https://pukara.vercel.app"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: LLOJETA_LAT
+        value: "-16.5235"
+      - key: LLOJETA_LON
+        value: "-68.1425"
+      - key: LECTURAS_CACHE_TTL_MINUTOS
+        value: "12"
+      - key: OPEN_METEO_BASE_URL
+        value: "https://api.open-meteo.com/v1/forecast"
+      - key: OPEN_METEO_TIMEOUT_MS
+        value: "8000"
+      - key: OPEN_METEO_TIMEZONE
+        value: "UTC"

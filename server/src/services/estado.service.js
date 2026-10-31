@@ -8,6 +8,7 @@
 import { pool } from '../db/pool.js';
 import { obtenerConfigZonaPiloto } from '../config/zonaPiloto.js';
 import { consultarYRegistrarLecturaReal } from './lecturas.service.js';
+import { obtenerConfiguracionVigente } from './configuracion.service.js';
 
 export const AVISO_PERMANENTE_OFICIAL =
   'Los niveles Normal, Precaución, Alerta y Emergencia son niveles informativos de lluvia: niveles meteorológicos simulados, calculados con umbrales académicos. No sustituyen alertas ni instrucciones de las autoridades oficiales. PUKARA muestra información bajo consulta y no avisa activamente a la población. Ante una emergencia, atienda las indicaciones oficiales y contacte a los servicios de emergencia.';
@@ -41,8 +42,8 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
     forzarConsultaExterna,
   });
 
-  // 2. Consulta paralela de catálogos y capas geográficas en PostgreSQL
-  const [zonasRes, puntosRes, contactosRes, recomendacionesRes] =
+  // 2. Consulta paralela de catálogos, capas geográficas y reglas vigentes en PostgreSQL
+  const [zonasRes, puntosRes, contactosRes, recomendacionesRes, configVigente] =
     await Promise.all([
       db.query(
         'SELECT id, nombre, geometria, fuente, fecha_dato, vigente_hasta, verificada, advertencia FROM zonas_referencia ORDER BY id ASC;'
@@ -56,6 +57,7 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
       db.query(
         "SELECT id, nivel, titulo, contenido, version, estado_publicacion, origen, fuente FROM recomendaciones_preventivas WHERE estado_publicacion = 'publicado' ORDER BY id ASC;"
       ),
+      obtenerConfiguracionVigente({ db }).catch(() => null),
     ]);
 
   // Mapeo seguro con números finitos para coordenadas e IDs
@@ -138,6 +140,12 @@ export async function obtenerEstadoPublicoV1(opciones = {}) {
     },
     recomendaciones_publicadas: recomendacionesMapeadas,
     contactos_emergencia: contactosMapeados,
+    parametros_vigentes_resumen: {
+      version_reglas: configVigente?.version ?? 1,
+      t_max_minutos: configVigente?.parametros?.t_max_minutos ?? 60,
+      separacion_minima_minutos:
+        configVigente?.parametros?.separacion_minima_minutos ?? 15,
+    },
     consultado_en: new Date(ahoraMs).toISOString(),
   };
 }

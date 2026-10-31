@@ -51,26 +51,17 @@ function crearRespuestaMeteoMock({
 describe('Servicio de Lecturas Meteorológicas: Caché, Persistencia y Resiliencia (lecturas.service.js)', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
-    await pool.end();
+    limpiarCacheLecturas();
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   it('1. Persistencia inicial con observado_en de la fuente (no hora del servidor)', async () => {

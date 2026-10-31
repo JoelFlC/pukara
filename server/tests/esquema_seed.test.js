@@ -1,10 +1,7 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { pool } from '../src/db/pool.js';
 
 describe('Modelo de Datos, Esquema y Datos Semilla (S1D2)', () => {
-  afterAll(async () => {
-    await pool.end();
-  });
 
   const TABLAS_OBLIGATORIAS = [
     'usuarios',

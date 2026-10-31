@@ -9,6 +9,7 @@ Este documento define las directrices inmutables y de obligado cumplimiento para
 - **Backend (`/server`):** Node.js en modo ESM (`"type": "module"`), Express, PostgreSQL nativo mediante `pg` (Pool).
   - **PROHIBICIÓN ESTRICTA:** Prohibido el uso de ORMs (como Prisma o TypeORM) y de PostGIS. La geometría GeoJSON se gestiona exclusivamente como `JSONB` nativo.
   - Autenticación administrativa con JWT y hashing de contraseñas con `bcrypt`.
+  - **Nota Operativa de Entorno:** PostgreSQL local corre en Docker bajo el contenedor `pukara-postgres` (`docker start pukara-postgres`).
 - **Estructura Backend Obligatoria:**
   `/server/src/{routes, services, engine, db, middleware}` y `/server/tests`.
 - **Testing Automatizado:** Vitest + Supertest en `/server/tests/`. Cobertura y pruebas en verde obligatorias.

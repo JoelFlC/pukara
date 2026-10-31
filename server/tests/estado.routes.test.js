@@ -56,26 +56,17 @@ describe('Rutas HTTP: GET /api/estado (v1)', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
     vi.clearAllMocks();
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
-    await pool.query(
-      'DELETE FROM lecturas_meteorologicas WHERE observado_en >= $1 AND observado_en < $2',
-      [RANGO_PRUEBA_INICIO, RANGO_PRUEBA_FIN]
-    );
-    await pool.end();
+    limpiarCacheLecturas();
+    await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   it('1. Debe ejecutar seedCapas() dos veces y mantener exactamente 2 zonas y 6 puntos sin duplicados', async () => {
