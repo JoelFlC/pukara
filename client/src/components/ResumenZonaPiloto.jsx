@@ -6,7 +6,7 @@ import React from 'react';
  * de puntos de referencia cartográfica de orientación urbana.
  *
  * REGLAS SEMÁNTICAS ESTRICTAS:
- * - NO contiene botones de "Cómo llegar" ni enlaces a Google Maps/Waze.
+ * - Prohibición estricta de botones de navegación asistida ni enlaces externos a servicios cartográficos.
  * - Todos los puntos se rotulan como "referencia de demostración, no validada".
  */
 export default function ResumenZonaPiloto({ zonaPiloto, capasReferencia }) {
