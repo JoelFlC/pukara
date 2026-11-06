@@ -342,3 +342,4 @@ describe('Semana 2 - Día 6 (Fase B): Pruebas de Renderizado del Esqueleto E2E (
     expect(html).toContain('14.5');
   });
 });
+
