@@ -132,6 +132,7 @@ describe('Semana 2 - Día 5 (Fase B): Pruebas de Integración de Orquestación y
     expect(res.body.nivel_vigente).toBe('ALERTA');
     expect(res.body.estado_sistema).toBe('ALERTA');
     expect(res.body.contador_descenso).toBe(0);
+    expect(res.body.regla_saturacion_aplicada).toBe(true);
     expect(res.body.version_reglas.version).toBe(1);
     expect(res.body.datos_desactualizados).toBe(false);
 
