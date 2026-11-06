@@ -189,3 +189,4 @@ Antes de dar por concluido cualquier despliegue, verifica que la interfaz web:
 - **NO** contenga las frases prohibidas: `"alerta oficial"`, `"orden de evacuación"`, `"evacuar"`, `"ruta segura"`, `"zona segura"`, ni botones `"Cómo llegar"`.
 - Mantenga el **Aviso Permanente Oficial** visible en todo momento.
 - Muestre los polígonos y puntos cartográficos con la leyenda obligatoria: *"referencia de demostración, no validada"*.
+

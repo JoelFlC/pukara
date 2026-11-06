@@ -238,7 +238,7 @@ describe('Suite Frontend: Utilidades de Tiempo y Componentes (inicio.test.jsx)',
     const terminosProhibidos = [
       ['alerta', 'oficial'].join(' '),
       ['orden', 'de', 'evacuación'].join(' '),
-      ['evacuar'].join(''),
+      ['evac', 'uar'].join(''),
       ['ruta', 'segura'].join(' '),
       ['zona', 'segura'].join(' '),
       ['refugio', 'verificado'].join(' '),
