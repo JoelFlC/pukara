@@ -42,6 +42,11 @@ app.use(
         return callback(null, true);
       }
 
+      // Permite comodín '*' para entornos de desarrollo/pruebas públicas si está configurado
+      if (origenesPermitidos.includes('*')) {
+        return callback(null, true);
+      }
+
       const origenNormalizado = origin.trim().replace(/\/+$/, '');
       if (origenesPermitidos.includes(origenNormalizado)) {
         return callback(null, true);
