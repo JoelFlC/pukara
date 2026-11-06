@@ -38,16 +38,19 @@ vi.mock('../src/services/openMeteo.js', async (importOriginal) => {
 describe('S1D7 - Fase A: Parámetros y Preparación Cloud / Pre-Despliegue', () => {
   beforeEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterEach(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
   afterAll(async () => {
     limpiarCacheLecturas();
+    await pool.query('DELETE FROM evaluaciones_nivel;');
     await pool.query('DELETE FROM lecturas_meteorologicas;');
   });
 
