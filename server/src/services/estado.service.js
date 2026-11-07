@@ -218,8 +218,21 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
       nombre: configPiloto.nombre,
       latitud_central: configPiloto.latitud,
       longitud_central: configPiloto.longitud,
+      latitud: configPiloto.latitud,
+      longitud: configPiloto.longitud,
       nota_alcance:
         'El nivel informativo se calcula con una sola consulta para toda la zona piloto y no varía espacialmente.',
+    },
+    zonaPiloto: {
+      nombre: configPiloto.nombre,
+      latitud: configPiloto.latitud,
+      longitud: configPiloto.longitud,
+      latitud_central: configPiloto.latitud,
+      longitud_central: configPiloto.longitud,
+    },
+    coordenada_central: {
+      latitud: configPiloto.latitud,
+      longitud: configPiloto.longitud,
     },
     estado_operativo: tieneLectura ? 'LECTURA_DISPONIBLE_V1' : 'SIN_DATOS',
     estado_sistema: estadoDerivado.estado_sistema,
