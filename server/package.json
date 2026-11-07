@@ -14,6 +14,7 @@
     "db:reset": "node src/db/migrate.js --reset",
     "db:seed": "node src/db/seed.js",
     "db:seed:capas": "node src/db/seedCapas.js",
+    "seed:admin": "node src/db/seedAdmin.js",
     "meteo:inspeccionar": "node src/scripts/inspeccionarOpenMeteo.js",
     "cloud:verificar": "node src/scripts/verificarDespliegue.js"
   },
@@ -25,6 +26,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.13.1"
   },
   "devDependencies": {

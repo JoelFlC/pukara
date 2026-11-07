@@ -5,6 +5,8 @@ import { saludRouter } from './routes/salud.routes.js';
 import { estadoRouter } from './routes/estado.routes.js';
 import { historialRouter } from './routes/historial.routes.js';
 import { simulacionRouter } from './routes/simulacion.routes.js';
+import { authRouter } from './routes/auth.routes.js';
+import { adminRouter } from './routes/admin.routes.js';
 
 dotenv.config();
 
@@ -32,7 +34,17 @@ export function parsearOrigenesCors(valorCorsOrigin) {
   return origenes.length > 0 ? origenes : ['http://localhost:5173'];
 }
 
-const origenesPermitidos = parsearOrigenesCors(process.env.CORS_ORIGIN);
+const origenesPermitidos = parsearOrigenesCors(
+  process.env.CORS_ORIGINS || process.env.CORS_ORIGIN
+);
+
+// Cabeceras de seguridad básicas
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
 
 app.use(
   cors({
@@ -65,6 +77,8 @@ app.use('/api/salud', saludRouter);
 app.use('/api/estado', estadoRouter);
 app.use('/api/historial', historialRouter);
 app.use('/api/simulacion', simulacionRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/admin', adminRouter);
 
 // Manejador para rutas no encontradas
 app.use((req, res) => {
