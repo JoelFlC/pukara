@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   obtenerEstadoSistema,
@@ -9,15 +9,17 @@ import {
 import AvisoPermanente from '../components/AvisoPermanente';
 import BannerModoSimulacion from '../components/BannerModoSimulacion';
 import BannerNivelInformativo from '../components/BannerNivelInformativo';
-import RecomendacionesNivelVigente from '../components/RecomendacionesNivelVigente';
+import AvisoCambioNivelInApp from '../components/AvisoCambioNivelInApp';
+import SeccionRecomendaciones from '../components/SeccionRecomendaciones';
+import SeccionContactosEmergencia from '../components/SeccionContactosEmergencia';
 import TarjetaLecturaMeteorologica from '../components/TarjetaLecturaMeteorologica';
 import HistorialEvaluaciones from '../components/HistorialEvaluaciones';
 import ResumenZonaPiloto from '../components/ResumenZonaPiloto';
 
 /**
- * Página principal mobile-first de PUKARA (Semana 2 - Día 6).
- * Conecta con GET /api/estado, GET /api/historial y permite la conmutación
- * e inyección de escenarios en modo simulación (Prueba P11) manteniendo aislamiento total.
+ * Página principal mobile-first de PUKARA (Semana 3 - Día 3).
+ * Conecta con GET /api/estado, GET /api/historial, gestiona el aviso visual in-app (P06)
+ * y expone recomendaciones preventivas y contactos de auxilio ciudadano en La Paz.
  */
 export default function InicioPage() {
   const [modalidad, setModalidad] = useState('real');
@@ -28,6 +30,11 @@ export default function InicioPage() {
   const [errorConexion, setErrorConexion] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
+
+  // Estado para el aviso visual in-app de cambio de nivel (P06)
+  const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
+  const ultimoNivelRef = useRef({ real: null, simulada: null });
+  const inicializadoRef = useRef({ real: false, simulada: false });
 
   /**
    * Carga el estado general del sistema y el historial de evaluaciones para la modalidad activa.
@@ -47,6 +54,33 @@ export default function InicioPage() {
             }
           ),
         ]);
+
+        // Detección de cambio de nivel informativo in-app (Requisito P06)
+        if (dataEstado && dataEstado.nivel_vigente) {
+          const nuevoNivel = dataEstado.nivel_vigente;
+          const fueInicializado = inicializadoRef.current[modActual];
+          const nivelPrevio = ultimoNivelRef.current[modActual];
+
+          if (!fueInicializado) {
+            // Primera carga: registrar referencia base sin disparar alerta
+            inicializadoRef.current[modActual] = true;
+            ultimoNivelRef.current[modActual] = nuevoNivel;
+          } else if (nivelPrevio && nivelPrevio !== nuevoNivel) {
+            // Cambio posterior detectado en la misma modalidad: disparar aviso P06
+            setCambioNivelDetectado({
+              nivelAnterior: nivelPrevio,
+              nivelNuevo: nuevoNivel,
+              modalidad: modActual,
+              detectadoEn: new Date().toISOString(),
+              recomendacion:
+                dataEstado.recomendacion ||
+                dataEstado.recomendacion_vigente ||
+                dataEstado.recomendaciones_nivel_vigente?.[0] ||
+                null,
+            });
+            ultimoNivelRef.current[modActual] = nuevoNivel;
+          }
+        }
 
         setEstado(dataEstado);
         setHistorial(dataHistorial);
@@ -191,6 +225,12 @@ export default function InicioPage() {
           cargando={cargando || cargandoAccion}
         />
 
+        {/* 4. Aviso Visual In-App de Cambio de Nivel Informativo (Requisito P06) */}
+        <AvisoCambioNivelInApp
+          cambioNivel={cambioNivelDetectado}
+          onCerrar={() => setCambioNivelDetectado(null)}
+        />
+
         {/* Feedback de Éxito / Alertas temporales */}
         {mensajeExito && (
           <div
@@ -222,19 +262,23 @@ export default function InicioPage() {
           </div>
         )}
 
-        {/* 4. Banner Global del Nivel Informativo y Estado del Sistema (P06, P15) */}
+        {/* 5. Banner Global del Nivel Informativo y Estado del Sistema (P06, P15) */}
         <BannerNivelInformativo estado={estado} />
 
-        {/* 5. Recomendaciones Preventivas Generales del Nivel Vigente */}
-        <RecomendacionesNivelVigente
-          recomendaciones={estado?.recomendaciones_nivel_vigente}
+        {/* 6. Sección Integral de Recomendaciones Preventivas Generales (Módulo 3) */}
+        <SeccionRecomendaciones
           nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+          estadoSistema={estado?.estado_sistema || 'NORMAL'}
+          recomendacionVigente={estado?.recomendacion || estado?.recomendacion_vigente}
+          recomendacionesPublicadas={
+            estado?.recomendaciones_publicadas || estado?.recomendaciones || []
+          }
         />
 
-        {/* 6. Tarjeta de Variables Pluviométricas y Complementarias */}
+        {/* 7. Tarjeta de Variables Pluviométricas y Complementarias */}
         <TarjetaLecturaMeteorologica meteorologia={estado?.meteorologia} />
 
-        {/* 7. Historial Reciente de Evaluaciones del Motor */}
+        {/* 8. Historial Reciente de Evaluaciones del Motor */}
         <HistorialEvaluaciones
           items={historial?.items}
           total={historial?.total}
@@ -243,51 +287,16 @@ export default function InicioPage() {
           cargando={cargando}
         />
 
-        {/* 8. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}
+        {/* 9. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}
         <ResumenZonaPiloto
           zonaPiloto={estado?.zona_piloto}
           capasReferencia={estado?.capas_referencia}
         />
 
-        {/* 9. Contactos de Emergencia y Auxilio Ciudadano en La Paz */}
-        {estado?.contactos_emergencia && estado.contactos_emergencia.length > 0 && (
-          <section
-            aria-label="Contactos de emergencia"
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3"
-          >
-            <div className="space-y-1 border-b border-slate-100 pb-2.5">
-              <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-                Servicios de Emergencia y Auxilio
-              </span>
-              <h2 className="text-sm font-bold text-slate-900">
-                Contactos Rápidos para La Paz / Cotahuma
-              </h2>
-            </div>
-            <ul className="divide-y divide-slate-100 text-xs">
-              {estado.contactos_emergencia.map((c) => (
-                <li
-                  key={c.id}
-                  className="py-2.5 flex items-center justify-between gap-3"
-                >
-                  <div>
-                    <p className="font-semibold text-slate-800">{c.nombre}</p>
-                    <p className="text-[11px] text-slate-400 font-mono">
-                      Fuente: {c.fuente || 'Institucional'}
-                    </p>
-                  </div>
-                  <a
-                    href={`tel:${c.telefono}`}
-                    className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono font-bold text-xs inline-flex items-center gap-1.5 transition-colors shadow-xs shrink-0"
-                    title={`Llamar a ${c.nombre}`}
-                  >
-                    <span aria-hidden="true">📞</span>
-                    <span>{c.telefono}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+        {/* 10. Sección de Contactos de Emergencia y Auxilio Ciudadano (Módulo 3) */}
+        <SeccionContactosEmergencia
+          contactos={estado?.contactos_emergencia || estado?.contactos || []}
+        />
       </main>
     </div>
   );
