@@ -131,21 +131,31 @@ export const CONTACTOS_SEMILLA = [
   {
     nombre: 'Red 114 — Emergencias GAMLP (Alcaldía La Paz)',
     telefono: '114',
-    fuente: 'Gobierno Autónomo Municipal de La Paz',
+    fuente:
+      'Gobierno Autónomo Municipal de La Paz [Verificar con fuente oficial]',
     verificado_en: '2026-10-23',
     activo: true,
   },
   {
     nombre: 'Dirección Departamental de Bomberos (La Paz)',
     telefono: '119',
-    fuente: 'Policía Boliviana - Bomberos Antofagasta',
+    fuente:
+      'Policía Boliviana - Bomberos Antofagasta [Verificar con fuente oficial]',
     verificado_en: '2026-10-23',
     activo: true,
   },
   {
     nombre: 'Radio Patrulla 110 (Policía Boliviana)',
     telefono: '110',
-    fuente: 'Policía Boliviana',
+    fuente: 'Policía Boliviana [Verificar con fuente oficial]',
+    verificado_en: '2026-10-23',
+    activo: true,
+  },
+  {
+    nombre: 'Defensa Civil — Viceministerio de Defensa Civil (VIDECI)',
+    telefono: '115',
+    fuente:
+      'Viceministerio de Defensa Civil [Verificar con fuente oficial]',
     verificado_en: '2026-10-23',
     activo: true,
   },

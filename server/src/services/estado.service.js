@@ -141,7 +141,7 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
         'SELECT id, nombre, telefono, fuente, verificado_en, activo FROM contactos_emergencia WHERE activo = true ORDER BY id ASC;'
       ),
       db.query(
-        "SELECT id, nivel, titulo, contenido, version, estado_publicacion, origen, fuente FROM recomendaciones_preventivas WHERE estado_publicacion = 'publicado' ORDER BY id ASC;"
+        "SELECT id, nivel, titulo, contenido, version, estado_publicacion, origen, fuente, actualizado_en FROM recomendaciones_preventivas WHERE estado_publicacion = 'publicado' ORDER BY id ASC;"
       ),
     ]);
 
@@ -176,16 +176,25 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
     activo: c.activo,
   }));
 
-  const recomendacionesMapeadas = recomendacionesRes.rows.map((r) => ({
-    id: Number(r.id),
-    nivel: r.nivel,
-    titulo: r.titulo,
-    contenido: r.contenido,
-    version: Number(r.version),
-    estado_publicacion: r.estado_publicacion,
-    origen: r.origen,
-    fuente: r.fuente,
-  }));
+  const ORDEN_LOGICO_NIVELES = ['NORMAL', 'PRECAUCION', 'ALERTA', 'EMERGENCIA'];
+
+  const recomendacionesMapeadas = recomendacionesRes.rows
+    .map((r) => ({
+      id: Number(r.id),
+      nivel: r.nivel,
+      titulo: r.titulo,
+      contenido: r.contenido,
+      version: Number(r.version),
+      estado_publicacion: r.estado_publicacion,
+      origen: r.origen,
+      fuente: r.fuente,
+      actualizado_en: r.actualizado_en ? new Date(r.actualizado_en).toISOString() : null,
+    }))
+    .sort((a, b) => {
+      const idxA = ORDEN_LOGICO_NIVELES.indexOf(a.nivel);
+      const idxB = ORDEN_LOGICO_NIVELES.indexOf(b.nivel);
+      return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+    });
 
   const tieneLectura = lectura !== null;
   const nivelVigenteActual = estadoDerivado.nivel_vigente;
@@ -193,6 +202,7 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
   const recomendacionesNivelVigente = recomendacionesMapeadas.filter(
     (r) => r.nivel === nivelRecom
   );
+  const recomendacionVigente = recomendacionesNivelVigente[0] || null;
 
   const clasificacion = resEvaluacion?.clasificacion || null;
 
@@ -261,9 +271,12 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
     },
     puntos_referencia: puntosMapeados,
     zonas_referencia: zonasMapeadas,
+    recomendacion: recomendacionVigente,
+    recomendacion_vigente: recomendacionVigente,
     recomendaciones: recomendacionesMapeadas,
     recomendaciones_publicadas: recomendacionesMapeadas,
     recomendaciones_nivel_vigente: recomendacionesNivelVigente,
+    contactos: contactosMapeados,
     contactos_emergencia: contactosMapeados,
     parametros_vigentes_resumen: {
       version_reglas: configVigente?.version ?? 1,
