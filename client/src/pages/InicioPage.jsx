@@ -15,6 +15,7 @@ import SeccionContactosEmergencia from '../components/SeccionContactosEmergencia
 import TarjetaLecturaMeteorologica from '../components/TarjetaLecturaMeteorologica';
 import HistorialEvaluaciones from '../components/HistorialEvaluaciones';
 import ResumenZonaPiloto from '../components/ResumenZonaPiloto';
+import MapaReferencial from '../components/MapaReferencial';
 
 /**
  * Página principal mobile-first de PUKARA (Semana 3 - Día 3).
@@ -287,13 +288,31 @@ export default function InicioPage() {
           cargando={cargando}
         />
 
-        {/* 9. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}
+        {/* 9. Mapa Referencial Leaflet y Distancias Haversine (Requisitos P09, P18) */}
+        <MapaReferencial
+          zonasReferencia={
+            estado?.zonas_referencia || estado?.capas_referencia?.zonas || []
+          }
+          puntosReferencia={
+            estado?.puntos_referencia || estado?.capas_referencia?.puntos || []
+          }
+          coordenadaCentral={
+            estado?.coordenada_central ||
+            estado?.zona_piloto || {
+              latitud: -16.5235,
+              longitud: -68.1425,
+            }
+          }
+          nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+        />
+
+        {/* 10. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}
         <ResumenZonaPiloto
           zonaPiloto={estado?.zona_piloto}
           capasReferencia={estado?.capas_referencia}
         />
 
-        {/* 10. Sección de Contactos de Emergencia y Auxilio Ciudadano (Módulo 3) */}
+        {/* 11. Sección de Contactos de Emergencia y Auxilio Ciudadano (Módulo 3) */}
         <SeccionContactosEmergencia
           contactos={estado?.contactos_emergencia || estado?.contactos || []}
         />
