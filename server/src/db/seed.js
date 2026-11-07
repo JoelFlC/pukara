@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { pool } from './pool.js';
 import { seedCapas } from './seedCapas.js';
+import { asegurarUsuarioAdministrador } from './seedAdmin.js';
 
 dotenv.config();
 
@@ -90,6 +91,10 @@ export async function seed() {
       adminId = userCheck.rows[0].id;
       console.log(`[SEED] - Usuario administrador ya existe con ID: ${adminId}`);
     }
+
+    // Asegurar usuario administrador institucional (admin@pukara.bo) con contraseña conocida
+    const adminInstitucional = await asegurarUsuarioAdministrador({ client });
+    console.log(`[SEED] ✓ Administrador institucional asegurado con ID: ${adminInstitucional.id} (${adminInstitucional.email})`);
 
     // 2. Configuración Inicial v1 (vigente)
     let configId;
