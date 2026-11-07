@@ -16,6 +16,11 @@ import TarjetaLecturaMeteorologica from '../components/TarjetaLecturaMeteorologi
 import HistorialEvaluaciones from '../components/HistorialEvaluaciones';
 import ResumenZonaPiloto from '../components/ResumenZonaPiloto';
 import MapaReferencial from '../components/MapaReferencial';
+import EstadoPwaBanner from '../components/EstadoPwaBanner';
+import {
+  guardarUltimoEstadoLocal,
+  obtenerUltimoEstadoLocal,
+} from '../utils/offlineStorage';
 
 /**
  * Página principal mobile-first de PUKARA (Semana 3 - Día 3).
@@ -31,6 +36,7 @@ export default function InicioPage() {
   const [errorConexion, setErrorConexion] = useState(null);
   const [mensajeExito, setMensajeExito] = useState(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
+  const [avisoOffline, setAvisoOffline] = useState(null);
 
   // Estado para el aviso visual in-app de cambio de nivel (P06)
   const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
@@ -83,15 +89,28 @@ export default function InicioPage() {
           }
         }
 
+        if (dataEstado && modActual === 'real') {
+          guardarUltimoEstadoLocal(dataEstado);
+          setAvisoOffline(null);
+        }
+
         setEstado(dataEstado);
         setHistorial(dataHistorial);
         setUltimaActualizacion(new Date());
       } catch (err) {
         if (err.name !== 'AbortError') {
-          setErrorConexion(
-            err.message ||
-              'No se pudo conectar con el servidor PUKARA. Verifique su conexión o intente nuevamente.'
-          );
+          // Intentar recuperación desde almacenamiento local offline (P08)
+          const respaldoOffline = obtenerUltimoEstadoLocal();
+          if (respaldoOffline && respaldoOffline.datos) {
+            setEstado(respaldoOffline.datos);
+            setAvisoOffline(respaldoOffline.aviso_offline);
+            setErrorConexion(null);
+          } else {
+            setErrorConexion(
+              err.message ||
+                'No se pudo conectar con el servidor PUKARA. Verifique su conexión o intente nuevamente.'
+            );
+          }
         }
       } finally {
         setCargando(false);
@@ -212,6 +231,26 @@ export default function InicioPage() {
             </p>
           )}
         </header>
+
+        {/* Banner de instalación PWA (Requisito P12) */}
+        <EstadoPwaBanner />
+
+        {/* Aviso obligatorio de datos offline no actualizados (P08 / GEMINI.md) */}
+        {avisoOffline && (
+          <div
+            data-testid="aviso-datos-offline"
+            role="status"
+            className="rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-950 font-medium space-y-1 shadow-xs"
+          >
+            <div className="flex items-center gap-1.5 font-bold text-amber-900">
+              <span aria-hidden="true">📡</span>
+              <span>Modo sin conexión / Datos almacenados</span>
+            </div>
+            <p className="text-amber-800 leading-relaxed font-semibold">
+              {avisoOffline}
+            </p>
+          </div>
+        )}
 
         {/* 2. Aviso Permanente Obligatorio (Invariable, no cerrable) */}
         <AvisoPermanente />
