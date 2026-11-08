@@ -17,6 +17,7 @@ import HistorialEvaluaciones from '../components/HistorialEvaluaciones';
 import ResumenZonaPiloto from '../components/ResumenZonaPiloto';
 import MapaReferencial from '../components/MapaReferencial';
 import EstadoPwaBanner from '../components/EstadoPwaBanner';
+import BannerModoOffline from '../components/BannerModoOffline';
 import {
   guardarUltimoEstadoLocal,
   obtenerUltimoEstadoLocal,
@@ -37,6 +38,13 @@ export default function InicioPage() {
   const [mensajeExito, setMensajeExito] = useState(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
   const [avisoOffline, setAvisoOffline] = useState(null);
+
+  // Estados de conectividad y modo offline resiliente (Requisitos P08 y P10)
+  const [sinConexionRed, setSinConexionRed] = useState(
+    typeof navigator !== 'undefined' ? !navigator.onLine : false
+  );
+  const [usandoRespaldoOffline, setUsandoRespaldoOffline] = useState(false);
+  const [infoRespaldoOffline, setInfoRespaldoOffline] = useState(null);
 
   // Estado para el aviso visual in-app de cambio de nivel (P06)
   const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
@@ -94,6 +102,8 @@ export default function InicioPage() {
           setAvisoOffline(null);
         }
 
+        setUsandoRespaldoOffline(false);
+        setInfoRespaldoOffline(null);
         setEstado(dataEstado);
         setHistorial(dataHistorial);
         setUltimaActualizacion(new Date());
@@ -104,8 +114,19 @@ export default function InicioPage() {
           if (respaldoOffline && respaldoOffline.datos) {
             setEstado(respaldoOffline.datos);
             setAvisoOffline(respaldoOffline.aviso_offline);
+            setUsandoRespaldoOffline(true);
+            setInfoRespaldoOffline({
+              fechaDatoIso:
+                respaldoOffline.datos?.meteorologia?.observado_en ||
+                respaldoOffline.fecha_dato_iso ||
+                respaldoOffline.guardado_en,
+              avisoOffline: respaldoOffline.aviso_offline,
+              guardadoEnIso: respaldoOffline.guardado_en,
+            });
             setErrorConexion(null);
           } else {
+            setUsandoRespaldoOffline(false);
+            setInfoRespaldoOffline(null);
             setErrorConexion(
               err.message ||
                 'No se pudo conectar con el servidor PUKARA. Verifique su conexión o intente nuevamente.'
@@ -118,6 +139,45 @@ export default function InicioPage() {
     },
     [modalidad]
   );
+
+  // Escucha activa de eventos de red online/offline (Requisito P08)
+  useEffect(() => {
+    const handleOnline = () => {
+      setSinConexionRed(false);
+      cargarDatos();
+    };
+
+    const handleOffline = () => {
+      setSinConexionRed(true);
+      const respaldoOffline = obtenerUltimoEstadoLocal();
+      if (respaldoOffline && respaldoOffline.datos) {
+        setEstado(respaldoOffline.datos);
+        setAvisoOffline(respaldoOffline.aviso_offline);
+        setUsandoRespaldoOffline(true);
+        setInfoRespaldoOffline({
+          fechaDatoIso:
+            respaldoOffline.datos?.meteorologia?.observado_en ||
+            respaldoOffline.fecha_dato_iso ||
+            respaldoOffline.guardado_en,
+          avisoOffline: respaldoOffline.aviso_offline,
+          guardadoEnIso: respaldoOffline.guardado_en,
+        });
+        setErrorConexion(null);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      }
+    };
+  }, [cargarDatos]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -235,22 +295,14 @@ export default function InicioPage() {
         {/* Banner de instalación PWA (Requisito P12) */}
         <EstadoPwaBanner />
 
-        {/* Aviso obligatorio de datos offline no actualizados (P08 / GEMINI.md) */}
-        {avisoOffline && (
-          <div
-            data-testid="aviso-datos-offline"
-            role="status"
-            className="rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-950 font-medium space-y-1 shadow-xs"
-          >
-            <div className="flex items-center gap-1.5 font-bold text-amber-900">
-              <span aria-hidden="true">📡</span>
-              <span>Modo sin conexión / Datos almacenados</span>
-            </div>
-            <p className="text-amber-800 leading-relaxed font-semibold">
-              {avisoOffline}
-            </p>
-          </div>
-        )}
+        {/* Banner de Consulta con Conectividad Limitada / Modo Avión (P08) */}
+        <BannerModoOffline
+          activo={usandoRespaldoOffline || sinConexionRed}
+          fechaDatoIso={infoRespaldoOffline?.fechaDatoIso}
+          avisoOffline={infoRespaldoOffline?.avisoOffline}
+          guardadoEnIso={infoRespaldoOffline?.guardadoEnIso}
+          onReintentar={() => cargarDatos()}
+        />
 
         {/* 2. Aviso Permanente Obligatorio (Invariable, no cerrable) */}
         <AvisoPermanente />
@@ -327,7 +379,7 @@ export default function InicioPage() {
           cargando={cargando}
         />
 
-        {/* 9. Mapa Referencial Leaflet y Distancias Haversine (Requisitos P09, P18) */}
+        {/* 9. Mapa Referencial Leaflet y Distancias Haversine (Requisitos P09, P18, P10) */}
         <MapaReferencial
           zonasReferencia={
             estado?.zonas_referencia || estado?.capas_referencia?.zonas || []
@@ -343,6 +395,7 @@ export default function InicioPage() {
             }
           }
           nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+          modoOffline={usandoRespaldoOffline || sinConexionRed}
         />
 
         {/* 10. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}

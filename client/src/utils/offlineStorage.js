@@ -91,8 +91,10 @@ export function guardarUltimoEstadoLocal(datosEstado) {
 
   const fechaReferencia =
     datosEstado.lectura?.observado_en ||
+    datosEstado.meteorologia?.observado_en ||
     datosEstado.meteorologia?.lectura?.observado_en ||
     datosEstado.evaluacion?.evaluada_en ||
+    datosEstado.observado_en ||
     datosEstado.consultado_en ||
     new Date().toISOString();
 

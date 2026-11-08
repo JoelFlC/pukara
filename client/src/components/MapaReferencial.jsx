@@ -64,6 +64,7 @@ export function manejarErrorGeolocalizacion(err, setEstado, setUbicacion) {
  * @param {string} [props.nivelVigente='NORMAL']
  * @param {Object|null} [props.ubicacionInicial=null]
  * @param {string} [props.estadoUbicacionInicial='inactivo']
+ * @param {boolean} [props.modoOffline=false]
  */
 export default function MapaReferencial({
   zonasReferencia = [],
@@ -72,6 +73,7 @@ export default function MapaReferencial({
   nivelVigente = 'NORMAL',
   ubicacionInicial = null,
   estadoUbicacionInicial = 'inactivo',
+  modoOffline = false,
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -79,8 +81,12 @@ export default function MapaReferencial({
   const markersLayerRef = useRef(null);
   const userMarkerRef = useRef(null);
 
-  // Estados de carga de teselas y conectividad
+  // Estados de carga de teselas y conectividad (Requisito P10)
   const [hayErrorTeselas, setHayErrorTeselas] = useState(false);
+  const sinTeselasDisponibles =
+    modoOffline ||
+    hayErrorTeselas ||
+    (typeof navigator !== 'undefined' && !navigator.onLine);
 
   // Estados de geolocalización en el dispositivo (Requisito P09)
   // 'inactivo' | 'solicitando' | 'concedido' | 'denegado' | 'no_disponible'
@@ -382,8 +388,8 @@ export default function MapaReferencial({
         </p>
       </div>
 
-      {/* 2. Aviso de error o mapa parcial (si fallan teselas u offline) */}
-      {hayErrorTeselas && (
+      {/* 2. Aviso de error o mapa parcial (si fallan teselas u offline - Requisito P10) */}
+      {sinTeselasDisponibles && (
         <div
           data-testid="aviso-mapa-parcial"
           role="status"
@@ -393,7 +399,7 @@ export default function MapaReferencial({
             <span aria-hidden="true">⚠️</span> Cartografía parcial
           </p>
           <p className="text-amber-800 leading-relaxed">
-            Mapa parcial: algunas teselas cartográficas no están disponibles en este momento. La lista de zonas y puntos de referencia de demostración sigue disponible abajo (el sistema no ofrece navegación).
+            Mapa parcial con limitación de teselas: sin conexión a internet o teselas de OpenStreetMap no disponibles en el caché del navegador. Por política de uso de OpenStreetMap no se realiza precarga masiva de teselas. El sistema no ofrece navegación; consulte a continuación la lista completa de zonas y puntos de referencia de demostración disponibles sin conexión.
           </p>
         </div>
       )}
