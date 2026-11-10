@@ -54,7 +54,6 @@ describe('Prueba de Contrato Frontend-Backend y Verificación Anti-404 (contrato
 
   afterAll(async () => {
     await limpiarDatosSimulados();
-    await pool.end();
   });
 
   // =========================================================================

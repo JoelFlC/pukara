@@ -4,11 +4,6 @@ import { app } from '../src/app.js';
 import { pool } from '../src/db/pool.js';
 
 describe('Integración: GET /api/salud', () => {
-  afterAll(async () => {
-    // Cerrar el pool de conexiones para liberar recursos
-    await pool.end();
-  });
-
   it('debe responder 200 con formato JSON y confirmar conectividad a PostgreSQL', async () => {
     const res = await request(app)
       .get('/api/salud')
