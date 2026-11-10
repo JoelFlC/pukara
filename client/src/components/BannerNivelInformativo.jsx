@@ -342,7 +342,7 @@ export default function BannerNivelInformativo({ estado, alInyectarPreset }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button
               type="button"
-              onClick={() => alInyectarPreset('NORMAL', 1.0, 4.0, 10.0)}
+              onClick={() => alInyectarPreset('NORMAL', 0.4, 2.0, 6.0)}
               className="px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>🟢</span>
@@ -350,7 +350,7 @@ export default function BannerNivelInformativo({ estado, alInyectarPreset }) {
             </button>
             <button
               type="button"
-              onClick={() => alInyectarPreset('PRECAUCION', 3.0, 15.0, 30.0)}
+              onClick={() => alInyectarPreset('PRECAUCION', 3.2, 14.0, 30.0)}
               className="px-2.5 py-1.5 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>🟡</span>
@@ -358,7 +358,7 @@ export default function BannerNivelInformativo({ estado, alInyectarPreset }) {
             </button>
             <button
               type="button"
-              onClick={() => alInyectarPreset('ALERTA', 8.0, 30.0, 65.0)}
+              onClick={() => alInyectarPreset('ALERTA', 7.5, 28.0, 64.0)}
               className="px-2.5 py-1.5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-900 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>🟠</span>
@@ -366,7 +366,7 @@ export default function BannerNivelInformativo({ estado, alInyectarPreset }) {
             </button>
             <button
               type="button"
-              onClick={() => alInyectarPreset('EMERGENCIA', 15.0, 50.0, 100.0)}
+              onClick={() => alInyectarPreset('EMERGENCIA', 14.5, 48.0, 98.0)}
               className="px-2.5 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-900 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>🔴</span>

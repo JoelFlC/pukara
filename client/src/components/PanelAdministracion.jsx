@@ -310,7 +310,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
   // -------------------------------------------------------------------------
   // Handlers: Modo Demostración
   // -------------------------------------------------------------------------
-  const inyectarPreset = async (intensidad, acum24, acum72, nivelNombre) => {
+  const inyectarPreset = async (intensidad, acum24, acum72, nivelNombre, opciones = {}) => {
     try {
       setCargando(true);
       const res = await inyectarLecturaSimuladaAdmin({
@@ -318,6 +318,8 @@ export default function PanelAdministracion({ alCerrarSesion }) {
         acum_24h_mm: acum24,
         acum_72h_mm: acum72,
         observado_en: new Date().toISOString(),
+        reiniciar_antes: opciones.reiniciar_antes ?? true,
+        modo_preset: opciones.modo_preset ?? true,
       });
       mostrarExito(`Escenario ${nivelNombre} inyectado (nivel calculado: ${res.evaluacion?.nivel_calculado}, nivel vigente: ${res.evaluacion?.nivel_vigente}).`);
     } catch (err) {
@@ -1335,39 +1337,39 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       <button
                         type="button"
-                        onClick={() => inyectarPreset(1.0, 4.0, 10.0, 'NORMAL')}
-                        className="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold text-xs transition-colors flex flex-col items-center gap-1 cursor-pointer"
+                        onClick={() => inyectarPreset(0.4, 2.0, 6.0, 'NORMAL')}
+                        className="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100/70 text-emerald-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
                       >
-                        <span className="text-lg">🟢</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
                         <span>Demostrar NORMAL</span>
-                        <span className="font-mono text-[10px] font-normal text-emerald-800">1 mm/h · 4 mm</span>
+                        <span className="font-mono text-[10px] font-normal text-emerald-800">0.4 mm/h · 2.0 mm</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => inyectarPreset(3.0, 15.0, 30.0, 'PRECAUCIÓN')}
-                        className="p-3.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-xs transition-colors flex flex-col items-center gap-1 cursor-pointer"
+                        onClick={() => inyectarPreset(3.2, 14.0, 30.0, 'PRECAUCIÓN')}
+                        className="p-3.5 rounded-xl border border-amber-300 bg-amber-50/70 hover:bg-amber-100/70 text-amber-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
                       >
-                        <span className="text-lg">🟡</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-200"></span>
                         <span>Demostrar PRECAUCIÓN</span>
-                        <span className="font-mono text-[10px] font-normal text-amber-800">3 mm/h · 15 mm</span>
+                        <span className="font-mono text-[10px] font-normal text-amber-800">3.2 mm/h · 14.0 mm</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => inyectarPreset(8.0, 30.0, 65.0, 'ALERTA')}
-                        className="p-3.5 rounded-xl border border-orange-300 bg-orange-50 hover:bg-orange-100 text-orange-950 font-bold text-xs transition-colors flex flex-col items-center gap-1 cursor-pointer"
+                        onClick={() => inyectarPreset(7.5, 28.0, 64.0, 'ALERTA')}
+                        className="p-3.5 rounded-xl border border-orange-300 bg-orange-50/70 hover:bg-orange-100/70 text-orange-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
                       >
-                        <span className="text-lg">🟠</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-orange-500 ring-2 ring-orange-200"></span>
                         <span>Demostrar ALERTA</span>
-                        <span className="font-mono text-[10px] font-normal text-orange-800">8 mm/h · 30 mm</span>
+                        <span className="font-mono text-[10px] font-normal text-orange-800">7.5 mm/h · 28.0 mm</span>
                       </button>
                       <button
                         type="button"
-                        onClick={() => inyectarPreset(15.0, 50.0, 100.0, 'EMERGENCIA')}
-                        className="p-3.5 rounded-xl border border-red-300 bg-red-50 hover:bg-red-100 text-red-950 font-bold text-xs transition-colors flex flex-col items-center gap-1 cursor-pointer"
+                        onClick={() => inyectarPreset(14.5, 48.0, 98.0, 'EMERGENCIA')}
+                        className="p-3.5 rounded-xl border border-red-300 bg-red-50/70 hover:bg-red-100/70 text-red-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
                       >
-                        <span className="text-lg">🔴</span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>
                         <span>Demostrar EMERGENCIA</span>
-                        <span className="font-mono text-[10px] font-normal text-red-800">15 mm/h · 50 mm</span>
+                        <span className="font-mono text-[10px] font-normal text-red-800">14.5 mm/h · 48.0 mm</span>
                       </button>
                     </div>
                   </div>

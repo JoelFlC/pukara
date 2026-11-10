@@ -168,4 +168,85 @@ describe('Prueba de Contrato Frontend-Backend y Verificación Anti-404 (contrato
       }
     });
   });
+
+  // =========================================================================
+  // Control 3: Inyección Robusta de Escenarios y Presets de Demostración (P11)
+  // =========================================================================
+  describe('Control 3: Inyección Robusta de Escenarios y Presets de Demostración (P11)', () => {
+    it('3.1. Inyecta secuencialmente los 4 niveles (NORMAL -> PRECAUCION -> ALERTA -> EMERGENCIA -> NORMAL) sin error 500 y con aislamiento real', async () => {
+      // Obtenemos el estado real base antes de iniciar simulación
+      const estadoRealAntes = await request(app).get('/api/estado?modalidad=real').expect(200);
+      const nivelRealOriginal = estadoRealAntes.body.nivel_vigente;
+
+      const presets = [
+        {
+          nivelEsperado: 'NORMAL',
+          payload: { intensidad_mm_h: 0.4, acum_24h_mm: 2.0, acum_72h_mm: 6.0, reiniciar_antes: true, modo_preset: true },
+        },
+        {
+          nivelEsperado: 'PRECAUCION',
+          payload: { intensidad_mm_h: 3.2, acum_24h_mm: 14.0, acum_72h_mm: 30.0, reiniciar_antes: true, modo_preset: true },
+        },
+        {
+          nivelEsperado: 'ALERTA',
+          payload: { intensidad_mm_h: 7.5, acum_24h_mm: 28.0, acum_72h_mm: 64.0, reiniciar_antes: true, modo_preset: true },
+        },
+        {
+          nivelEsperado: 'EMERGENCIA',
+          payload: { intensidad_mm_h: 14.5, acum_24h_mm: 48.0, acum_72h_mm: 98.0, reiniciar_antes: true, modo_preset: true },
+        },
+        {
+          nivelEsperado: 'NORMAL',
+          payload: { intensidad_mm_h: 0.4, acum_24h_mm: 2.0, acum_72h_mm: 6.0, reiniciar_antes: true, modo_preset: true },
+        },
+      ];
+
+      for (const { nivelEsperado, payload } of presets) {
+        const resInyeccion = await request(app)
+          .post('/api/simulacion/lectura')
+          .send(payload)
+          .expect('Content-Type', /json/);
+
+        expect(resInyeccion.status).toBe(201);
+        expect(resInyeccion.body.ok).toBe(true);
+        expect(resInyeccion.body.evaluacion.nivel_vigente).toBe(nivelEsperado);
+
+        // Verificamos que GET /api/estado?modalidad=simulada refleja el nivel con recomendación
+        const resSim = await request(app)
+          .get('/api/estado?modalidad=simulada')
+          .expect(200);
+
+        expect(resSim.body.modalidad).toBe('simulada');
+        expect(resSim.body.nivel_vigente).toBe(nivelEsperado);
+        expect(resSim.body.recomendacion).toBeDefined();
+        expect(resSim.body.recomendacion.nivel).toBe(nivelEsperado);
+
+        // Verificamos aislamiento estricto: el flujo real NO fue alterado
+        const resReal = await request(app)
+          .get('/api/estado?modalidad=real')
+          .expect(200);
+
+        expect(resReal.body.modalidad).toBe('real');
+        expect(resReal.body.nivel_vigente).toBe(nivelRealOriginal);
+      }
+    });
+
+    it('3.2. DELETE /api/simulacion limpia los datos simulados y preserva el estado real', async () => {
+      const resDelete = await request(app)
+        .delete('/api/simulacion')
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(resDelete.body.ok).toBe(true);
+
+      const resSim = await request(app)
+        .get('/api/estado?modalidad=simulada')
+        .expect(200);
+
+      expect(resSim.body.modalidad).toBe('simulada');
+      expect(resSim.body.lectura).toBeNull();
+      expect(resSim.body.meteorologia?.disponible).toBe(false);
+    });
+  });
 });
+

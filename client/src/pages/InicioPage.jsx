@@ -354,8 +354,8 @@ export default function InicioPage() {
                 onClick={() => handleCambiarModalidad('real')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   modalidad === 'real'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'hover:text-slate-900'
+                    ? 'bg-[#0F172A] text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Datos Reales (Open-Meteo)
@@ -365,8 +365,8 @@ export default function InicioPage() {
                 onClick={() => handleCambiarModalidad('simulada')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   modalidad === 'simulada'
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'hover:text-slate-900'
+                    ? 'bg-slate-800 text-teal-300 shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Modo Simulación (Demostración)
@@ -414,10 +414,12 @@ export default function InicioPage() {
         <BannerModoSimulacion
           modalidad={modalidad}
           esSimulacion={modalidad === 'simulada'}
+          nivelActual={estado?.nivel_vigente}
           alCambiarModalidad={handleCambiarModalidad}
           alInyectarEscenario={handleInyectarEscenario}
           alLimpiarSimulacion={handleLimpiarSimulacion}
           cargando={cargando || cargandoAccion}
+          ocultarSelector={true}
         />
 
         {/* Aviso Visual In-App de Cambio de Nivel Informativo (Requisito P06) */}

@@ -164,22 +164,80 @@ export async function obtenerUltimaEvaluacionPorModalidad({
  * @returns {Promise<Object>} Resultado de la simulación
  */
 export async function registrarYEvaluarLecturaSimulada(
-  datosSimulados,
+  datosSimulados = {},
   { db = pool } = {}
 ) {
-  if (!datosSimulados || !datosSimulados.observado_en) {
-    throw new Error(
-      'Parámetro requerido faltante: datosSimulados.observado_en es obligatorio.'
-    );
+  const datos = datosSimulados || {};
+
+  // 1. Manejo de reinicio explícito (para que los presets rápidos muestren el nivel inmediato)
+  if (
+    datos.reiniciar_antes === true ||
+    datos.reiniciar_escenario === true ||
+    datos.modo_preset === true
+  ) {
+    await limpiarDatosSimulados({ db });
   }
 
-  // 1. Obtener la configuración vigente de umbrales y reglas
+  // 2. Normalización de campos numéricos y tolerancias de nombres
+  const parseNum = (val) => {
+    if (val === null || val === undefined || val === '') return null;
+    const n = Number(val);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const intensidad_mm_h = parseNum(datos.intensidad_mm_h ?? datos.intensidad);
+  const acum_24h_mm = parseNum(
+    datos.acum_24h_mm ?? datos.acum24h ?? datos.acumulado_24h
+  );
+  const acum_72h_mm = parseNum(
+    datos.acum_72h_mm ?? datos.acum72h ?? datos.acumulado_72h
+  );
+  const horas_validas_24h = parseNum(datos.horas_validas_24h) ?? 24;
+  const horas_validas_72h = parseNum(datos.horas_validas_72h) ?? 72;
+  const temperatura = parseNum(datos.temperatura) ?? 14.5;
+  const humedad = parseNum(datos.humedad) ?? 68;
+  const viento = parseNum(datos.viento) ?? 9.2;
+  const fuente = datos.fuente || 'simulacion_academica';
+
+  // 3. Garantía de observado_en monotónico y sin colisión UNIQUE
+  let observadoEn = datos.observado_en;
+
+  if (!observadoEn) {
+    const resMax = await db.query(
+      `SELECT MAX(observado_en) AS ultimo FROM lecturas_meteorologicas WHERE modalidad = 'simulada'`
+    );
+    const ultimo = resMax.rows[0]?.ultimo;
+    if (ultimo) {
+      // Avanzar al menos 16 minutos tras la última lectura simulada
+      const proximoMs = Math.max(Date.now(), new Date(ultimo).getTime() + 16 * 60 * 1000);
+      observadoEn = new Date(proximoMs).toISOString();
+    } else {
+      observadoEn = new Date().toISOString();
+    }
+  } else {
+    observadoEn = new Date(observadoEn).toISOString();
+  }
+
+  const datosNormalizados = {
+    observado_en: observadoEn,
+    intensidad_mm_h,
+    acum_24h_mm,
+    acum_72h_mm,
+    horas_validas_24h,
+    horas_validas_72h,
+    temperatura,
+    humedad,
+    viento,
+    fuente,
+  };
+
+  // 4. Obtener la configuración vigente de umbrales y reglas
   const configVigente = await obtenerConfiguracionVigente({ db });
 
-  // 2. Clasificar muestra según umbrales vigentes
-  const clasificacion = clasificarMuestra(datosSimulados, configVigente);
+  // 5. Clasificar muestra según umbrales vigentes
+  const clasificacion = clasificarMuestra(datosNormalizados, configVigente);
 
-  // 3. Determinar estado de la lectura para lecturas_meteorologicas
+  // 6. Determinar estado de la lectura para lecturas_meteorologicas
   let estadoLectura = 'valida';
   if (!clasificacion.muestra_valida) {
     estadoLectura = 'invalida';
@@ -187,29 +245,29 @@ export async function registrarYEvaluarLecturaSimulada(
     estadoLectura = 'incompleta';
   }
 
-  // 4. Insertar de forma idempotente la lectura forzando siempre modalidad = 'simulada'
-  const fuente = datosSimulados.fuente || 'simulacion_academica';
+  // 7. Insertar de forma idempotente la lectura forzando siempre modalidad = 'simulada'
   const { lectura: filaLectura } = await insertarLecturaMeteorologica(
     {
       modalidad: 'simulada',
       fuente,
-      observado_en: new Date(datosSimulados.observado_en).toISOString(),
-      intensidad_mm_h: datosSimulados.intensidad_mm_h ?? null,
-      acum_24h_mm: datosSimulados.acum_24h_mm ?? null,
-      acum_72h_mm: datosSimulados.acum_72h_mm ?? null,
-      horas_validas_24h: datosSimulados.horas_validas_24h ?? 24,
-      horas_validas_72h: datosSimulados.horas_validas_72h ?? 72,
+      observado_en: observadoEn,
+      intensidad_mm_h,
+      acum_24h_mm,
+      acum_72h_mm,
+      horas_validas_24h,
+      horas_validas_72h,
       estado: estadoLectura,
-      temperatura: datosSimulados.temperatura ?? null,
-      humedad: datosSimulados.humedad ?? null,
-      viento: datosSimulados.viento ?? null,
+      temperatura,
+      humedad,
+      viento,
     },
     { db }
   );
 
-  // 5. Si la muestra no es válida, retornar T5 sin registrar evaluación
+  // 8. Si la muestra no es válida, retornar T5 sin registrar evaluación
   if (!clasificacion.muestra_valida) {
     return {
+      ok: true,
       modalidad: 'simulada',
       aviso_simulacion: AVISO_MODO_SIMULACION,
       lectura: filaLectura,
@@ -223,16 +281,19 @@ export async function registrarYEvaluarLecturaSimulada(
     };
   }
 
-  // 6. Obtener estado previo simulado (aislamiento estricto de modalidad = 'real')
+  // 9. Obtener estado previo simulado (aislamiento estricto de modalidad = 'real')
   const estadoSimuladoPrevio =
-    datosSimulados.reiniciar_secuencia === true
+    datos.reiniciar_secuencia === true ||
+    datos.reiniciar_antes === true ||
+    datos.reiniciar_escenario === true ||
+    datos.modo_preset === true
       ? crearEstadoInicialMotor()
       : await obtenerUltimaEvaluacionPorModalidad({
           modalidad: 'simulada',
           db,
         });
 
-  // 7. Evaluar siguiente estado en la máquina con histéresis
+  // 10. Evaluar siguiente estado en la máquina con histéresis
   const resultadoEstado = siguienteEstado(
     estadoSimuladoPrevio,
     {
@@ -288,6 +349,7 @@ export async function registrarYEvaluarLecturaSimulada(
   }
 
   return {
+    ok: true,
     modalidad: 'simulada',
     aviso_simulacion: AVISO_MODO_SIMULACION,
     lectura: filaLectura,
