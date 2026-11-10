@@ -30,4 +30,5 @@ Thumbs.db
 
 # Artefactos de pruebas y reportes
 .vitest-cache/
+.vite/
 .system_generated/

@@ -4,11 +4,7 @@
  * Funciona tanto con el proxy local de Vite (/api) como en producción mediante VITE_API_URL.
  */
 
-const API_BASE = (
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  ''
-).replace(/\/+$/, '');
+import { construirUrlApi } from '../utils/apiUrl';
 
 /**
  * Consulta el estado público integral del sistema PUKARA para la modalidad indicada.
@@ -19,7 +15,7 @@ const API_BASE = (
  * @returns {Promise<Object>} Datos del endpoint GET /api/estado
  */
 export async function obtenerEstadoSistema(modalidad = 'real', { signal } = {}) {
-  const url = `${API_BASE}/api/estado?modalidad=${encodeURIComponent(modalidad)}`;
+  const url = construirUrlApi(`/estado?modalidad=${encodeURIComponent(modalidad)}`);
   const res = await fetch(url, {
     signal,
     headers: {
@@ -67,7 +63,9 @@ export async function obtenerHistorialEvaluaciones(
   limite = 10,
   { signal } = {}
 ) {
-  const url = `${API_BASE}/api/historial?modalidad=${encodeURIComponent(modalidad)}&limite=${encodeURIComponent(limite)}`;
+  const url = construirUrlApi(
+    `/historial?modalidad=${encodeURIComponent(modalidad)}&limite=${encodeURIComponent(limite)}`
+  );
   const res = await fetch(url, {
     signal,
     headers: {
@@ -95,7 +93,7 @@ export async function obtenerHistorialEvaluaciones(
  * @returns {Promise<Object>} Respuesta del endpoint POST /api/simulacion/lectura
  */
 export async function enviarLecturaSimulada(payload, { signal } = {}) {
-  const url = `${API_BASE}/api/simulacion/lectura`;
+  const url = construirUrlApi('/simulacion/lectura');
   const res = await fetch(url, {
     method: 'POST',
     signal,
@@ -125,7 +123,7 @@ export async function enviarLecturaSimulada(payload, { signal } = {}) {
  * @returns {Promise<Object>} Respuesta del endpoint DELETE /api/simulacion
  */
 export async function limpiarSimulacion({ signal } = {}) {
-  const url = `${API_BASE}/api/simulacion`;
+  const url = construirUrlApi('/simulacion');
   const res = await fetch(url, {
     method: 'DELETE',
     signal,

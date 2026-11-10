@@ -3,11 +3,7 @@
  * @description Cliente de API para autenticación y operaciones del panel de administración en PUKARA.
  */
 
-const API_BASE = (
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  ''
-).replace(/\/+$/, '');
+import { construirUrlApi } from '../utils/apiUrl';
 
 const TOKEN_KEY = 'pukara_admin_token';
 const USER_KEY = 'pukara_admin_user';
@@ -102,7 +98,8 @@ async function fetchAutenticado(endpoint, opciones = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
+  const url = construirUrlApi(endpoint);
+  const res = await fetch(url, {
     ...opciones,
     headers,
   });
@@ -137,7 +134,8 @@ async function fetchAutenticado(endpoint, opciones = {}) {
  * @returns {Promise<{ ok: boolean, token: string, usuario: Object }>}
  */
 export async function loginAdmin(email, password) {
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
+  const url = construirUrlApi('/auth/login');
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

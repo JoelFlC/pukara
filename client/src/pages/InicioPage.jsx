@@ -24,7 +24,7 @@ import {
 } from '../utils/offlineStorage';
 
 /**
- * Página principal mobile-first de PUKARA (Semana 3 - Día 3).
+ * Página principal institucional de PUKARA (Estilo Bento Desktop + Mobile-First).
  * Conecta con GET /api/estado, GET /api/historial, gestiona el aviso visual in-app (P06)
  * y expone recomendaciones preventivas y contactos de auxilio ciudadano en La Paz.
  */
@@ -233,46 +233,153 @@ export default function InicioPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 p-3 sm:p-4 md:p-6 flex flex-col items-center">
-      <main className="w-full max-w-lg mx-auto space-y-4">
-        {/* 1. Cabecera principal compacta con botón de recarga */}
-        <header className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-lg" aria-hidden="true">
-                🌧️
-              </span>
-              <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                PUKARA · Monitoreo Informativo
-              </span>
-            </div>
-            <Link
-              to="/admin"
-              className="text-[11px] font-medium text-slate-400 hover:text-slate-700 transition-colors py-1 px-1.5"
-              title="Acceso administrativo"
-            >
-              Acceso Admin →
-            </Link>
-          </div>
+  const estaOffline = usandoRespaldoOffline || sinConexionRed;
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+  return (
+    <div id="monitoreo" className="min-h-screen bg-[#F4F7FB] text-slate-800 flex flex-col font-sans">
+      {/* 1. Barra de Navegación Institucional Sticky */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Logo y Denominación Institucional */}
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0F172A] text-teal-400 flex items-center justify-center shrink-0 shadow-xs">
+              <svg
+                className="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M12 8v4" />
+                <path d="M12 16h.01" />
+              </svg>
+            </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 leading-snug">
-                Sector Llojeta / Bajo Llojeta
-              </h1>
-              <p className="text-xs text-slate-500">
-                Macrodistrito Cotahuma, La Paz · Consulta informativa de lluvias
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-base tracking-tight text-slate-900">
+                  PUKARA
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/70">
+                  Llojeta
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                Monitoreo Informativo de Lluvias · Sector Llojeta
               </p>
             </div>
+          </div>
 
-            {/* Botón táctil con área mínima accesible (>= 44px) */}
+          {/* Enlaces de Navegación Desktop */}
+          <nav aria-label="Navegación principal desktop" className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
+            <a href="#monitoreo" className="hover:text-slate-900 transition-colors">
+              Monitoreo
+            </a>
+            <a href="#telemetria" className="hover:text-slate-900 transition-colors">
+              Telemetría
+            </a>
+            <a href="#prevencion" className="hover:text-slate-900 transition-colors">
+              Prevención
+            </a>
+            <a href="#mapa" className="hover:text-slate-900 transition-colors">
+              Mapa Referencial
+            </a>
+            <a href="#historial" className="hover:text-slate-900 transition-colors">
+              Historial
+            </a>
+          </nav>
+
+          {/* Indicador de Conexión y Acceso Administrativo */}
+          <div className="flex items-center gap-3">
+            {estaOffline ? (
+              <span
+                role="status"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+              >
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true" />
+                <span>Sin conexión</span>
+              </span>
+            ) : (
+              <span
+                role="status"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
+                <span>En línea</span>
+              </span>
+            )}
+
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors shrink-0"
+              title="Acceso administrativo"
+            >
+              <span>Acceso Admin →</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* 2. Sub-barra de Control y Metadatos Operativos */}
+      <div className="bg-white border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs text-slate-500">
+            <div>
+              <span className="font-semibold text-slate-800">Sector Llojeta / Bajo Llojeta</span>
+              <span className="hidden sm:inline"> · </span>
+              <span>Macrodistrito Cotahuma, La Paz</span>
+            </div>
+            <span className="hidden md:inline text-slate-300">|</span>
+            <span className="font-mono text-[11px] text-slate-400">
+              Lat -16.5235 · Lon -68.1425
+            </span>
+            {ultimaActualizacion && (
+              <>
+                <span className="hidden md:inline text-slate-300">|</span>
+                <span className="font-mono text-[11px] text-slate-500">
+                  Consulta: {ultimaActualizacion.toLocaleTimeString()}
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between md:justify-end gap-3">
+            {/* Segmented Pill Switcher de Modalidad */}
+            <div className="inline-flex rounded-xl bg-slate-100 p-0.5 text-xs font-semibold text-slate-600 border border-slate-200/60">
+              <button
+                type="button"
+                onClick={() => handleCambiarModalidad('real')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  modalidad === 'real'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'hover:text-slate-900'
+                }`}
+              >
+                Datos Reales (Open-Meteo)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCambiarModalidad('simulada')}
+                className={`px-3 py-1.5 rounded-lg transition-all ${
+                  modalidad === 'simulada'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'hover:text-slate-900'
+                }`}
+              >
+                Modo Simulación (Demostración)
+              </button>
+            </div>
+
+            {/* Botón táctil de actualización accesible (>= 44px) */}
             <button
               type="button"
               onClick={() => cargarDatos()}
               disabled={cargando || cargandoAccion}
               aria-label="Actualizar datos meteorológicos"
-              className="min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-sm shrink-0"
+              className="min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F172A] text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
             >
               <span
                 className={cargando ? 'animate-spin inline-block' : ''}
@@ -283,31 +390,27 @@ export default function InicioPage() {
               <span>{cargando ? 'Consultando...' : 'Actualizar'}</span>
             </button>
           </div>
+        </div>
+      </div>
 
-          {ultimaActualizacion && (
-            <p className="text-[10px] text-slate-400 text-right font-mono">
-              Consulta local: {ultimaActualizacion.toLocaleTimeString()} · Modo:{' '}
-              {modalidad}
-            </p>
-          )}
-        </header>
-
+      {/* 3. Contenedor Principal Bento Layout */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-12 w-full flex-1">
         {/* Banner de instalación PWA (Requisito P12) */}
         <EstadoPwaBanner />
 
         {/* Banner de Consulta con Conectividad Limitada / Modo Avión (P08) */}
         <BannerModoOffline
-          activo={usandoRespaldoOffline || sinConexionRed}
+          activo={estaOffline}
           fechaDatoIso={infoRespaldoOffline?.fechaDatoIso}
           avisoOffline={infoRespaldoOffline?.avisoOffline}
           guardadoEnIso={infoRespaldoOffline?.guardadoEnIso}
           onReintentar={() => cargarDatos()}
         />
 
-        {/* 2. Aviso Permanente Obligatorio (Invariable, no cerrable) */}
+        {/* Aviso Permanente Obligatorio (Invariable, no cerrable) */}
         <AvisoPermanente />
 
-        {/* 3. Selector de Modalidad y Banner de Demostración Simulación (P11) */}
+        {/* Panel de demostración en modo simulación (P11) */}
         <BannerModoSimulacion
           modalidad={modalidad}
           esSimulacion={modalidad === 'simulada'}
@@ -317,7 +420,7 @@ export default function InicioPage() {
           cargando={cargando || cargandoAccion}
         />
 
-        {/* 4. Aviso Visual In-App de Cambio de Nivel Informativo (Requisito P06) */}
+        {/* Aviso Visual In-App de Cambio de Nivel Informativo (Requisito P06) */}
         <AvisoCambioNivelInApp
           cambioNivel={cambioNivelDetectado}
           onCerrar={() => setCambioNivelDetectado(null)}
@@ -327,7 +430,7 @@ export default function InicioPage() {
         {mensajeExito && (
           <div
             role="status"
-            className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900 font-medium flex items-center gap-2 shadow-xs"
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-900 font-medium flex items-center gap-2 shadow-xs"
           >
             <span aria-hidden="true">✅</span>
             <span>{mensajeExito}</span>
@@ -338,7 +441,7 @@ export default function InicioPage() {
         {errorConexion && (
           <div
             role="alert"
-            className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-900 space-y-2 shadow-sm"
+            className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs text-red-900 space-y-2 shadow-sm"
           >
             <p className="font-semibold flex items-center gap-1.5">
               <span>⚠️</span> Incidencia de comunicación con la API
@@ -347,68 +450,195 @@ export default function InicioPage() {
             <button
               type="button"
               onClick={() => cargarDatos()}
-              className="min-h-[44px] px-3.5 py-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-900 font-semibold text-xs transition-colors"
+              className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-900 font-semibold text-xs transition-colors"
             >
               Reintentar consulta
             </button>
           </div>
         )}
 
-        {/* 5. Banner Global del Nivel Informativo y Estado del Sistema (P06, P15) */}
-        <BannerNivelInformativo estado={estado} />
+        {/* FILA 1 (HERO): Banner Nivel Informativo + Bento Card Resumen Espacial */}
+        <section aria-label="Nivel informativo y ámbito espacial" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-7 xl:col-span-8">
+            <BannerNivelInformativo
+              estado={estado}
+              alInyectarPreset={(nivel, int, a24, a72) =>
+                handleInyectarEscenario({
+                  intensidad_mm_h: int,
+                  acum_24h_mm: a24,
+                  acum_72h_mm: a72,
+                  observado_en: new Date().toISOString(),
+                })
+              }
+            />
+          </div>
 
-        {/* 6. Sección Integral de Recomendaciones Preventivas Generales (Módulo 3) */}
-        <SeccionRecomendaciones
-          nivelVigente={estado?.nivel_vigente || 'NORMAL'}
-          estadoSistema={estado?.estado_sistema || 'NORMAL'}
-          recomendacionVigente={estado?.recomendacion || estado?.recomendacion_vigente}
-          recomendacionesPublicadas={
-            estado?.recomendaciones_publicadas || estado?.recomendaciones || []
-          }
-        />
+          <div className="lg:col-span-5 xl:col-span-4 rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Ámbito Espacial de Consulta
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                  Sector Piloto Activo
+                </span>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Sector Llojeta / Bajo Llojeta
+                </h2>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                  Lat -16.5235 · Lon -68.1425 (La Paz, BOT)
+                </p>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                El nivel informativo de lluvia se calcula con una sola consulta meteorológica para toda la zona piloto de Llojeta y no varía espacialmente dentro del sector.
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                  <span className="block text-lg font-extrabold text-slate-800">
+                    {(estado?.zonas_referencia || estado?.capas_referencia?.zonas || []).length || 2}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">
+                    Polígonos en cuenca
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                  <span className="block text-lg font-extrabold text-slate-800">
+                    {(estado?.puntos_referencia || estado?.capas_referencia?.puntos || []).length || 6}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">
+                    Puntos referenciales
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-3 text-xs text-slate-700 space-y-1">
+                <div className="flex items-center gap-1.5 font-semibold text-[11px] text-slate-900">
+                  <span>📍</span>
+                  <span>Proximidad Haversine en el Dispositivo</span>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  Cálculo ejecutado 100% en el dispositivo móvil. Sus coordenadas GPS jamás se envían ni se almacenan en el servidor.
+                </p>
+              </div>
+            </div>
 
-        {/* 7. Tarjeta de Variables Pluviométricas y Complementarias */}
-        <TarjetaLecturaMeteorologica meteorologia={estado?.meteorologia} />
+            <a
+              href="#mapa"
+              className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs text-center transition-colors block mt-2"
+            >
+              Explorar mapa y puntos referenciales ↓
+            </a>
+          </div>
+        </section>
 
-        {/* 8. Historial Reciente de Evaluaciones del Motor */}
-        <HistorialEvaluaciones
-          items={historial?.items}
-          total={historial?.total}
-          modalidad={modalidad}
-          alRecargar={() => cargarDatos()}
-          cargando={cargando}
-        />
+        {/* FILA 2: Telemetría Pluviométrica */}
+        <section id="telemetria" aria-label="Telemetría meteorológica">
+          <TarjetaLecturaMeteorologica meteorologia={estado?.meteorologia} />
+        </section>
 
-        {/* 9. Mapa Referencial Leaflet y Distancias Haversine (Requisitos P09, P18, P10) */}
-        <MapaReferencial
-          zonasReferencia={
-            estado?.zonas_referencia || estado?.capas_referencia?.zonas || []
-          }
-          puntosReferencia={
-            estado?.puntos_referencia || estado?.capas_referencia?.puntos || []
-          }
-          coordenadaCentral={
-            estado?.coordenada_central ||
-            estado?.zona_piloto || {
-              latitud: -16.5235,
-              longitud: -68.1425,
+        {/* FILA 3: Recomendaciones Preventivas y Contactos de Emergencia */}
+        <section id="prevencion" aria-label="Prevención y auxilio" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="lg:col-span-7">
+            <SeccionRecomendaciones
+              nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+              estadoSistema={estado?.estado_sistema || 'NORMAL'}
+              recomendacionVigente={estado?.recomendacion || estado?.recomendacion_vigente}
+              recomendacionesPublicadas={
+                estado?.recomendaciones_publicadas || estado?.recomendaciones || []
+              }
+            />
+          </div>
+
+          <div id="contactos" className="lg:col-span-5">
+            <SeccionContactosEmergencia
+              contactos={estado?.contactos_emergencia || estado?.contactos || []}
+            />
+          </div>
+        </section>
+
+        {/* FILA 4: Mapa Referencial Leaflet y Distancias Haversine */}
+        <section id="mapa" aria-label="Mapa cartográfico referencial">
+          <MapaReferencial
+            zonasReferencia={
+              estado?.zonas_referencia || estado?.capas_referencia?.zonas || []
             }
-          }
-          nivelVigente={estado?.nivel_vigente || 'NORMAL'}
-          modoOffline={usandoRespaldoOffline || sinConexionRed}
-        />
+            puntosReferencia={
+              estado?.puntos_referencia || estado?.capas_referencia?.puntos || []
+            }
+            coordenadaCentral={
+              estado?.coordenada_central ||
+              estado?.zona_piloto || {
+                latitud: -16.5235,
+                longitud: -68.1425,
+              }
+            }
+            nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+            modoOffline={estaOffline}
+          />
+        </section>
 
-        {/* 10. Resumen de la Zona Piloto Llojeta y Puntos de Orientación */}
-        <ResumenZonaPiloto
-          zonaPiloto={estado?.zona_piloto}
-          capasReferencia={estado?.capas_referencia}
-        />
+        {/* FILA 5: Historial Reciente de Evaluaciones */}
+        <section id="historial" aria-label="Historial de evaluaciones">
+          <HistorialEvaluaciones
+            items={historial?.items}
+            total={historial?.total}
+            modalidad={modalidad}
+            alRecargar={() => cargarDatos()}
+            cargando={cargando}
+          />
+        </section>
 
-        {/* 11. Sección de Contactos de Emergencia y Auxilio Ciudadano (Módulo 3) */}
-        <SeccionContactosEmergencia
-          contactos={estado?.contactos_emergencia || estado?.contactos || []}
-        />
+        {/* FILA 6: Resumen Detallado de la Zona Piloto Llojeta */}
+        <section aria-label="Detalle de zona piloto y capas referenciales">
+          <ResumenZonaPiloto
+            zonaPiloto={estado?.zona_piloto}
+            capasReferencia={estado?.capas_referencia}
+          />
+        </section>
       </main>
+
+      {/* 4. Barra de Navegación Inferior Móvil (Mobile Bottom Bar) */}
+      <nav
+        aria-label="Navegación móvil inferior"
+        className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 z-40 py-2 px-3 flex items-center justify-around text-xs shadow-lg"
+      >
+        <a
+          href="#monitoreo"
+          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
+        >
+          <span className="text-base" aria-hidden="true">🌧️</span>
+          <span className="text-[10px] font-semibold">Monitoreo</span>
+        </a>
+        <a
+          href="#telemetria"
+          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
+        >
+          <span className="text-base" aria-hidden="true">📊</span>
+          <span className="text-[10px] font-semibold">Telemetría</span>
+        </a>
+        <a
+          href="#prevencion"
+          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
+        >
+          <span className="text-base" aria-hidden="true">🛡️</span>
+          <span className="text-[10px] font-semibold">Prevención</span>
+        </a>
+        <a
+          href="#mapa"
+          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
+        >
+          <span className="text-base" aria-hidden="true">🗺️</span>
+          <span className="text-[10px] font-semibold">Mapa</span>
+        </a>
+        <Link
+          to="/admin"
+          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
+        >
+          <span className="text-base" aria-hidden="true">⚙️</span>
+          <span className="text-[10px] font-semibold">Admin</span>
+        </Link>
+      </nav>
     </div>
   );
 }

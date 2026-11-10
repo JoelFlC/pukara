@@ -160,17 +160,19 @@ export default function MapaReferencial({
     setUbicacionUsuario(null);
   };
 
-  // Inicialización y ciclo de vida de Leaflet encapsulado para navegadores
+  // Inicialización y actualización de Leaflet
   useEffect(() => {
-    if (typeof window === 'undefined' || !mapContainerRef.current) return;
+    if (typeof window === 'undefined') return;
+
     let cancelado = false;
 
     import('leaflet')
       .then((leafletModule) => {
-        if (cancelado || !mapContainerRef.current) return;
+        if (cancelado) return;
         const L = leafletModule.default || leafletModule;
 
-        if (L.Icon && L.Icon.Default) {
+        // Arreglo de íconos por defecto de Leaflet en Vite
+        try {
           delete L.Icon.Default.prototype._getIconUrl;
           L.Icon.Default.mergeOptions({
             iconRetinaUrl:
@@ -180,73 +182,83 @@ export default function MapaReferencial({
             shadowUrl:
               'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
           });
-        }
+        } catch {}
 
-        let map = mapInstanceRef.current;
-        if (!map) {
-          map = L.map(mapContainerRef.current, {
+        if (!mapContainerRef.current) return;
+
+        // Crear mapa si no existe
+        if (!mapInstanceRef.current) {
+          const map = L.map(mapContainerRef.current, {
             center: [centroLat, centroLon],
             zoom: 14,
             zoomControl: true,
-            attributionControl: true,
+            attributionControl: false,
           });
 
-          mapInstanceRef.current = map;
-
           const tileLayer = L.tileLayer(tileUrl, {
-            attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
             maxZoom: 18,
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           });
 
           tileLayer.on('tileerror', () => {
             setHayErrorTeselas(true);
           });
 
+          tileLayer.on('tileload', () => {
+            setHayErrorTeselas(false);
+          });
+
           tileLayer.addTo(map);
           tileLayerRef.current = tileLayer;
 
-          markersLayerRef.current = L.layerGroup().addTo(map);
+          const markersLayer = L.layerGroup().addTo(map);
+          markersLayerRef.current = markersLayer;
+
+          mapInstanceRef.current = map;
         }
 
-        // Actualizar capas vectoriales
-        if (markersLayerRef.current) {
+        // Renderizado de capas sobre el mapa
+        if (markersLayerRef.current && mapInstanceRef.current) {
           markersLayerRef.current.clearLayers();
 
-          // 1. Zonas en color neutro fijo
-          if (Array.isArray(zonasReferencia)) {
+          // 1. Polígonos de zonas en tono neutro inmutable (#475569)
+          if (Array.isArray(zonasReferencia) && zonasReferencia.length > 0) {
             zonasReferencia.forEach((zona) => {
               if (zona.geometria) {
                 try {
-                  const geojsonLayer = L.geoJSON(zona.geometria, {
+                  const geoLayer = L.geoJSON(zona.geometria, {
                     style: () => ESTILO_ZONA_NEUTRO,
                     onEachFeature: (_, layer) => {
                       layer.bindPopup(`
                         <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
                           <p style="font-weight: bold; margin: 0 0 4px 0; color: #0f172a;">${zona.nombre}</p>
-                          <p style="margin: 0 0 2px 0; color: #475569;"><strong>Fuente:</strong> ${zona.fuente || 'Sin fuente'}</p>
-                          <p style="margin: 0 0 2px 0; color: #475569;"><strong>Fecha dato:</strong> ${zona.fecha_dato || 'No disponible'}</p>
-                          <p style="margin: 0 0 4px 0; color: #475569;"><strong>Verificación:</strong> ${zona.verificada ? 'Verificada por autoridad' : 'Sin verificación oficial'}</p>
-                          <p style="margin: 4px 0 0 0; font-size: 11px; color: #92400e; font-style: italic; background: #fef3c7; padding: 2px 4px; border-radius: 4px;">
+                          <p style="margin: 0 0 2px 0; color: #475569;"><strong>Fuente:</strong> ${zona.fuente || 'Propuesta académica'}</p>
+                          <p style="margin: 0 0 4px 0; color: #475569;"><strong>Estado:</strong> ${
+                            zona.verificada
+                              ? 'Verificada por autoridad'
+                              : 'Referencia de demostración, no validada (sin verificar)'
+                          }</p>
+                          <p style="margin: 4px 0 0 0; font-size: 10px; color: #92400e; font-style: italic;">
                             referencia de demostración, no validada
                           </p>
                         </div>
                       `);
                     },
                   });
-                  geojsonLayer.addTo(markersLayerRef.current);
+                  geoLayer.addTo(markersLayerRef.current);
                 } catch (err) {
-                  console.warn('Error al añadir polígono GeoJSON:', err.message);
+                  console.warn('Error dibujando polígono de zona:', err);
                 }
               }
             });
           }
 
-          // 2. Puntos de referencia
-          if (Array.isArray(puntosConDistancia)) {
+          // 2. Marcadores de puntos de referencia
+          if (Array.isArray(puntosConDistancia) && puntosConDistancia.length > 0) {
             puntosConDistancia.forEach((punto) => {
-              const lat = Number(punto.latitud);
-              const lon = Number(punto.longitud);
+              const lat = Number(punto.latitud ?? punto.lat);
+              const lon = Number(punto.longitud ?? punto.lng);
 
               if (Number.isFinite(lat) && Number.isFinite(lon)) {
                 const marker = L.marker([lat, lon]);
@@ -360,27 +372,27 @@ export default function MapaReferencial({
   return (
     <section
       aria-label="Mapa referencial del sector piloto"
-      className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4"
+      className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-5"
     >
       {/* 1. Encabezado e Indicador Global vs Tono Neutro */}
-      <div className="space-y-1.5 border-b border-slate-100 pb-3">
+      <div className="space-y-2 border-b border-slate-100 pb-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             Cartografía Referencial
           </span>
-          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
             Sector Piloto Llojeta
           </span>
         </div>
 
-        <h2 className="text-base font-bold text-slate-900 leading-snug">
+        <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
           Mapa del Sector Piloto Llojeta / Bajo Llojeta
         </h2>
 
         {/* Nota obligatoria de la directriz arquitectónica */}
         <p
           data-testid="nota-indicador-global"
-          className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100"
+          className="text-xs text-slate-600 leading-relaxed bg-slate-50/80 p-3 rounded-xl border border-slate-200/80"
         >
           El nivel informativo de lluvia es un indicador global para todo el
           sector piloto Llojeta / Bajo Llojeta y no varía espacialmente. Las
@@ -393,7 +405,7 @@ export default function MapaReferencial({
         <div
           data-testid="aviso-mapa-parcial"
           role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 font-medium space-y-1 shadow-xs"
+          className="rounded-xl border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-900 font-medium space-y-1 shadow-2xs"
         >
           <p className="font-semibold flex items-center gap-1.5">
             <span aria-hidden="true">⚠️</span> Cartografía parcial
@@ -404,261 +416,270 @@ export default function MapaReferencial({
         </div>
       )}
 
-      {/* 3. Contenedor interactivo del Mapa Leaflet */}
-      <div className="relative">
-        <div
-          ref={mapContainerRef}
-          data-testid="mapa-leaflet-contenedor"
-          className="w-full h-72 sm:h-80 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 z-0 relative"
-          tabIndex={0}
-          aria-label="Mapa cartográfico referencial del sector piloto Llojeta"
-        />
-
-        <div className="mt-1 text-[10px] text-slate-400 text-right">
-          &copy;{' '}
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-slate-600"
-          >
-            OpenStreetMap
-          </a>{' '}
-          contributors
-        </div>
-      </div>
-
-      {/* 4. Panel de Control de Ubicación GPS (Requisito P09) */}
-      <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3.5 space-y-2.5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
-          <div>
-            <h3 className="text-xs font-bold text-slate-800">
-              Ubicación aproximada en dispositivo
-            </h3>
-            <p className="text-[11px] text-slate-500 leading-snug">
-              Su ubicación se procesa únicamente en este dispositivo para
-              calcular la distancia en línea recta y nunca se almacena ni se
-              envía al servidor.
-            </p>
+      {/* 3. Layout Responsivo en 2 Columnas para Desktop (lg:grid-cols-12) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Columna Izquierda (lg:col-span-7): Lienzo del Mapa Leaflet */}
+        <div className="lg:col-span-7 space-y-2">
+          <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-2xs">
+            <div
+              ref={mapContainerRef}
+              data-testid="mapa-leaflet-contenedor"
+              className="w-full h-80 sm:h-96 lg:h-[480px] z-0 relative"
+              tabIndex={0}
+              aria-label="Mapa cartográfico referencial del sector piloto Llojeta"
+            />
           </div>
 
-          <div className="shrink-0">
-            {estadoUbicacion !== 'concedido' ? (
-              <button
-                type="button"
-                data-testid="btn-solicitar-ubicacion"
-                onClick={handleSolicitarUbicacion}
-                disabled={estadoUbicacion === 'solicitando'}
-                className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-xs w-full sm:w-auto"
+          {/* Atribución única clara de OpenStreetMap */}
+          <div className="text-[10px] text-slate-400 text-right px-1">
+            &copy;{' '}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-slate-600"
+            >
+              OpenStreetMap
+            </a>{' '}
+            contributors
+          </div>
+        </div>
+
+        {/* Columna Derecha (lg:col-span-5): Proximidad Haversine, Zonas y Puntos */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Panel de Control de Ubicación GPS (Requisito P09 / P18) */}
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/90 p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs font-bold text-slate-800">
+                  Ubicación aproximada en dispositivo
+                </h3>
+                <p className="text-[11px] text-slate-500 leading-snug mt-0.5">
+                  Su ubicación se procesa únicamente en este dispositivo para
+                  calcular la distancia en línea recta y nunca se almacena ni se
+                  envía al servidor.
+                </p>
+              </div>
+
+              <div className="w-full sm:w-auto shrink-0">
+                {estadoUbicacion !== 'concedido' ? (
+                  <button
+                    type="button"
+                    data-testid="btn-solicitar-ubicacion"
+                    onClick={handleSolicitarUbicacion}
+                    disabled={estadoUbicacion === 'solicitando'}
+                    className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F172A] text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-xs w-full sm:w-auto cursor-pointer"
+                  >
+                    <span>📍</span>
+                    <span>
+                      {estadoUbicacion === 'solicitando'
+                        ? 'Consultando GPS local...'
+                        : 'Calcular distancia aproximada desde mi ubicación (procesado solo en este dispositivo)'}
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    data-testid="btn-ocultar-ubicacion"
+                    onClick={handleOcultarUbicacion}
+                    className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
+                  >
+                    <span>Ocultar mi ubicación</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Escenario P09: GPS Denegado o no disponible */}
+            {(estadoUbicacion === 'denegado' ||
+              estadoUbicacion === 'no_disponible') && (
+              <div
+                data-testid="aviso-gps-denegado"
+                role="status"
+                className="rounded-xl border border-slate-300 bg-white p-3 text-xs text-slate-700 space-y-1 shadow-2xs"
               >
-                <span>📍</span>
+                <p className="font-semibold text-slate-800">
+                  Permiso de ubicación denegado o no disponible
+                </p>
+                <p className="text-slate-600 leading-relaxed">
+                  Permiso de ubicación denegado o no disponible: no se muestran distancias a los puntos de referencia. La consulta general del nivel informativo, las recomendaciones y el mapa referencial funcionan con normalidad.
+                </p>
+              </div>
+            )}
+
+            {/* Ubicación concedida: detalle de precisión */}
+            {estadoUbicacion === 'concedido' && ubicacionUsuario && (
+              <div
+                data-testid="aviso-gps-concedido"
+                role="status"
+                className="rounded-xl border border-blue-200 bg-blue-50 p-2.5 text-xs text-blue-900 flex items-center justify-between gap-2 shadow-2xs"
+              >
                 <span>
-                  {estadoUbicacion === 'solicitando'
-                    ? 'Consultando GPS local...'
-                    : 'Calcular distancia aproximada desde mi ubicación (procesado solo en este dispositivo)'}
+                  Ubicación activa en este dispositivo · Precisión: ±
+                  {ubicacionUsuario.precision} m
                 </span>
-              </button>
+                <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono">
+                  GPS local
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Listado de Zonas de Referencia */}
+          <div
+            data-testid="seccion-zonas-referencia"
+            className="rounded-2xl border border-slate-200/80 bg-white p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Zonas de Referencia ({zonasReferencia.length})
+              </h3>
+              <span className="text-[10px] text-amber-900 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                referencia de demostración, no validada
+              </span>
+            </div>
+
+            {zonasReferencia.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">
+                No se han delimitado zonas de referencia aún.
+              </p>
             ) : (
-              <button
-                type="button"
-                data-testid="btn-ocultar-ubicacion"
-                onClick={handleOcultarUbicacion}
-                className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto"
-              >
-                <span>Ocultar mi ubicación</span>
-              </button>
+              <div className="grid grid-cols-1 gap-2.5 max-h-52 overflow-y-auto pr-1">
+                {zonasReferencia.map((z) => (
+                  <div
+                    key={z.id}
+                    data-testid="tarjeta-zona"
+                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1 text-xs"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-bold text-slate-900">{z.nombre}</h4>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
+                          z.verificada
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                        }`}
+                      >
+                        {z.verificada
+                          ? 'Verificada por autoridad'
+                          : 'Sin verificación oficial'}
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 space-y-0.5">
+                      <p>
+                        <span className="font-medium text-slate-700">Fuente:</span>{' '}
+                        {z.fuente || 'Propuesta académica'}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-700">
+                          Fecha del dato:
+                        </span>{' '}
+                        {z.fecha_dato || 'No disponible'}
+                        {z.vigente_hasta && ` · Vigente hasta: ${z.vigente_hasta}`}
+                      </p>
+                      {z.advertencia && (
+                        <p className="text-amber-800 italic">{z.advertencia}</p>
+                      )}
+                    </div>
+
+                    <div className="pt-1">
+                      <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
+                        referencia de demostración, no validada
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Listado de Puntos de Referencia con Distancias Haversine (P18) */}
+          <div
+            data-testid="seccion-puntos-referencia"
+            className="rounded-2xl border border-slate-200/80 bg-white p-4 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Puntos de Referencia ({puntosConDistancia.length})
+              </h3>
+              <span className="text-[10px] text-amber-900 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                referencia de demostración, no validada
+              </span>
+            </div>
+
+            {puntosConDistancia.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">
+                No se han registrado puntos de referencia aún.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                {puntosConDistancia.map((p) => (
+                  <div
+                    key={p.id}
+                    data-testid="tarjeta-punto"
+                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1.5 text-xs"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-bold text-slate-900">{p.nombre}</h4>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          Tipo: {p.tipo || 'Punto'}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
+                          p.estado_verificacion === 'verificado_por_autoridad'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        {p.estado_verificacion === 'verificado_por_autoridad'
+                          ? 'Verificado por autoridad'
+                          : 'Referencia de demostración, no validada (sin verificar)'}
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-slate-600 space-y-0.5 font-mono">
+                      <p>
+                        Lat: {Number(p.latitud).toFixed(4)}, Lon:{' '}
+                        {Number(p.longitud).toFixed(4)}
+                      </p>
+                      <p className="font-sans text-slate-500">
+                        Fuente: {p.fuente || 'Propuesta académica'}
+                      </p>
+                    </div>
+
+                    {/* Distancia Haversine calculada en el cliente (P18) */}
+                    {p.distancia ? (
+                      <div
+                        data-testid="distancia-haversine"
+                        className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-900 space-y-0.5 shadow-2xs"
+                      >
+                        <p className="font-bold text-xs">
+                          Distancia en línea recta: {p.distancia.distanciaCorta}
+                        </p>
+                        <p className="text-[10px] text-slate-600 leading-snug">
+                          {p.distancia.leyenda}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-slate-400 italic">
+                        Distancia no calculada (active ubicación en el dispositivo)
+                      </div>
+                    )}
+
+                    <div className="pt-0.5">
+                      <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
+                        referencia de demostración, no validada
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
-
-        {/* Escenario P09: GPS Denegado o no disponible */}
-        {(estadoUbicacion === 'denegado' ||
-          estadoUbicacion === 'no_disponible') && (
-          <div
-            data-testid="aviso-gps-denegado"
-            role="status"
-            className="rounded-lg border border-slate-300 bg-slate-100 p-2.5 text-xs text-slate-700 space-y-1"
-          >
-            <p className="font-semibold text-slate-800">
-              Permiso de ubicación denegado o no disponible
-            </p>
-            <p className="text-slate-600 leading-relaxed">
-              Permiso de ubicación denegado o no disponible: no se muestran distancias a los puntos de referencia. La consulta general del nivel informativo, las recomendaciones y el mapa referencial funcionan con normalidad.
-            </p>
-          </div>
-        )}
-
-        {/* Ubicación concedida: detalle de precisión */}
-        {estadoUbicacion === 'concedido' && ubicacionUsuario && (
-          <div
-            data-testid="aviso-gps-concedido"
-            role="status"
-            className="rounded-lg border border-blue-200 bg-blue-50 p-2.5 text-xs text-blue-900 flex items-center justify-between gap-2"
-          >
-            <span>
-              Ubicación activa en este dispositivo · Precisión: ±
-              {ubicacionUsuario.precision} m
-            </span>
-            <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono">
-              GPS local
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 5. Listado de Zonas de Referencia con Trazabilidad Completa */}
-      <div
-        data-testid="seccion-zonas-referencia"
-        className="space-y-2 border-t border-slate-100 pt-3"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-            Zonas de Referencia ({zonasReferencia.length})
-          </h3>
-          <span className="text-[10px] text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            referencia de demostración, no validada
-          </span>
-        </div>
-
-        {zonasReferencia.length === 0 ? (
-          <p className="text-xs text-slate-400 italic">
-            No se han delimitado zonas de referencia aún.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 gap-2">
-            {zonasReferencia.map((z) => (
-              <div
-                key={z.id}
-                data-testid="tarjeta-zona"
-                className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 text-xs"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-bold text-slate-900">{z.nombre}</h4>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
-                      z.verificada
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
-                    }`}
-                  >
-                    {z.verificada
-                      ? 'Verificada por autoridad'
-                      : 'Sin verificación oficial'}
-                  </span>
-                </div>
-
-                <div className="text-[11px] text-slate-600 space-y-0.5">
-                  <p>
-                    <span className="font-medium text-slate-700">Fuente:</span>{' '}
-                    {z.fuente || 'Propuesta académica'}
-                  </p>
-                  <p>
-                    <span className="font-medium text-slate-700">
-                      Fecha del dato:
-                    </span>{' '}
-                    {z.fecha_dato || 'No disponible'}
-                    {z.vigente_hasta && ` · Vigente hasta: ${z.vigente_hasta}`}
-                  </p>
-                  {z.advertencia && (
-                    <p className="text-amber-800 italic">{z.advertencia}</p>
-                  )}
-                </div>
-
-                <div className="pt-1">
-                  <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
-                    referencia de demostración, no validada
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 6. Listado de Puntos de Referencia con Distancias Haversine (P18) */}
-      <div
-        data-testid="seccion-puntos-referencia"
-        className="space-y-2 border-t border-slate-100 pt-3"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-            Puntos de Referencia ({puntosConDistancia.length})
-          </h3>
-          <span className="text-[10px] text-amber-800 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            referencia de demostración, no validada
-          </span>
-        </div>
-
-        {puntosConDistancia.length === 0 ? (
-          <p className="text-xs text-slate-400 italic">
-            No se han registrado puntos de referencia aún.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 gap-2">
-            {puntosConDistancia.map((p) => (
-              <div
-                key={p.id}
-                data-testid="tarjeta-punto"
-                className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-xs"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h4 className="font-bold text-slate-900">{p.nombre}</h4>
-                    <span className="text-[10px] text-slate-500 font-mono">
-                      Tipo: {p.tipo || 'Punto'}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
-                      p.estado_verificacion === 'verificado_por_autoridad'
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
-                    }`}
-                  >
-                    {p.estado_verificacion === 'verificado_por_autoridad'
-                      ? 'Verificado por autoridad'
-                      : 'Referencia de demostración, no validada (sin verificar)'}
-                  </span>
-                </div>
-
-                <div className="text-[11px] text-slate-600 space-y-0.5 font-mono">
-                  <p>
-                    Lat: {Number(p.latitud).toFixed(4)}, Lon:{' '}
-                    {Number(p.longitud).toFixed(4)}
-                  </p>
-                  <p className="font-sans text-slate-500">
-                    Fuente: {p.fuente || 'Propuesta académica'}
-                  </p>
-                </div>
-
-                {/* Distancia Haversine calculada en el cliente (P18) */}
-                {p.distancia ? (
-                  <div
-                    data-testid="distancia-haversine"
-                    className="p-2 rounded-lg bg-blue-50/70 border border-blue-200 text-blue-900 space-y-0.5"
-                  >
-                    <p className="font-bold text-xs">
-                      Distancia en línea recta: {p.distancia.distanciaCorta}
-                    </p>
-                    <p className="text-[10px] text-slate-600 leading-snug">
-                      {p.distancia.leyenda}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-[10px] text-slate-400 italic">
-                    Distancia no calculada (active ubicación en el dispositivo)
-                  </div>
-                )}
-
-                <div className="pt-0.5">
-                  <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
-                    referencia de demostración, no validada
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       <footer className="pt-2 text-[11px] text-slate-400 border-t border-slate-100 leading-relaxed">
@@ -667,4 +688,3 @@ export default function MapaReferencial({
     </section>
   );
 }
-
