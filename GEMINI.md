@@ -68,3 +68,24 @@ Los nombres exactos e inmutables del esquema relacional son:
 - Todo desarrollo se realiza en ramas de funcionalidad con prefijo `feat/<nombre-tarea>`.
 - Formato obligatorio de commits: `S<semana>D<dia>: <resumen en imperativo>` (ejemplo: `S1D1: Configuración de entorno base y endpoint de salud`).
 - **Criterio de Aceptación:** Ninguna sesión puede darse por concluida si existen pruebas automatizadas fallidas (`vitest` en rojo).
+
+---
+
+## 7. Estado Actual del Proyecto y Puerta de Calidad (Cierre Semana 3)
+- **Semanas 1, 2 y 3 (`S1D1` a `S3D7`) completadas al 100% en `main`:**
+  - Los 5 módulos arquitectónicos se encuentran implementados y plenamente integrados:
+    - Módulo 1: Ingesta pluviométrica resiliente desde Open-Meteo y series horarias.
+    - Módulo 2: Motor de evaluación por umbrales, histéresis y saturación de cuenca.
+    - Módulo 3: Recomendaciones preventivas con etiqueta de origen, contactos verificados y aviso visual in-app.
+    - Módulo 4: Cartografía referencial en tonos neutros, Haversine en el cliente y PWA offline.
+    - Módulo 5: Autenticación JWT, panel administrativo y bitácora de auditoría inmutable.
+  - Certificación integral: 27 suites de pruebas automatizadas en riguroso verde (19 suites / 197 pruebas en `/server` y 8 suites / 61 pruebas en `/client`).
+- **Régimen de Congelamiento de Funcionalidades (Feature Freeze Vigente):**
+  - Conforme al cierre de la Semana 3, rige congelamiento estricto de funcionalidades para toda la Semana 4 (`S4D1` a `S4D7`).
+  - **PROHIBIDO** agregar nuevas funcionalidades, nuevos endpoints o alterar el esquema de base de datos durante la Semana 4.
+  - El alcance exclusivo de la Semana 4 comprende:
+    1. Verificación y validación cruzada de las 19 pruebas académicas obligatorias (`P01` a `P19`).
+    2. Protocolo de campo en dispositivo físico Android real (instalación PWA, modo avión `P08`, mapa parcial `P10` e instalación `P12`).
+    3. Evaluación de usabilidad, accesibilidad y rendimiento en dispositivos móviles (`P19`).
+    4. Simulación de los escenarios históricos de referencia (abril 2019 y noviembre 2024 en Llojeta).
+    5. Documentación de cierre del proyecto y preparación para la defensa académica.
