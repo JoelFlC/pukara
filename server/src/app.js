@@ -64,6 +64,13 @@ app.use(
         return callback(null, true);
       }
 
+      // En desarrollo, permitir conexiones desde la red local (localhost, 127.0.0.1, 192.168.x.x, 10.x.x.x, etc.)
+      const esDesarrollo = process.env.NODE_ENV !== 'production';
+      const esIpLocal = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origenNormalizado);
+      if (esDesarrollo && esIpLocal) {
+        return callback(null, true);
+      }
+
       return callback(new Error(`Origen ${origin} no permitido por política CORS`));
     },
     credentials: true,
