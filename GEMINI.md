@@ -91,3 +91,4 @@ Los nombres exactos e inmutables del esquema relacional son:
     5. Documentación de cierre del proyecto y preparación para la defensa académica.
 - **Avance de la Semana 4 (`S4D1` a `S4D7`):**
   - `S4D1` completado (Suite de integración API completa + Colección Postman v2.1 + `P01`, `P03`, `P04`, `P05`, `P07`, `P16`, `P17` verificadas — 21 suites / 212 pruebas en `/server` y 8 suites / 61 pruebas en `/client`).
+  - `S4D2` completado (Verificación de datos faltantes `P02`, fallos de API `P03`/`T5` y aislamiento simulación vs real `P11` documentados y en verde — 22 suites / 217 pruebas en `/server` y 8 suites / 61 pruebas en `/client`).
