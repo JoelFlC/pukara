@@ -17,7 +17,8 @@
     "seed:admin": "node src/db/seedAdmin.js",
     "meteo:inspeccionar": "node src/scripts/inspeccionarOpenMeteo.js",
     "cloud:verificar": "node src/scripts/verificarDespliegue.js",
-    "verify:api": "node src/scripts/verificarApiDespliegue.js"
+    "verify:api": "node src/scripts/verificarApiDespliegue.js",
+    "verify:resiliencia": "node src/scripts/verificarResilienciaS4D2.js"
   },
   "engines": {
     "node": ">=20.0.0"
