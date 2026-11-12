@@ -89,3 +89,5 @@ Los nombres exactos e inmutables del esquema relacional son:
     3. Evaluación de usabilidad, accesibilidad y rendimiento en dispositivos móviles (`P19`).
     4. Simulación de los escenarios históricos de referencia (abril 2019 y noviembre 2024 en Llojeta).
     5. Documentación de cierre del proyecto y preparación para la defensa académica.
+- **Avance de la Semana 4 (`S4D1` a `S4D7`):**
+  - `S4D1` completado (Suite de integración API completa + Colección Postman v2.1 + `P01`, `P03`, `P04`, `P05`, `P07`, `P16`, `P17` verificadas — 21 suites / 212 pruebas en `/server` y 8 suites / 61 pruebas en `/client`).

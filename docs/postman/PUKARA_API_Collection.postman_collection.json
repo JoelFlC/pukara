@@ -1,0 +1,1109 @@
+{
+  "info": {
+    "_postman_id": "a7b8c9d0-1234-4e5f-89ab-cdef01234567",
+    "name": "PUKARA — API REST de Consulta Informativa de Lluvias (Sector Llojeta, La Paz)",
+    "description": "Colección oficial Postman v2.1.0 para la verificación de integración de la API de PUKARA (Semana 4 — Día 1, S4D1). Cubre salud del servicio, consulta pública (real y simulada), seguridad RBAC/JWT (P07), gobernanza y versionado de reglas (P05, P16), gestión de recomendaciones, contactos, capas cartográficas, bitácora de auditoría y modo simulación (P11).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "configBorradorId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Salud y Consulta Pública",
+      "description": "Endpoints públicos de salud operativa, estado consolidado del nivel informativo de lluvia e historial paginado.",
+      "item": [
+        {
+          "name": "1.1 GET /api/salud — Estado del servicio y PostgreSQL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Estado del servicio es ok y base de datos conectada', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.estado).to.eql('ok');",
+                  "  pm.expect(jsonData.base_de_datos).to.eql('conectado');",
+                  "  pm.expect(jsonData).to.have.property('timestamp');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/salud",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "salud"]
+            }
+          }
+        },
+        {
+          "name": "1.2 GET /api/estado — Consulta pública integral (Modalidad Real)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Estructura completa del contrato público v1', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.modalidad).to.eql('real');",
+                  "  pm.expect(jsonData).to.have.any.keys('nivel_vigente', 'estado_sistema');",
+                  "  pm.expect(jsonData).to.have.property('lectura');",
+                  "  pm.expect(jsonData).to.have.property('antiguedad_minutos');",
+                  "  pm.expect(jsonData).to.have.property('recomendacion_vigente');",
+                  "  pm.expect(jsonData.recomendaciones).to.be.an('array').that.has.lengthOf.at.least(4);",
+                  "  pm.expect(jsonData.contactos_emergencia).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(jsonData.zonas_referencia).to.be.an('array').that.has.lengthOf(2);",
+                  "  pm.expect(jsonData.puntos_referencia).to.be.an('array').that.has.lengthOf(6);",
+                  "  pm.expect(jsonData).to.have.property('version_reglas');",
+                  "});",
+                  "pm.test('Incluye el Aviso Permanente obligatorio de nivel informativo de lluvia', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.aviso_permanente).to.include('niveles informativos de lluvia');",
+                  "  pm.expect(jsonData.aviso_permanente).to.include('umbrales académicos');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "estado"]
+            }
+          }
+        },
+        {
+          "name": "1.3 GET /api/estado?modalidad=simulada — Consulta pública aislada en modo simulación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Verifica aislamiento de consulta en modalidad simulada (P11)', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.es_simulacion).to.be.true;",
+                  "  pm.expect(jsonData.banner_simulacion).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/estado?modalidad=simulada",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "estado"],
+              "query": [
+                {
+                  "key": "modalidad",
+                  "value": "simulada"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.4 GET /api/historial?limite=10 — Historial de evaluaciones reales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Devuelve lista paginada de evaluaciones en modalidad real', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('real');",
+                  "  pm.expect(jsonData.limite).to.eql(10);",
+                  "  pm.expect(jsonData.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historial?limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historial"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.5 GET /api/historial?modalidad=simulada&limite=10 — Historial de evaluaciones simuladas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Devuelve lista paginada de evaluaciones en modalidad simulada', function () {",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.limite).to.eql(10);",
+                  "  pm.expect(jsonData.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historial?modalidad=simulada&limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historial"],
+              "query": [
+                {
+                  "key": "modalidad",
+                  "value": "simulada"
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Autenticación y Seguridad (P07)",
+      "description": "Pruebas de autenticación administrativa con JWT y control de acceso basado en roles (Prueba P07).",
+      "item": [
+        {
+          "name": "2.1 POST /api/auth/login — Login exitoso y captura de token JWT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK con token JWT válido', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.token).to.be.a('string').and.not.empty;",
+                  "  pm.expect(jsonData.usuario.rol).to.eql('administrador');",
+                  "  pm.collectionVariables.set('adminToken', jsonData.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@pukara.bo\",\n  \"password\": \"PukaraAdmin2026!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.2 POST /api/auth/login — Rechazo con contraseña inválida (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza credenciales inválidas con HTTP 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.false;",
+                  "  pm.expect(jsonData.error.codigo).to.eql('CREDENCIALES_INVALIDAS');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@pukara.bo\",\n  \"password\": \"ClaveIncorrecta123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "2.3 GET /api/admin/configuraciones — Sin cabecera Authorization (401 P07)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza petición sin token con HTTP 401 (P07)', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.false;",
+                  "  pm.expect(jsonData.error.codigo).to.eql('TOKEN_FALTANTE');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones"]
+            }
+          }
+        },
+        {
+          "name": "2.4 GET /api/admin/configuraciones — Con token malformado o vencido (401 P07)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza petición con token inválido/vencido con HTTP 401 (P07)', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.false;",
+                  "  pm.expect(jsonData.error.codigo).to.be.oneOf(['TOKEN_INVALIDO', 'TOKEN_EXPIRADO']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token.jwt.malformado.p07"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Administración de Reglas y Umbrales (P05, P16)",
+      "description": "Validación de coherencia matemática de umbrales (P16) y ciclo de versionado inmutable (P05).",
+      "item": [
+        {
+          "name": "3.1 GET /api/admin/configuraciones — Listar versiones de reglas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK con versiones de configuración', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.versiones).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones"]
+            }
+          }
+        },
+        {
+          "name": "3.2 POST /api/admin/configuraciones — Rechazo de configuración incoherente (400 P16)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza configuración incoherente con HTTP 400 (P16)', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.false;",
+                  "  pm.expect(jsonData.error.codigo).to.eql('CONFIGURACION_INVALIDA');",
+                  "  pm.expect(jsonData.error.detalles).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba P16 de umbrales incoherentes (PRECAUCION >= ALERTA y 24h > 72h)\",\n  \"activar\": false,\n  \"umbrales\": [\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"PRECAUCION\", \"valor\": -1.5 },\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"ALERTA\", \"valor\": 6.5 },\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"EMERGENCIA\", \"valor\": 5.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"PRECAUCION\", \"valor\": 10.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"ALERTA\", \"valor\": 70.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"EMERGENCIA\", \"valor\": 80.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"PRECAUCION\", \"valor\": 25.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"ALERTA\", \"valor\": 60.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"EMERGENCIA\", \"valor\": 90.0 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones"]
+            }
+          }
+        },
+        {
+          "name": "3.3 POST /api/admin/configuraciones — Crear nueva versión válida en borrador (201 P05)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Crea nueva versión coherente en estado borrador (201)', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.configuracion.estado).to.eql('borrador');",
+                  "  pm.expect(jsonData.configuracion.umbrales).to.have.lengthOf(9);",
+                  "  pm.collectionVariables.set('configBorradorId', jsonData.configuracion.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Calibración académica de umbrales versión de prueba Postman S4D1\",\n  \"activar\": false,\n  \"parametros\": {\n    \"t_max_minutos\": 60,\n    \"separacion_minima_minutos\": 15,\n    \"muestras_descenso\": 2\n  },\n  \"umbrales\": [\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"PRECAUCION\", \"valor\": 2.5 },\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"ALERTA\", \"valor\": 6.5 },\n    { \"variable\": \"intensidad_mm_h\", \"nivel\": \"EMERGENCIA\", \"valor\": 12.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"PRECAUCION\", \"valor\": 10.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"ALERTA\", \"valor\": 25.0 },\n    { \"variable\": \"acum_24h_mm\", \"nivel\": \"EMERGENCIA\", \"valor\": 40.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"PRECAUCION\", \"valor\": 25.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"ALERTA\", \"valor\": 60.0 },\n    { \"variable\": \"acum_72h_mm\", \"nivel\": \"EMERGENCIA\", \"valor\": 90.0 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones"]
+            }
+          }
+        },
+        {
+          "name": "3.4 POST /api/admin/configuraciones/:id/activar — Activar versión y reiniciar contador (200 P05)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Activa la versión de configuración y reinicia contador_descenso (P05)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.configuracion.estado).to.eql('vigente');",
+                  "  pm.expect(jsonData.configuracion.contador_descenso_reiniciado).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Activación de versión validada en pruebas S4D1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/configuraciones/{{configBorradorId}}/activar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "configuraciones", "{{configBorradorId}}", "activar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Administración de Contenidos, Capas y Bitácora",
+      "description": "Gestión de recomendaciones preventivas, contactos de emergencia, inmutabilidad cartográfica y auditoría en bitácora.",
+      "item": [
+        {
+          "name": "4.1 GET /api/admin/recomendaciones — Listar recomendaciones con etiqueta de origen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK y verifica campo origen en recomendaciones', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.recomendaciones).to.be.an('array').that.is.not.empty;",
+                  "  jsonData.recomendaciones.forEach((rec) => {",
+                  "    pm.expect(rec.origen).to.be.oneOf(['demostracion', 'institucional_verificada']);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/recomendaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "recomendaciones"]
+            }
+          }
+        },
+        {
+          "name": "4.2 PUT /api/admin/recomendaciones/1 — Actualizar recomendación preventiva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Actualiza recomendación y conserva etiqueta de origen válida', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.recomendacion.origen).to.be.oneOf(['demostracion', 'institucional_verificada']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Recomendaciones generales — Nivel Normal\",\n  \"contenido\": \"Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.\",\n  \"origen\": \"demostracion\",\n  \"fuente\": \"Propuesta académica PUKARA - Contenido preventivo general de demostración\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/recomendaciones/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "recomendaciones", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.3 GET /api/admin/contactos — Listar directorio de emergencias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK con directorio de contactos', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.contactos).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/contactos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "contactos"]
+            }
+          }
+        },
+        {
+          "name": "4.4 POST /api/admin/contactos — Registrar contacto de emergencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Registra contacto de emergencia con HTTP 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.contacto).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Centro de Operaciones de Emergencia Municipal Test\",\n  \"telefono\": \"114\",\n  \"fuente\": \"GAMLP — Demostración académica\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/contactos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "contactos"]
+            }
+          }
+        },
+        {
+          "name": "4.5 PUT /api/admin/contactos/1 — Actualizar contacto de emergencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Actualiza contacto existente con HTTP 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.contacto.telefono).to.eql('114');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Red 114 — Emergencias GAMLP (Alcaldía La Paz)\",\n  \"telefono\": \"114\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/contactos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "contactos", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.6 GET /api/admin/capas — Consultar zonas y puntos de referencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK con zonas y puntos', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.zonas).to.be.an('array').that.has.lengthOf(2);",
+                  "  pm.expect(jsonData.puntos).to.be.an('array').that.has.lengthOf.at.least(6);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/capas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "capas"]
+            }
+          }
+        },
+        {
+          "name": "4.7 PUT /api/admin/zonas/1 — Actualizar atributos protegiendo geometría GeoJSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Actualiza atributos de zona e ignora intento de alterar geometria', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.zona.advertencia).to.eql('referencia de demostración, no validada');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sector Piloto Llojeta — Cuenca Media (Referencial)\",\n  \"fuente\": \"Delimitación académica aproximada sobre cartografía base OpenStreetMap\",\n  \"advertencia\": \"referencia de demostración, no validada\",\n  \"verificada\": false,\n  \"geometria\": { \"type\": \"Point\", \"coordinates\": [0, 0] }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/zonas/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "zonas", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.8 PUT /api/admin/puntos/1 — Actualizar atributos protegiendo coordenadas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Actualiza atributos de punto y preserva latitud/longitud inmutables', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.punto.latitud).to.be.closeTo(-16.5268, 0.001);",
+                  "  pm.expect(jsonData.punto.longitud).to.be.closeTo(-68.1372, 0.001);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cruce Av. Los Sargentos — Acceso Bajo Llojeta (Referencia vial)\",\n  \"tipo\": \"hito_vial_referencial\",\n  \"estado_verificacion\": \"sin_verificar\",\n  \"latitud\": 0.0,\n  \"longitud\": 0.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/puntos/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "puntos", "1"]
+            }
+          }
+        },
+        {
+          "name": "4.9 GET /api/admin/bitacora — Consultar bitácora de auditoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde HTTP 200 OK con registros de auditoría completos', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "  pm.expect(jsonData.registros).to.be.an('array').that.is.not.empty;",
+                  "  const item = jsonData.registros[0];",
+                  "  pm.expect(item).to.have.property('usuario_id');",
+                  "  pm.expect(item).to.have.property('entidad');",
+                  "  pm.expect(item).to.have.property('accion');",
+                  "  pm.expect(item).to.have.property('valor_anterior');",
+                  "  pm.expect(item).to.have.property('valor_nuevo');",
+                  "  pm.expect(item).to.have.property('ocurrido_en');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/bitacora",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "bitacora"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Modo Simulación y Demostración (P11)",
+      "description": "Inyección de lecturas simuladas para los 4 niveles informativos de lluvia y limpieza garantizando aislamiento respecto al estado real.",
+      "item": [
+        {
+          "name": "5.1 POST /api/simulacion/lectura — Escenario NORMAL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Evalúa escenario simulado NORMAL (201)', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.evaluacion.nivel_vigente).to.eql('NORMAL');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"intensidad_mm_h\": 0.4,\n  \"acum_24h_mm\": 2.0,\n  \"acum_72h_mm\": 6.0,\n  \"reiniciar_antes\": true,\n  \"modo_preset\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacion/lectura",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacion", "lectura"]
+            }
+          }
+        },
+        {
+          "name": "5.2 POST /api/simulacion/lectura — Escenario PRECAUCION",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Evalúa escenario simulado PRECAUCION (201)', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.evaluacion.nivel_vigente).to.eql('PRECAUCION');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"intensidad_mm_h\": 3.2,\n  \"acum_24h_mm\": 14.0,\n  \"acum_72h_mm\": 30.0,\n  \"reiniciar_antes\": true,\n  \"modo_preset\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacion/lectura",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacion", "lectura"]
+            }
+          }
+        },
+        {
+          "name": "5.3 POST /api/simulacion/lectura — Escenario ALERTA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Evalúa escenario simulado ALERTA (201)', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.evaluacion.nivel_vigente).to.eql('ALERTA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"intensidad_mm_h\": 7.5,\n  \"acum_24h_mm\": 28.0,\n  \"acum_72h_mm\": 64.0,\n  \"reiniciar_antes\": true,\n  \"modo_preset\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacion/lectura",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacion", "lectura"]
+            }
+          }
+        },
+        {
+          "name": "5.4 POST /api/simulacion/lectura — Escenario EMERGENCIA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Evalúa escenario simulado EMERGENCIA (201)', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.modalidad).to.eql('simulada');",
+                  "  pm.expect(jsonData.evaluacion.nivel_vigente).to.eql('EMERGENCIA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"intensidad_mm_h\": 14.5,\n  \"acum_24h_mm\": 48.0,\n  \"acum_72h_mm\": 98.0,\n  \"reiniciar_antes\": true,\n  \"modo_preset\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacion/lectura",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacion", "lectura"]
+            }
+          }
+        },
+        {
+          "name": "5.5 DELETE /api/simulacion — Limpiar datos simulados preservando flujo real",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Limpia datos simulados exitosamente (200)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const jsonData = pm.response.json();",
+                  "  pm.expect(jsonData.ok).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacion"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
