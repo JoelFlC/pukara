@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "verify:pwa": "node scripts/verificarBuildPwaS4D3.js"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
