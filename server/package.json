@@ -18,7 +18,8 @@
     "meteo:inspeccionar": "node src/scripts/inspeccionarOpenMeteo.js",
     "cloud:verificar": "node src/scripts/verificarDespliegue.js",
     "verify:api": "node src/scripts/verificarApiDespliegue.js",
-    "verify:resiliencia": "node src/scripts/verificarResilienciaS4D2.js"
+    "verify:resiliencia": "node src/scripts/verificarResilienciaS4D2.js",
+    "verify:p19": "node src/scripts/medirRendimientoP19.js"
   },
   "engines": {
     "node": ">=20.0.0"
