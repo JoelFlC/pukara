@@ -96,3 +96,5 @@ Los nombres exactos e inmutables del esquema relacional son:
   - `S4D4` completado (Prueba de usabilidad con 5 participantes y medición de rendimiento `P19` `< 3s` certificadas y en verde — 23 suites / 220 pruebas en `/server` y 10 suites / 70 pruebas en `/client`).
   - `S4D5` completado (Escenario de referencia histórico abril 2019 y noviembre 2024 — Sección 11.3 — y auditoría automatizada de seguridad básica — Sección 6.4 — en verde — 24 suites / 228 pruebas en `/server` y 10 suites / 70 pruebas en `/client`).
   - `S4D6` completado (Manual de instalación, Tabla 11.4 ampliada P01-P19, Reporte de pruebas y paridad, y README.md final completados y auditados — 24 suites / 228 pruebas en `/server` y 10 suites / 70 pruebas en `/client`).
+  - `S4D7` completado (Guion de defensa final, script `pre-defensa`, respaldo JSON de despliegue, suite de ensayo integral en 5 actos y cierre de Semana 4 — 25 suites / 233 pruebas en `/server` y 10 suites / 70 pruebas en `/client` — **35 suites / 303 pruebas totales en riguroso verde**).
+- **ESTADO FINAL DEL PROYECTO:** **Semanas 1, 2, 3 y 4 (`S1D1` a `S4D7`) 100% COMPLETADAS — PROYECTO CERRADO Y LISTO PARA DEFENSA FINAL.**
