@@ -21,7 +21,8 @@
     "verify:resiliencia": "node src/scripts/verificarResilienciaS4D2.js",
     "verify:p19": "node src/scripts/medirRendimientoP19.js",
     "verify:s4d5": "node src/scripts/ejecutarEscenarioReferenciaSeguridadS4D5.js",
-    "verify:evidencias": "node src/scripts/verificarEvidenciasS4D6.js"
+    "verify:evidencias": "node src/scripts/verificarEvidenciasS4D6.js",
+    "pre-defensa": "node src/scripts/prepararDefensaS4D7.js"
   },
   "engines": {
     "node": ">=20.0.0"

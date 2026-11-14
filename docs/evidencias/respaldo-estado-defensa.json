@@ -1,0 +1,686 @@
+{
+  "generado_en_utc": "2026-11-14T03:13:44.881Z",
+  "proposito": "Copia de respaldo del estado y despliegue para la defensa final de PUKARA (S4D7)",
+  "coordenada_piloto_llojeta": {
+    "latitud": -16.5235,
+    "longitud": -68.1425,
+    "sector": "Sector Llojeta / Bajo Llojeta, La Paz"
+  },
+  "configuracion_vigente_v1": {
+    "id": 1,
+    "version": 1,
+    "estado": "vigente",
+    "parametros": {
+      "t_max_minutos": 60,
+      "separacion_minima_minutos": 15,
+      "muestras_descenso": 2,
+      "saturacion": {
+        "habilitada": true,
+        "acum_72h_min_mm": 60,
+        "intensidad_min_mm_h": 2.5,
+        "nivel_minimo": "ALERTA"
+      }
+    },
+    "umbrales": [
+      {
+        "variable": "acum_24h_mm",
+        "nivel": "PRECAUCION",
+        "valor": 10
+      },
+      {
+        "variable": "acum_24h_mm",
+        "nivel": "ALERTA",
+        "valor": 25
+      },
+      {
+        "variable": "acum_24h_mm",
+        "nivel": "EMERGENCIA",
+        "valor": 40
+      },
+      {
+        "variable": "acum_72h_mm",
+        "nivel": "PRECAUCION",
+        "valor": 25
+      },
+      {
+        "variable": "acum_72h_mm",
+        "nivel": "ALERTA",
+        "valor": 60
+      },
+      {
+        "variable": "acum_72h_mm",
+        "nivel": "EMERGENCIA",
+        "valor": 90
+      },
+      {
+        "variable": "intensidad_mm_h",
+        "nivel": "PRECAUCION",
+        "valor": 2.5
+      },
+      {
+        "variable": "intensidad_mm_h",
+        "nivel": "ALERTA",
+        "valor": 6.5
+      },
+      {
+        "variable": "intensidad_mm_h",
+        "nivel": "EMERGENCIA",
+        "valor": 12
+      }
+    ],
+    "creada_por": 1,
+    "creada_en": "2026-10-23T22:51:18.448Z",
+    "activada_en": "2026-10-23T22:51:18.448Z",
+    "motivo": "Configuración inicial v1 con umbrales académicos simulados de referencia (Llojeta)"
+  },
+  "resumen_entidades": {
+    "tablas_verificadas": 10,
+    "umbrales_v1": 9,
+    "recomendaciones_publicadas": 4,
+    "contactos_emergencia": 4,
+    "zonas_referencia": 2,
+    "puntos_referencia": 6
+  },
+  "payload_estado_publico": {
+    "ok": true,
+    "version_esquema_api": "v1",
+    "modalidad": "real",
+    "es_simulacion": false,
+    "banner_simulacion": null,
+    "aviso_permanente": "Los niveles Normal, Precaución, Alerta y Emergencia son niveles informativos de lluvia: niveles meteorológicos simulados, calculados con umbrales académicos. No sustituyen alertas ni instrucciones de las autoridades oficiales. PUKARA muestra información bajo consulta y no avisa activamente a la población. Ante una emergencia, atienda las indicaciones oficiales y contacte a los servicios de emergencia.",
+    "zona_piloto": {
+      "nombre": "Sector Llojeta / Bajo Llojeta (Macrodistrito Cotahuma, La Paz)",
+      "latitud_central": -16.5235,
+      "longitud_central": -68.1425,
+      "latitud": -16.5235,
+      "longitud": -68.1425,
+      "nota_alcance": "El nivel informativo se calcula con una sola consulta para toda la zona piloto y no varía espacialmente."
+    },
+    "zonaPiloto": {
+      "nombre": "Sector Llojeta / Bajo Llojeta (Macrodistrito Cotahuma, La Paz)",
+      "latitud": -16.5235,
+      "longitud": -68.1425,
+      "latitud_central": -16.5235,
+      "longitud_central": -68.1425
+    },
+    "coordenada_central": {
+      "latitud": -16.5235,
+      "longitud": -68.1425
+    },
+    "estado_operativo": "LECTURA_DISPONIBLE_V1",
+    "estado_sistema": "NORMAL",
+    "nivel_vigente": "NORMAL",
+    "nivel_calculado": "NORMAL",
+    "contador_descenso": 0,
+    "clasificacion_parcial": true,
+    "regla_saturacion_aplicada": false,
+    "antiguedad_minutos": 13.75,
+    "datos_desactualizados": false,
+    "t_max_minutos": 60,
+    "version_reglas": {
+      "configuracion_id": 1,
+      "version": 1,
+      "estado": "vigente",
+      "parametros": {
+        "t_max_minutos": 60,
+        "separacion_minima_minutos": 15,
+        "muestras_descenso": 2,
+        "saturacion": {
+          "habilitada": true,
+          "acum_72h_min_mm": 60,
+          "intensidad_min_mm_h": 2.5,
+          "nivel_minimo": "ALERTA"
+        }
+      }
+    },
+    "clasificacion": {
+      "estado_motor": "PENDIENTE_MOTOR_SEMANA_2",
+      "nivel_vigente": "NORMAL",
+      "nivel_calculado": "NORMAL",
+      "contador_descenso": 0,
+      "mensaje": "Motor de clasificación por umbrales e histéresis temporal activo en Semana 2."
+    },
+    "evaluacion": {
+      "evaluacion_id": 2838,
+      "lectura_id": 4005,
+      "configuracion_id": 1,
+      "modalidad": "real",
+      "fuente": "Open-Meteo",
+      "observado_en": "2026-11-14T03:00:00.000Z",
+      "intensidad_mm_h": 0,
+      "acum_24h_mm": 6.2,
+      "acum_72h_mm": 16.1,
+      "horas_validas_24h": 24,
+      "horas_validas_72h": 72,
+      "estado_lectura": "valida",
+      "nivel_calculado": "NORMAL",
+      "nivel_vigente": "NORMAL",
+      "estado_sistema": "NORMAL",
+      "contador_descenso": 0,
+      "candidato_descenso_maximo": null,
+      "evaluada_en": "2026-11-14T03:13:44.859Z"
+    },
+    "lectura": {
+      "id": 4006,
+      "modalidad": "real",
+      "fuente": "Open-Meteo",
+      "observado_en": "2026-11-14T03:13:44.214Z",
+      "recibido_en": "2026-11-14T03:13:44.867Z",
+      "intensidad_mm_h": 0.4,
+      "acum_24h_mm": null,
+      "acum_72h_mm": null,
+      "horas_validas_24h": 0,
+      "horas_validas_72h": 0,
+      "estado": "incompleta",
+      "temperatura": 13.8,
+      "humedad": 68,
+      "viento": 8.5,
+      "antiguedad_minutos": 0
+    },
+    "meteorologia": {
+      "disponible": true,
+      "origen_respuesta": "cache_servidor",
+      "fallo_api_reciente": false,
+      "lectura": {
+        "id": 4006,
+        "modalidad": "real",
+        "fuente": "Open-Meteo",
+        "observado_en": "2026-11-14T03:13:44.214Z",
+        "recibido_en": "2026-11-14T03:13:44.867Z",
+        "intensidad_mm_h": 0.4,
+        "acum_24h_mm": null,
+        "acum_72h_mm": null,
+        "horas_validas_24h": 0,
+        "horas_validas_72h": 0,
+        "estado": "incompleta",
+        "temperatura": 13.8,
+        "humedad": 68,
+        "viento": 8.5,
+        "antiguedad_minutos": 0
+      },
+      "banderas_calidad": {
+        "intensidad_completa": true,
+        "acum_24h_completo": false,
+        "acum_72h_completo": false,
+        "clasificacion_parcial": true
+      },
+      "nota_modelo": "Datos provenientes de modelo meteorológico (Open-Meteo), no equivalen a mediciones de estación pluviométrica local."
+    },
+    "capas_referencia": {
+      "leyenda_obligatoria": "referencia de demostración, no validada",
+      "zonas": [
+        {
+          "id": 1,
+          "nombre": "Sector Piloto Llojeta — Cuenca Media (Referencial)",
+          "geometria": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -68.151,
+                  -16.5175
+                ],
+                [
+                  -68.138,
+                  -16.5175
+                ],
+                [
+                  -68.138,
+                  -16.525
+                ],
+                [
+                  -68.151,
+                  -16.525
+                ],
+                [
+                  -68.151,
+                  -16.5175
+                ]
+              ]
+            ]
+          },
+          "fuente": "Delimitación académica aproximada sobre cartografía base OpenStreetMap",
+          "fecha_dato": "2026-10-23T04:00:00.000Z",
+          "vigente_hasta": null,
+          "verificada": false,
+          "advertencia": "referencia de demostración, no validada"
+        },
+        {
+          "id": 2,
+          "nombre": "Subsector Bajo Llojeta — Corredor Pasajahuira / Los Sargentos (Referencial)",
+          "geometria": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -68.1455,
+                  -16.523
+                ],
+                [
+                  -68.1335,
+                  -16.523
+                ],
+                [
+                  -68.1335,
+                  -16.5305
+                ],
+                [
+                  -68.1455,
+                  -16.5305
+                ],
+                [
+                  -68.1455,
+                  -16.523
+                ]
+              ]
+            ]
+          },
+          "fuente": "Delimitación académica aproximada sobre cartografía base OpenStreetMap",
+          "fecha_dato": "2026-10-23T04:00:00.000Z",
+          "vigente_hasta": null,
+          "verificada": false,
+          "advertencia": "referencia de demostración, no validada"
+        }
+      ],
+      "puntos": [
+        {
+          "id": 1,
+          "nombre": "Cruce Av. Los Sargentos — Acceso Bajo Llojeta (Referencia vial)",
+          "tipo": "hito_vial_referencial",
+          "latitud": -16.5268,
+          "longitud": -68.1372,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        },
+        {
+          "id": 2,
+          "nombre": "Entorno Cementerio Jardín — Llojeta (Referencia urbana)",
+          "tipo": "referencia_urbana",
+          "latitud": -16.5229,
+          "longitud": -68.1434,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        },
+        {
+          "id": 3,
+          "nombre": "Parada Teleférico Línea Morada — Faro Murillo / Conexión Cotahuma (Referencia transporte)",
+          "tipo": "transporte_referencial",
+          "latitud": -16.5152,
+          "longitud": -68.1489,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        },
+        {
+          "id": 4,
+          "nombre": "Puente / Eje Av. Costanera — Confluencia Bajo Llojeta (Referencia vial)",
+          "tipo": "hito_vial_referencial",
+          "latitud": -16.5294,
+          "longitud": -68.1341,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        },
+        {
+          "id": 5,
+          "nombre": "Plaza / Cancha El Vergel — Llojeta (Referencia barrial)",
+          "tipo": "referencia_barrial",
+          "latitud": -16.5211,
+          "longitud": -68.1468,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        },
+        {
+          "id": 6,
+          "nombre": "Vía Principal Max Fernández — Llojeta Alto (Referencia vial)",
+          "tipo": "hito_vial_referencial",
+          "latitud": -16.5193,
+          "longitud": -68.1405,
+          "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+          "estado_verificacion": "sin_verificar",
+          "activo": true
+        }
+      ]
+    },
+    "puntos_referencia": [
+      {
+        "id": 1,
+        "nombre": "Cruce Av. Los Sargentos — Acceso Bajo Llojeta (Referencia vial)",
+        "tipo": "hito_vial_referencial",
+        "latitud": -16.5268,
+        "longitud": -68.1372,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      },
+      {
+        "id": 2,
+        "nombre": "Entorno Cementerio Jardín — Llojeta (Referencia urbana)",
+        "tipo": "referencia_urbana",
+        "latitud": -16.5229,
+        "longitud": -68.1434,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      },
+      {
+        "id": 3,
+        "nombre": "Parada Teleférico Línea Morada — Faro Murillo / Conexión Cotahuma (Referencia transporte)",
+        "tipo": "transporte_referencial",
+        "latitud": -16.5152,
+        "longitud": -68.1489,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      },
+      {
+        "id": 4,
+        "nombre": "Puente / Eje Av. Costanera — Confluencia Bajo Llojeta (Referencia vial)",
+        "tipo": "hito_vial_referencial",
+        "latitud": -16.5294,
+        "longitud": -68.1341,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      },
+      {
+        "id": 5,
+        "nombre": "Plaza / Cancha El Vergel — Llojeta (Referencia barrial)",
+        "tipo": "referencia_barrial",
+        "latitud": -16.5211,
+        "longitud": -68.1468,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      },
+      {
+        "id": 6,
+        "nombre": "Vía Principal Max Fernández — Llojeta Alto (Referencia vial)",
+        "tipo": "hito_vial_referencial",
+        "latitud": -16.5193,
+        "longitud": -68.1405,
+        "fuente": "Referencia cartográfica OpenStreetMap — Demostración académica no validada",
+        "estado_verificacion": "sin_verificar",
+        "activo": true
+      }
+    ],
+    "zonas_referencia": [
+      {
+        "id": 1,
+        "nombre": "Sector Piloto Llojeta — Cuenca Media (Referencial)",
+        "geometria": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -68.151,
+                -16.5175
+              ],
+              [
+                -68.138,
+                -16.5175
+              ],
+              [
+                -68.138,
+                -16.525
+              ],
+              [
+                -68.151,
+                -16.525
+              ],
+              [
+                -68.151,
+                -16.5175
+              ]
+            ]
+          ]
+        },
+        "fuente": "Delimitación académica aproximada sobre cartografía base OpenStreetMap",
+        "fecha_dato": "2026-10-23T04:00:00.000Z",
+        "vigente_hasta": null,
+        "verificada": false,
+        "advertencia": "referencia de demostración, no validada"
+      },
+      {
+        "id": 2,
+        "nombre": "Subsector Bajo Llojeta — Corredor Pasajahuira / Los Sargentos (Referencial)",
+        "geometria": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -68.1455,
+                -16.523
+              ],
+              [
+                -68.1335,
+                -16.523
+              ],
+              [
+                -68.1335,
+                -16.5305
+              ],
+              [
+                -68.1455,
+                -16.5305
+              ],
+              [
+                -68.1455,
+                -16.523
+              ]
+            ]
+          ]
+        },
+        "fuente": "Delimitación académica aproximada sobre cartografía base OpenStreetMap",
+        "fecha_dato": "2026-10-23T04:00:00.000Z",
+        "vigente_hasta": null,
+        "verificada": false,
+        "advertencia": "referencia de demostración, no validada"
+      }
+    ],
+    "recomendacion": {
+      "id": 1,
+      "nivel": "NORMAL",
+      "titulo": "Recomendaciones generales — Nivel Normal",
+      "contenido": "Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.",
+      "version": 1,
+      "estado_publicacion": "publicado",
+      "origen": "demostracion",
+      "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+      "actualizado_en": "2026-11-14T02:57:48.508Z"
+    },
+    "recomendacion_vigente": {
+      "id": 1,
+      "nivel": "NORMAL",
+      "titulo": "Recomendaciones generales — Nivel Normal",
+      "contenido": "Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.",
+      "version": 1,
+      "estado_publicacion": "publicado",
+      "origen": "demostracion",
+      "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+      "actualizado_en": "2026-11-14T02:57:48.508Z"
+    },
+    "recomendaciones": [
+      {
+        "id": 1,
+        "nivel": "NORMAL",
+        "titulo": "Recomendaciones generales — Nivel Normal",
+        "contenido": "Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      },
+      {
+        "id": 2,
+        "nivel": "PRECAUCION",
+        "titulo": "Recomendaciones generales — Nivel Precaución",
+        "contenido": "Evitar cauces y quebradas; revisar desagües y canaletas; tener a mano linterna y documentos; consultar con regularidad el nivel informativo y los canales oficiales.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      },
+      {
+        "id": 3,
+        "nivel": "ALERTA",
+        "titulo": "Recomendaciones generales — Nivel Alerta",
+        "contenido": "Mantenerse alejado de ríos, cauces y taludes con grietas; preparar una mochila de emergencia; evitar vías cercanas a cauces; seguir los canales oficiales.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:51.867Z"
+      },
+      {
+        "id": 4,
+        "nivel": "EMERGENCIA",
+        "titulo": "Recomendaciones generales — Nivel Emergencia",
+        "contenido": "Mantenerse informado por canales oficiales; evitar cauces y taludes; no cruzar zonas inundadas ni con lodo; contactar a los servicios de emergencia.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      }
+    ],
+    "recomendaciones_publicadas": [
+      {
+        "id": 1,
+        "nivel": "NORMAL",
+        "titulo": "Recomendaciones generales — Nivel Normal",
+        "contenido": "Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      },
+      {
+        "id": 2,
+        "nivel": "PRECAUCION",
+        "titulo": "Recomendaciones generales — Nivel Precaución",
+        "contenido": "Evitar cauces y quebradas; revisar desagües y canaletas; tener a mano linterna y documentos; consultar con regularidad el nivel informativo y los canales oficiales.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      },
+      {
+        "id": 3,
+        "nivel": "ALERTA",
+        "titulo": "Recomendaciones generales — Nivel Alerta",
+        "contenido": "Mantenerse alejado de ríos, cauces y taludes con grietas; preparar una mochila de emergencia; evitar vías cercanas a cauces; seguir los canales oficiales.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:51.867Z"
+      },
+      {
+        "id": 4,
+        "nivel": "EMERGENCIA",
+        "titulo": "Recomendaciones generales — Nivel Emergencia",
+        "contenido": "Mantenerse informado por canales oficiales; evitar cauces y taludes; no cruzar zonas inundadas ni con lodo; contactar a los servicios de emergencia.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      }
+    ],
+    "recomendaciones_nivel_vigente": [
+      {
+        "id": 1,
+        "nivel": "NORMAL",
+        "titulo": "Recomendaciones generales — Nivel Normal",
+        "contenido": "Mantenerse informado por canales oficiales; revisar el estado de canaletas y desagües de la vivienda.",
+        "version": 1,
+        "estado_publicacion": "publicado",
+        "origen": "demostracion",
+        "fuente": "Propuesta académica PUKARA - Contenido preventivo general de demostración",
+        "actualizado_en": "2026-11-14T02:57:48.508Z"
+      }
+    ],
+    "contactos": [
+      {
+        "id": 1,
+        "nombre": "Red 114 — Emergencias GAMLP (Alcaldía La Paz)",
+        "telefono": "114",
+        "fuente": "Gobierno Autónomo Municipal de La Paz [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 2,
+        "nombre": "Dirección Departamental de Bomberos (La Paz)",
+        "telefono": "119",
+        "fuente": "Policía Boliviana - Bomberos Antofagasta [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 3,
+        "nombre": "Radio Patrulla 110 (Policía Boliviana)",
+        "telefono": "110",
+        "fuente": "Policía Boliviana [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 10,
+        "nombre": "Defensa Civil — Viceministerio de Defensa Civil (VIDECI)",
+        "telefono": "115",
+        "fuente": "Viceministerio de Defensa Civil [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      }
+    ],
+    "contactos_emergencia": [
+      {
+        "id": 1,
+        "nombre": "Red 114 — Emergencias GAMLP (Alcaldía La Paz)",
+        "telefono": "114",
+        "fuente": "Gobierno Autónomo Municipal de La Paz [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 2,
+        "nombre": "Dirección Departamental de Bomberos (La Paz)",
+        "telefono": "119",
+        "fuente": "Policía Boliviana - Bomberos Antofagasta [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 3,
+        "nombre": "Radio Patrulla 110 (Policía Boliviana)",
+        "telefono": "110",
+        "fuente": "Policía Boliviana [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      },
+      {
+        "id": 10,
+        "nombre": "Defensa Civil — Viceministerio de Defensa Civil (VIDECI)",
+        "telefono": "115",
+        "fuente": "Viceministerio de Defensa Civil [Verificar con fuente oficial]",
+        "verificado_en": "2026-10-23T04:00:00.000Z",
+        "activo": true
+      }
+    ],
+    "parametros_vigentes_resumen": {
+      "version_reglas": 1,
+      "t_max_minutos": 60,
+      "separacion_minima_minutos": 15
+    },
+    "consultado_en": "2026-11-14T03:13:44.873Z"
+  }
+}
