@@ -133,8 +133,19 @@ export function verificarTokenAcceso(token, opciones = {}) {
     'pukara_dev_jwt_secret_llojeta_2026_umsa';
 
   try {
-    return jwt.verify(token.trim(), secret);
+    const decoded = jwt.verify(token.trim(), secret);
+    if (!decoded || typeof decoded !== 'object' || typeof decoded.exp !== 'number') {
+      throw new AuthError(
+        401,
+        'TOKEN_INVALIDO',
+        'El token de autenticación debe poseer expiración (exp) válida.'
+      );
+    }
+    return decoded;
   } catch (err) {
+    if (err instanceof AuthError) {
+      throw err;
+    }
     if (err instanceof jwt.TokenExpiredError) {
       throw new AuthError(
         401,
