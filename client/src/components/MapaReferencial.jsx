@@ -52,7 +52,7 @@ export function manejarErrorGeolocalizacion(err, setEstado, setUbicacion) {
 }
 
 /**
- * Componente MapaReferencial
+ * Componente MapaReferencial (Capítulo 02 — Cartografía de Referencia)
  * Muestra el mapa referencial con Leaflet, polígonos de zonas en tono neutro, puntos de referencia,
  * control de geolocalización procesado 100% en el dispositivo (P09) y cálculo de distancias
  * en línea recta con la fórmula de Haversine (P18).
@@ -89,7 +89,6 @@ export default function MapaReferencial({
     (typeof navigator !== 'undefined' && !navigator.onLine);
 
   // Estados de geolocalización en el dispositivo (Requisito P09)
-  // 'inactivo' | 'solicitando' | 'concedido' | 'denegado' | 'no_disponible'
   const [estadoUbicacion, setEstadoUbicacion] = useState(estadoUbicacionInicial);
   const [ubicacionUsuario, setUbicacionUsuario] = useState(ubicacionInicial);
 
@@ -314,7 +313,7 @@ export default function MapaReferencial({
               [ubicacionUsuario.latitud, ubicacionUsuario.longitud],
               {
                 radius: 8,
-                fillColor: '#2563eb',
+                fillColor: '#3525CD',
                 color: '#ffffff',
                 weight: 2,
                 opacity: 1,
@@ -372,27 +371,27 @@ export default function MapaReferencial({
   return (
     <section
       aria-label="Mapa referencial del sector piloto"
-      className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-5"
+      className="clay-card p-5 sm:p-7 space-y-5 animate-fade-up"
     >
-      {/* 1. Encabezado e Indicador Global vs Tono Neutro */}
-      <div className="space-y-2 border-b border-slate-100 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-            Cartografía Referencial
+      {/* 1. Encabezado Editorial Suizo e Indicador Global vs Tono Neutro */}
+      <div className="space-y-2.5 border-b border-slate-100 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="swiss-chapter-badge">
+            02 CAPÍTULO DOS — CARTOGRAFÍA DE REFERENCIA
           </span>
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="clay-pill px-3 py-1 text-xs font-bold bg-[#F0F3FF] text-[#111C2D] border border-[#E2DFFF]">
             Sector Piloto Llojeta
           </span>
         </div>
 
-        <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+        <h2 className="headline-lg text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111C2D] leading-snug break-words">
           Mapa del Sector Piloto Llojeta / Bajo Llojeta
         </h2>
 
         {/* Nota obligatoria de la directriz arquitectónica */}
         <p
           data-testid="nota-indicador-global"
-          className="text-xs text-slate-600 leading-relaxed bg-slate-50/80 p-3 rounded-xl border border-slate-200/80"
+          className="text-base text-[#1E293B] leading-relaxed bg-[#F9F9FF] p-4 rounded-2xl border border-slate-200/80"
         >
           El nivel informativo de lluvia es un indicador global para todo el
           sector piloto Llojeta / Bajo Llojeta y no varía espacialmente. Las
@@ -405,39 +404,39 @@ export default function MapaReferencial({
         <div
           data-testid="aviso-mapa-parcial"
           role="status"
-          className="rounded-xl border border-amber-200 bg-amber-50/90 p-3.5 text-xs text-amber-900 font-medium space-y-1 shadow-2xs"
+          className="clay-card-sm border-2 border-[#FDE68A] bg-[#FEF3C7] p-4 text-base text-[#92400E] font-medium space-y-1.5"
         >
-          <p className="font-semibold flex items-center gap-1.5">
+          <p className="font-bold flex items-center gap-2">
             <span aria-hidden="true">⚠️</span> Cartografía parcial
           </p>
-          <p className="text-amber-800 leading-relaxed">
+          <p className="text-sm sm:text-base text-[#92400E] leading-relaxed">
             Mapa parcial con limitación de teselas: sin conexión a internet o teselas de OpenStreetMap no disponibles en el caché del navegador. Por política de uso de OpenStreetMap no se realiza precarga masiva de teselas. El sistema no ofrece navegación; consulte a continuación la lista completa de zonas y puntos de referencia de demostración disponibles sin conexión.
           </p>
         </div>
       )}
 
-      {/* 3. Layout Responsivo en 2 Columnas para Desktop (lg:grid-cols-12) */}
+      {/* 3. Layout Responsivo: Apilado en móvil, 12 columnas en desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Columna Izquierda (lg:col-span-7): Lienzo del Mapa Leaflet */}
-        <div className="lg:col-span-7 space-y-2">
-          <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-2xs">
+        <div className="lg:col-span-7 space-y-2.5">
+          <div className="clay-card-sm p-1.5 bg-[#F9F9FF]">
             <div
               ref={mapContainerRef}
               data-testid="mapa-leaflet-contenedor"
-              className="w-full h-80 sm:h-96 lg:h-[480px] z-0 relative"
+              className="h-[300px] sm:h-[380px] lg:h-[440px] w-full rounded-2xl overflow-hidden z-0 relative bg-slate-100"
               tabIndex={0}
               aria-label="Mapa cartográfico referencial del sector piloto Llojeta"
             />
           </div>
 
           {/* Atribución única clara de OpenStreetMap */}
-          <div className="text-[10px] text-slate-400 text-right px-1">
+          <div className="text-xs text-[#475569] text-right px-1">
             &copy;{' '}
             <a
               href="https://www.openstreetmap.org/copyright"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-slate-600"
+              className="underline hover:text-[#111C2D]"
             >
               OpenStreetMap
             </a>{' '}
@@ -448,29 +447,29 @@ export default function MapaReferencial({
         {/* Columna Derecha (lg:col-span-5): Proximidad Haversine, Zonas y Puntos */}
         <div className="lg:col-span-5 space-y-4">
           {/* Panel de Control de Ubicación GPS (Requisito P09 / P18) */}
-          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/90 p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <h3 className="text-xs font-bold text-slate-800">
+          <div className="clay-card-sm bg-[#F9F9FF] p-4 sm:p-5 space-y-3.5">
+            <div className="space-y-3">
+              <div className="min-w-0">
+                <h3 className="headline-sm text-base sm:text-lg font-bold text-[#111C2D]">
                   Ubicación aproximada en dispositivo
                 </h3>
-                <p className="text-[11px] text-slate-500 leading-snug mt-0.5">
+                <p className="text-sm sm:text-base text-[#464555] leading-relaxed mt-1">
                   Su ubicación se procesa únicamente en este dispositivo para
                   calcular la distancia en línea recta y nunca se almacena ni se
                   envía al servidor.
                 </p>
               </div>
 
-              <div className="w-full sm:w-auto shrink-0">
+              <div className="w-full">
                 {estadoUbicacion !== 'concedido' ? (
                   <button
                     type="button"
                     data-testid="btn-solicitar-ubicacion"
                     onClick={handleSolicitarUbicacion}
                     disabled={estadoUbicacion === 'solicitando'}
-                    className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F172A] text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-xs w-full sm:w-auto cursor-pointer"
+                    className="clay-btn-primary clay-interactive min-h-[50px] w-full px-4 py-3 text-sm sm:text-base font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2 text-center leading-snug cursor-pointer"
                   >
-                    <span>📍</span>
+                    <span className="shrink-0" aria-hidden="true">📍</span>
                     <span>
                       {estadoUbicacion === 'solicitando'
                         ? 'Consultando GPS local...'
@@ -482,7 +481,7 @@ export default function MapaReferencial({
                     type="button"
                     data-testid="btn-ocultar-ubicacion"
                     onClick={handleOcultarUbicacion}
-                    className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors inline-flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer"
+                    className="clay-btn-secondary clay-interactive min-h-[48px] w-full px-4 py-2.5 text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>Ocultar mi ubicación</span>
                   </button>
@@ -496,12 +495,12 @@ export default function MapaReferencial({
               <div
                 data-testid="aviso-gps-denegado"
                 role="status"
-                className="rounded-xl border border-slate-300 bg-white p-3 text-xs text-slate-700 space-y-1 shadow-2xs"
+                className="clay-card-sm bg-white p-3.5 text-sm sm:text-base text-[#1E293B] space-y-1 border border-slate-300"
               >
-                <p className="font-semibold text-slate-800">
+                <p className="font-bold text-[#111C2D]">
                   Permiso de ubicación denegado o no disponible
                 </p>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-[#464555] leading-relaxed">
                   Permiso de ubicación denegado o no disponible: no se muestran distancias a los puntos de referencia. La consulta general del nivel informativo, las recomendaciones y el mapa referencial funcionan con normalidad.
                 </p>
               </div>
@@ -512,13 +511,13 @@ export default function MapaReferencial({
               <div
                 data-testid="aviso-gps-concedido"
                 role="status"
-                className="rounded-xl border border-blue-200 bg-blue-50 p-2.5 text-xs text-blue-900 flex items-center justify-between gap-2 shadow-2xs"
+                className="clay-card-sm border border-[#E2DFFF] bg-[#EEF2FF] p-3.5 text-sm sm:text-base text-[#111C2D] flex flex-wrap items-center justify-between gap-2"
               >
-                <span>
+                <span className="font-semibold">
                   Ubicación activa en este dispositivo · Precisión: ±
                   {ubicacionUsuario.precision} m
                 </span>
-                <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono">
+                <span className="clay-pill text-xs bg-white text-[#3525CD] px-2.5 py-0.5 font-mono font-bold border border-[#E2DFFF]">
                   GPS local
                 </span>
               </div>
@@ -528,36 +527,36 @@ export default function MapaReferencial({
           {/* Listado de Zonas de Referencia */}
           <div
             data-testid="seccion-zonas-referencia"
-            className="rounded-2xl border border-slate-200/80 bg-white p-4 space-y-3"
+            className="clay-card-sm p-4 sm:p-5 space-y-3"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                 Zonas de Referencia ({zonasReferencia.length})
               </h3>
-              <span className="text-[10px] text-amber-900 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              <span className="clay-pill text-xs text-[#92400E] font-bold bg-[#FEF3C7] px-2.5 py-0.5 border border-[#FDE68A]">
                 referencia de demostración, no validada
               </span>
             </div>
 
             {zonasReferencia.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">
+              <p className="text-base text-[#475569] italic">
                 No se han delimitado zonas de referencia aún.
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-2.5 max-h-52 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-1">
                 {zonasReferencia.map((z) => (
                   <div
                     key={z.id}
                     data-testid="tarjeta-zona"
-                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1 text-xs"
+                    className="p-3.5 rounded-2xl bg-[#F9F9FF] border border-slate-200/80 space-y-1.5"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-bold text-slate-900">{z.nombre}</h4>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <h4 className="font-bold text-base text-[#111C2D]">{z.nombre}</h4>
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
+                        className={`clay-pill text-xs px-2.5 py-0.5 font-bold border ${
                           z.verificada
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
+                            ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]'
+                            : 'bg-slate-100 text-[#475569] border-slate-200'
                         }`}
                       >
                         {z.verificada
@@ -566,25 +565,25 @@ export default function MapaReferencial({
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-slate-600 space-y-0.5">
+                    <div className="text-sm text-[#464555] space-y-0.5">
                       <p>
-                        <span className="font-medium text-slate-700">Fuente:</span>{' '}
+                        <span className="font-semibold text-[#111C2D]">Fuente:</span>{' '}
                         {z.fuente || 'Propuesta académica'}
                       </p>
                       <p>
-                        <span className="font-medium text-slate-700">
+                        <span className="font-semibold text-[#111C2D]">
                           Fecha del dato:
                         </span>{' '}
                         {z.fecha_dato || 'No disponible'}
                         {z.vigente_hasta && ` · Vigente hasta: ${z.vigente_hasta}`}
                       </p>
                       {z.advertencia && (
-                        <p className="text-amber-800 italic">{z.advertencia}</p>
+                        <p className="text-[#92400E] italic text-xs sm:text-sm">{z.advertencia}</p>
                       )}
                     </div>
 
                     <div className="pt-1">
-                      <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-xs text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded-full font-semibold">
                         referencia de demostración, no validada
                       </span>
                     </div>
@@ -597,41 +596,41 @@ export default function MapaReferencial({
           {/* Listado de Puntos de Referencia con Distancias Haversine (P18) */}
           <div
             data-testid="seccion-puntos-referencia"
-            className="rounded-2xl border border-slate-200/80 bg-white p-4 space-y-3"
+            className="clay-card-sm p-4 sm:p-5 space-y-3"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                 Puntos de Referencia ({puntosConDistancia.length})
               </h3>
-              <span className="text-[10px] text-amber-900 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              <span className="clay-pill text-xs text-[#92400E] font-bold bg-[#FEF3C7] px-2.5 py-0.5 border border-[#FDE68A]">
                 referencia de demostración, no validada
               </span>
             </div>
 
             {puntosConDistancia.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">
+              <p className="text-base text-[#475569] italic">
                 No se han registrado puntos de referencia aún.
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-2.5 max-h-72 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto pr-1">
                 {puntosConDistancia.map((p) => (
                   <div
                     key={p.id}
                     data-testid="tarjeta-punto"
-                    className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1.5 text-xs"
+                    className="p-3.5 rounded-2xl bg-[#F9F9FF] border border-slate-200/80 space-y-2"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h4 className="font-bold text-slate-900">{p.nombre}</h4>
-                        <span className="text-[10px] text-slate-500 font-mono">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-base text-[#111C2D] break-words">{p.nombre}</h4>
+                        <span className="text-xs text-[#475569] font-mono">
                           Tipo: {p.tipo || 'Punto'}
                         </span>
                       </div>
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-semibold border ${
+                        className={`clay-pill text-xs px-2.5 py-0.5 font-bold border ${
                           p.estado_verificacion === 'verificado_por_autoridad'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                            ? 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]'
+                            : 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
                         }`}
                       >
                         {p.estado_verificacion === 'verificado_por_autoridad'
@@ -640,12 +639,12 @@ export default function MapaReferencial({
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-slate-600 space-y-0.5 font-mono">
-                      <p>
+                    <div className="text-xs sm:text-sm text-[#464555] space-y-0.5 font-mono">
+                      <p className="break-words">
                         Lat: {Number(p.latitud).toFixed(4)}, Lon:{' '}
                         {Number(p.longitud).toFixed(4)}
                       </p>
-                      <p className="font-sans text-slate-500">
+                      <p className="font-sans text-[#464555]">
                         Fuente: {p.fuente || 'Propuesta académica'}
                       </p>
                     </div>
@@ -654,23 +653,23 @@ export default function MapaReferencial({
                     {p.distancia ? (
                       <div
                         data-testid="distancia-haversine"
-                        className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-900 space-y-0.5 shadow-2xs"
+                        className="p-3 rounded-xl bg-[#EEF2FF] border border-[#E2DFFF] text-[#111C2D] space-y-1"
                       >
-                        <p className="font-bold text-xs">
+                        <p className="font-bold text-sm sm:text-base text-[#3525CD]">
                           Distancia en línea recta: {p.distancia.distanciaCorta}
                         </p>
-                        <p className="text-[10px] text-slate-600 leading-snug">
+                        <p className="text-xs sm:text-sm text-[#464555] leading-snug">
                           {p.distancia.leyenda}
                         </p>
                       </div>
                     ) : (
-                      <div className="text-[10px] text-slate-400 italic">
+                      <div className="text-xs sm:text-sm text-[#475569] italic">
                         Distancia no calculada (active ubicación en el dispositivo)
                       </div>
                     )}
 
                     <div className="pt-0.5">
-                      <span className="text-[10px] text-amber-900 bg-amber-100/70 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-xs text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded-full font-semibold">
                         referencia de demostración, no validada
                       </span>
                     </div>
@@ -682,7 +681,7 @@ export default function MapaReferencial({
         </div>
       </div>
 
-      <footer className="pt-2 text-[11px] text-slate-400 border-t border-slate-100 leading-relaxed">
+      <footer className="pt-3 text-sm text-[#475569] border-t border-slate-100 leading-relaxed">
         Los puntos y polígonos son referencias cartográficas fijas de demostración académica; no representan rutas ni garantizan seguridad ante contingencias pluviales.
       </footer>
     </section>

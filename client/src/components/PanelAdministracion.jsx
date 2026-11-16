@@ -30,7 +30,7 @@ const SECCIONES = [
 ];
 
 /**
- * Panel de Administración Institucional PUKARA (Estilo Bento Desktop + Mobile-First).
+ * Panel de Administración Institucional PUKARA (Swiss Grid + Claymorphism Mobile-First).
  * Control integral de configuración de umbrales, recomendaciones, contactos, capas y auditoría.
  */
 export default function PanelAdministracion({ alCerrarSesion }) {
@@ -60,7 +60,6 @@ export default function PanelAdministracion({ alCerrarSesion }) {
     sat_acum_72h: 60,
     sat_intensidad: 2.5,
     sat_nivel: 'ALERTA',
-    // Umbrales
     int_precaucion: 2.5,
     int_alerta: 6.5,
     int_emergencia: 12.0,
@@ -108,7 +107,6 @@ export default function PanelAdministracion({ alCerrarSesion }) {
     if (alCerrarSesion) alCerrarSesion();
   };
 
-  // Carga de datos según la sección activa
   useEffect(() => {
     cargarDatosSeccion(seccionActiva);
   }, [seccionActiva]);
@@ -341,35 +339,32 @@ export default function PanelAdministracion({ alCerrarSesion }) {
     }
   };
 
-  // Versión vigente actual para visualización destacada
   const versionVigente = configuraciones.find((c) => c.estado === 'vigente') || configuraciones[0];
 
-  // Filtrado de recomendaciones
   const recomendacionesFiltradas =
     filtroNivelRec === 'TODOS'
       ? recomendaciones
       : recomendaciones.filter((r) => r.nivel === filtroNivelRec);
 
-  // Filtrado de bitácora
   const bitacoraFiltrada =
     filtroBitacora === 'TODAS'
       ? bitacora
       : bitacora.filter((b) => b.entidad === filtroBitacora);
 
   return (
-    <div className="min-h-screen bg-[#F4F7FB] text-slate-800 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F6F8FA] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full">
       {/* 1. Cabecera Superior del Panel Administrativo */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Marca e Identidad Institucional */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0F172A] text-teal-400 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center shrink-0 clay-pill shadow-sm">
               <svg
                 className="w-5 h-5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
@@ -379,33 +374,33 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                 <path d="M12 16h.01" />
               </svg>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-extrabold text-base tracking-tight text-slate-900 leading-none">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="headline-sm font-extrabold text-base sm:text-lg tracking-tight text-[#111C2D] leading-snug">
                   Panel de Administración PUKARA
                 </h1>
-                <span className="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200/80">
+                <span className="hidden sm:inline-block clay-pill text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF]">
                   Consola Administrativa · Rol: Administrador
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+              <p className="text-xs sm:text-sm text-[#475569] font-mono mt-0.5 truncate">
                 {usuario?.nombre || 'Administrador PUKARA'} · {usuario?.email || 'admin@pukara.bo'}
               </p>
             </div>
           </div>
 
           {/* Botones de Navegación y Sesión */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <Link
               to="/"
-              className="min-h-[40px] px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+              className="clay-btn-secondary clay-interactive min-h-[48px] px-4 py-2 text-xs sm:text-sm font-bold text-[#111C2D] inline-flex items-center justify-center gap-1.5"
             >
               <span>← Ver Consulta Pública</span>
             </Link>
             <button
               type="button"
               onClick={handleCerrarSesion}
-              className="min-h-[40px] px-3.5 py-1.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 text-xs font-semibold transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+              className="clay-pill clay-interactive min-h-[48px] px-4 py-2 bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span aria-hidden="true">🚪</span>
               <span>Cerrar sesión</span>
@@ -415,33 +410,33 @@ export default function PanelAdministracion({ alCerrarSesion }) {
       </header>
 
       {/* 2. Barra de Navegación Horizontal Deslizable para Móviles */}
-      <div className="lg:hidden bg-white border-b border-slate-200/80 px-4 py-2.5 overflow-x-auto">
-        <nav aria-label="Secciones móviles" className="flex items-center gap-1.5 min-w-max">
+      <div className="lg:hidden bg-white/90 border-b border-slate-200/80 px-4 py-2.5">
+        <nav aria-label="Secciones móviles" className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
           {SECCIONES.map((sec) => (
             <button
               key={sec.id}
               type="button"
               onClick={() => setSeccionActiva(sec.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-1.5 ${
+              className={`clay-pill min-h-[48px] px-4 py-2 text-sm font-bold transition-all inline-flex items-center gap-2 shrink-0 cursor-pointer ${
                 seccionActiva === sec.id
-                  ? 'bg-[#0F172A] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-[#3525CD] text-white'
+                  : 'bg-[#F0F3FF] text-[#464555] hover:text-[#111C2D]'
               }`}
             >
-              <span>{sec.icono}</span>
-              <span>{sec.label}</span>
+              <span aria-hidden="true">{sec.icono}</span>
+              <span className="whitespace-nowrap">{sec.label}</span>
             </button>
           ))}
         </nav>
       </div>
 
-      {/* 3. Contenedor Principal Bento Layout con Sidebar Desktop */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full flex-1">
+      {/* 3. Contenedor Principal Swiss Grid con Sidebar Desktop */}
+      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full flex-1">
         {/* Notificaciones globales */}
         {mensajeExito && (
           <div
             role="status"
-            className="rounded-2xl border border-emerald-300 bg-emerald-50 p-3.5 text-xs text-emerald-950 font-medium flex items-center gap-2 shadow-xs"
+            className="clay-card-sm border border-[#A7F3D0] bg-[#ECFDF5] p-4 text-base text-[#065F46] font-semibold flex items-center gap-2.5 animate-fade-up"
           >
             <span aria-hidden="true">✅</span>
             <span>{mensajeExito}</span>
@@ -451,7 +446,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
         {errorGlobal && (
           <div
             role="alert"
-            className="rounded-2xl border border-red-300 bg-red-50 p-3.5 text-xs text-red-950 font-medium flex items-center gap-2 shadow-xs"
+            className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 text-base text-[#991B1B] font-semibold flex items-center gap-2.5"
           >
             <span aria-hidden="true">⚠️</span>
             <span>{errorGlobal}</span>
@@ -461,11 +456,11 @@ export default function PanelAdministracion({ alCerrarSesion }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Sidebar Desktop (col-span-3) */}
           <aside className="hidden lg:block lg:col-span-3 space-y-4 sticky top-24">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-2 pb-1">
+            <div className="clay-card p-4 space-y-2">
+              <span className="swiss-chapter-badge px-2 pb-1">
                 Módulos de Configuración
               </span>
-              <nav aria-label="Navegación administrativa desktop" className="space-y-1">
+              <nav aria-label="Navegación administrativa desktop" className="space-y-1.5">
                 {SECCIONES.map((sec) => {
                   const activa = seccionActiva === sec.id;
                   return (
@@ -473,16 +468,16 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                       key={sec.id}
                       type="button"
                       onClick={() => setSeccionActiva(sec.id)}
-                      className={`w-full text-left p-2.5 rounded-xl text-xs font-semibold transition-all flex items-start gap-2.5 cursor-pointer ${
+                      className={`w-full min-h-[48px] text-left p-3 rounded-2xl text-sm font-bold transition-all flex items-start gap-2.5 cursor-pointer ${
                         activa
-                          ? 'bg-[#0F172A] text-white shadow-xs'
-                          : 'text-slate-700 hover:bg-slate-100'
+                          ? 'bg-[#3525CD] text-white shadow-sm'
+                          : 'text-[#1E293B] hover:bg-[#F0F3FF]'
                       }`}
                     >
-                      <span className="text-base shrink-0">{sec.icono}</span>
+                      <span className="text-base shrink-0 mt-0.5" aria-hidden="true">{sec.icono}</span>
                       <div className="min-w-0">
                         <span className="block truncate">{sec.label}</span>
-                        <span className={`block text-[10px] font-normal truncate ${activa ? 'text-slate-300' : 'text-slate-400'}`}>
+                        <span className={`block text-xs font-normal truncate ${activa ? 'text-indigo-100' : 'text-[#475569]'}`}>
                           {sec.desc}
                         </span>
                       </div>
@@ -492,95 +487,95 @@ export default function PanelAdministracion({ alCerrarSesion }) {
               </nav>
             </div>
 
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 p-4 text-xs text-slate-600 space-y-1.5">
-              <span className="font-bold text-slate-900 block text-[11px] uppercase tracking-wider">
+            <div className="clay-card-sm bg-[#F9F9FF] p-4 text-sm text-[#464555] space-y-1.5">
+              <span className="font-extrabold text-[#111C2D] block text-xs uppercase tracking-wider">
                 Gobernanza Institucional
               </span>
-              <p className="text-[11px] leading-relaxed text-slate-500">
+              <p className="text-sm leading-relaxed text-[#464555]">
                 Toda modificación genera un registro inmutable en la bitácora relacional con autor, fecha, entidad y valores antes/después.
               </p>
             </div>
           </aside>
 
           {/* Área Principal de Contenido (col-span-9) */}
-          <div className="lg:col-span-9 space-y-6">
+          <div className="lg:col-span-9 space-y-6 min-w-0">
             {/* ============================================================= */}
             {/* SECCIÓN 1: UMBRALES Y MOTOR (P05/P16) */}
             {/* ============================================================= */}
             {seccionActiva === 'umbrales' && (
               <div className="space-y-6">
                 {/* 1.A Tarjeta Destacada: Versión Vigente Actual */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
                     <div>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="swiss-chapter-badge">
                         Parámetros Activos del Motor
                       </span>
-                      <h2 className="text-base font-bold text-slate-900">
+                      <h2 className="headline-md text-xl font-bold text-[#111C2D] mt-1">
                         Configuración Vigente v{versionVigente?.version ?? 1}
                       </h2>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="clay-pill px-3.5 py-1 text-xs font-extrabold uppercase bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]">
                       ✓ Vigente en Motor
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-600">
-                    <strong className="font-semibold text-slate-800">Motivo de versión:</strong>{' '}
+                  <p className="text-base text-[#464555]">
+                    <strong className="font-bold text-[#111C2D]">Motivo de versión:</strong>{' '}
                     {versionVigente?.motivo || 'Configuración inicial ratificada'}
                   </p>
 
                   {/* Matriz 3x3 de Umbrales */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
+                  <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                    <table className="w-full text-left text-sm border-collapse">
                       <thead>
-                        <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px]">
-                          <th className="py-2.5 px-3">Variable Pluviométrica</th>
-                          <th className="py-2.5 px-3 text-amber-800 bg-amber-50/50">PRECAUCIÓN</th>
-                          <th className="py-2.5 px-3 text-orange-800 bg-orange-50/50">ALERTA</th>
-                          <th className="py-2.5 px-3 text-red-800 bg-red-50/50">EMERGENCIA</th>
+                        <tr className="border-b border-slate-200 text-[#475569] font-extrabold uppercase text-xs bg-[#F0F3FF]">
+                          <th className="py-3 px-3.5">Variable Pluviométrica</th>
+                          <th className="py-3 px-3 text-[#92400E] bg-[#FEF3C7]/70">PRECAUCIÓN</th>
+                          <th className="py-3 px-3 text-[#9A3412] bg-[#FFEDD5]/70">ALERTA</th>
+                          <th className="py-3 px-3 text-[#991B1B] bg-[#FEE2E2]/70">EMERGENCIA</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-mono text-xs">
+                      <tbody className="divide-y divide-slate-100 font-mono text-sm bg-white">
                         <tr>
-                          <td className="py-2.5 px-3 font-sans font-semibold text-slate-800">
+                          <td className="py-3 px-3.5 font-sans font-bold text-[#111C2D]">
                             Intensidad Horaria (mm/h)
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-amber-900 bg-amber-50/30">
+                          <td className="py-3 px-3 font-bold text-[#92400E] bg-[#FEF3C7]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'intensidad_mm_h' && u.nivel === 'PRECAUCION')?.valor ?? formConfig.int_precaucion} mm/h
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-orange-900 bg-orange-50/30">
+                          <td className="py-3 px-3 font-bold text-[#9A3412] bg-[#FFEDD5]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'intensidad_mm_h' && u.nivel === 'ALERTA')?.valor ?? formConfig.int_alerta} mm/h
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-red-900 bg-red-50/30">
+                          <td className="py-3 px-3 font-bold text-[#991B1B] bg-[#FEE2E2]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'intensidad_mm_h' && u.nivel === 'EMERGENCIA')?.valor ?? formConfig.int_emergencia} mm/h
                           </td>
                         </tr>
                         <tr>
-                          <td className="py-2.5 px-3 font-sans font-semibold text-slate-800">
+                          <td className="py-3 px-3.5 font-sans font-bold text-[#111C2D]">
                             Acumulado 24 Horas (mm)
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-amber-900 bg-amber-50/30">
+                          <td className="py-3 px-3 font-bold text-[#92400E] bg-[#FEF3C7]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_24h_mm' && u.nivel === 'PRECAUCION')?.valor ?? formConfig.a24_precaucion} mm
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-orange-900 bg-orange-50/30">
+                          <td className="py-3 px-3 font-bold text-[#9A3412] bg-[#FFEDD5]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_24h_mm' && u.nivel === 'ALERTA')?.valor ?? formConfig.a24_alerta} mm
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-red-900 bg-red-50/30">
+                          <td className="py-3 px-3 font-bold text-[#991B1B] bg-[#FEE2E2]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_24h_mm' && u.nivel === 'EMERGENCIA')?.valor ?? formConfig.a24_emergencia} mm
                           </td>
                         </tr>
                         <tr>
-                          <td className="py-2.5 px-3 font-sans font-semibold text-slate-800">
+                          <td className="py-3 px-3.5 font-sans font-bold text-[#111C2D]">
                             Acumulado 72 Horas (mm)
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-amber-900 bg-amber-50/30">
+                          <td className="py-3 px-3 font-bold text-[#92400E] bg-[#FEF3C7]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_72h_mm' && u.nivel === 'PRECAUCION')?.valor ?? formConfig.a72_precaucion} mm
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-orange-900 bg-orange-50/30">
+                          <td className="py-3 px-3 font-bold text-[#9A3412] bg-[#FFEDD5]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_72h_mm' && u.nivel === 'ALERTA')?.valor ?? formConfig.a72_alerta} mm
                           </td>
-                          <td className="py-2.5 px-3 font-bold text-red-900 bg-red-50/30">
+                          <td className="py-3 px-3 font-bold text-[#991B1B] bg-[#FEE2E2]/35">
                             {versionVigente?.umbrales?.find((u) => u.variable === 'acum_72h_mm' && u.nivel === 'EMERGENCIA')?.valor ?? formConfig.a72_emergencia} mm
                           </td>
                         </tr>
@@ -589,28 +584,28 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                   </div>
 
                   {/* Parámetros de Histéresis y Saturación de la versión vigente */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-500 uppercase block font-semibold">T_max Vigencia</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+                    <div className="clay-card-sm bg-[#F9F9FF] p-3.5">
+                      <span className="text-xs text-[#475569] uppercase block font-bold">T_max Vigencia</span>
+                      <span className="font-mono font-extrabold text-[#111C2D] text-base">
                         {versionVigente?.parametros?.t_max_minutos ?? formConfig.t_max_minutos} min
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-500 uppercase block font-semibold">Descenso Histéresis</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                    <div className="clay-card-sm bg-[#F9F9FF] p-3.5">
+                      <span className="text-xs text-[#475569] uppercase block font-bold">Descenso Histéresis</span>
+                      <span className="font-mono font-extrabold text-[#111C2D] text-base">
                         {versionVigente?.parametros?.muestras_descenso ?? formConfig.muestras_descenso} muestras
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-500 uppercase block font-semibold">Separación Mínima</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                    <div className="clay-card-sm bg-[#F9F9FF] p-3.5">
+                      <span className="text-xs text-[#475569] uppercase block font-bold">Separación Mínima</span>
+                      <span className="font-mono font-extrabold text-[#111C2D] text-base">
                         {versionVigente?.parametros?.separacion_minima_minutos ?? formConfig.separacion_minima_minutos} min
                       </span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] text-slate-500 uppercase block font-semibold">Saturación Cuenca</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                    <div className="clay-card-sm bg-[#F9F9FF] p-3.5">
+                      <span className="text-xs text-[#475569] uppercase block font-bold">Saturación Cuenca</span>
+                      <span className="font-mono font-extrabold text-[#111C2D] text-base">
                         ≥ {versionVigente?.parametros?.saturacion?.acum_72h_min_mm ?? formConfig.sat_acum_72h}mm / 72h
                       </span>
                     </div>
@@ -618,20 +613,20 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                 </section>
 
                 {/* 1.B Formulario de Nueva Versión Inmutable (P05/P16) */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-5">
-                  <div className="border-b border-slate-100 pb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-5">
+                  <div className="border-b border-slate-100 pb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="swiss-chapter-badge">
                         Reglas P05 y P16
                       </span>
-                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                      <span className="clay-pill text-xs font-bold text-[#3525CD] bg-[#EEF2FF] px-3 py-1 border border-[#E2DFFF]">
                         Inmutabilidad Garantizada
                       </span>
                     </div>
-                    <h2 className="text-base font-bold text-slate-900 mt-1">
+                    <h2 className="headline-md text-xl font-bold text-[#111C2D] mt-1.5">
                       Crear Nueva Versión Inmutable de Configuración
                     </h2>
-                    <p className="text-xs text-slate-500 leading-relaxed mt-0.5">
+                    <p className="text-base text-[#464555] leading-relaxed mt-1">
                       Las configuraciones son inmutables. Crear una versión nueva no recalcula evaluaciones pasadas y reinicia el contador de descenso de histéresis.
                     </p>
                   </div>
@@ -640,12 +635,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                   {erroresValidacionConfig.length > 0 && (
                     <div
                       role="alert"
-                      className="rounded-xl border border-red-300 bg-red-50 p-4 text-xs text-red-950 space-y-2 shadow-xs"
+                      className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 text-sm sm:text-base text-[#991B1B] space-y-2"
                     >
-                      <p className="font-bold flex items-center gap-1.5">
-                        <span>🛑</span> Error de Validación Estricta (Regla P16):
+                      <p className="font-bold flex items-center gap-2">
+                        <span aria-hidden="true">🛑</span> Error de Validación Estricta (Regla P16):
                       </p>
-                      <ul className="list-disc list-inside space-y-1 pl-1 text-red-900/90 font-mono text-[11px]">
+                      <ul className="list-disc list-inside space-y-1 pl-1 font-mono text-sm">
                         {erroresValidacionConfig.map((errStr, idx) => (
                           <li key={idx}>{errStr}</li>
                         ))}
@@ -654,18 +649,18 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                   )}
 
                   <form onSubmit={handleGuardarConfig} className="space-y-5">
-                    {/* Grilla de los 9 Umbrales en 3 Columnas por Variable */}
+                    {/* Grilla de los 9 Umbrales */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Intensidad Horaria */}
-                      <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
-                        <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                          <span className="text-xs font-bold text-slate-800 uppercase">
+                      <div className="clay-card-sm p-4 bg-[#F9F9FF] space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                          <span className="text-sm font-extrabold text-[#111C2D] uppercase">
                             Intensidad (mm/h)
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">P &lt; A &lt; E</span>
+                          <span className="text-xs text-[#475569] font-mono">P &lt; A &lt; E</span>
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Precaución (mm/h)
                           </label>
                           <input
@@ -673,12 +668,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.int_precaucion}
                             onChange={(e) => setFormConfig({ ...formConfig, int_precaucion: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Alerta (mm/h)
                           </label>
                           <input
@@ -686,12 +681,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.int_alerta}
                             onChange={(e) => setFormConfig({ ...formConfig, int_alerta: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Emergencia (mm/h)
                           </label>
                           <input
@@ -699,22 +694,22 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.int_emergencia}
                             onChange={(e) => setFormConfig({ ...formConfig, int_emergencia: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                       </div>
 
                       {/* Acumulado 24h */}
-                      <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
-                        <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                          <span className="text-xs font-bold text-slate-800 uppercase">
+                      <div className="clay-card-sm p-4 bg-[#F9F9FF] space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                          <span className="text-sm font-extrabold text-[#111C2D] uppercase">
                             Acumulado 24h (mm)
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">P &lt; A &lt; E</span>
+                          <span className="text-xs text-[#475569] font-mono">P &lt; A &lt; E</span>
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Precaución (mm)
                           </label>
                           <input
@@ -722,12 +717,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a24_precaucion}
                             onChange={(e) => setFormConfig({ ...formConfig, a24_precaucion: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Alerta (mm)
                           </label>
                           <input
@@ -735,12 +730,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a24_alerta}
                             onChange={(e) => setFormConfig({ ...formConfig, a24_alerta: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Emergencia (mm)
                           </label>
                           <input
@@ -748,22 +743,22 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a24_emergencia}
                             onChange={(e) => setFormConfig({ ...formConfig, a24_emergencia: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                       </div>
 
                       {/* Acumulado 72h */}
-                      <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
-                        <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                          <span className="text-xs font-bold text-slate-800 uppercase">
+                      <div className="clay-card-sm p-4 bg-[#F9F9FF] space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                          <span className="text-sm font-extrabold text-[#111C2D] uppercase">
                             Acumulado 72h (mm)
                           </span>
-                          <span className="text-[10px] text-slate-400 font-mono">24h ≤ 72h</span>
+                          <span className="text-xs text-[#475569] font-mono">24h ≤ 72h</span>
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Precaución (mm)
                           </label>
                           <input
@@ -771,12 +766,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a72_precaucion}
                             onChange={(e) => setFormConfig({ ...formConfig, a72_precaucion: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Alerta (mm)
                           </label>
                           <input
@@ -784,12 +779,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a72_alerta}
                             onChange={(e) => setFormConfig({ ...formConfig, a72_alerta: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
                         <div>
-                          <label className="text-[11px] font-medium text-slate-600 block mb-1">
+                          <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                             Emergencia (mm)
                           </label>
                           <input
@@ -797,7 +792,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             step="0.1"
                             value={formConfig.a72_emergencia}
                             onChange={(e) => setFormConfig({ ...formConfig, a72_emergencia: e.target.value })}
-                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-slate-900"
+                            className="clay-input w-full px-3.5 py-2 text-base font-mono"
                             required
                           />
                         </div>
@@ -805,40 +800,40 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     </div>
 
                     {/* Parámetros de Histéresis y Saturación */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50/70">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 clay-card-sm bg-[#F9F9FF]">
                       <div>
-                        <label className="text-[11px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           T_max (minutos vigencia)
                         </label>
                         <input
                           type="number"
                           value={formConfig.t_max_minutos}
                           onChange={(e) => setFormConfig({ ...formConfig, t_max_minutos: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                           required
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           Separación mínima (minutos)
                         </label>
                         <input
                           type="number"
                           value={formConfig.separacion_minima_minutos}
                           onChange={(e) => setFormConfig({ ...formConfig, separacion_minima_minutos: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                           required
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           Muestras para descenso (histéresis)
                         </label>
                         <input
                           type="number"
                           value={formConfig.muestras_descenso}
                           onChange={(e) => setFormConfig({ ...formConfig, muestras_descenso: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                           required
                         />
                       </div>
@@ -847,7 +842,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     {/* Justificación y Activación */}
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs font-semibold text-slate-700 block uppercase mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block uppercase mb-1">
                           Motivo / Justificación Académica
                         </label>
                         <input
@@ -855,20 +850,20 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                           value={formConfig.motivo}
                           onChange={(e) => setFormConfig({ ...formConfig, motivo: e.target.value })}
                           placeholder="Ej. Ajuste de umbrales para temporada de lluvias extraordinarias en cuenca Llojeta"
-                          className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs bg-white"
+                          className="clay-input w-full px-4 py-2.5 text-base"
                           required
                         />
                       </div>
 
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <label className="flex items-center gap-3 cursor-pointer select-none min-h-[48px]">
                         <input
                           type="checkbox"
                           id="check-activar"
                           checked={formConfig.activar}
                           onChange={(e) => setFormConfig({ ...formConfig, activar: e.target.checked })}
-                          className="rounded border-slate-300 text-slate-900 focus:ring-slate-900 w-4 h-4"
+                          className="rounded border-slate-300 text-[#3525CD] focus:ring-[#3525CD] w-5 h-5"
                         />
-                        <span className="text-xs font-medium text-slate-700">
+                        <span className="text-sm sm:text-base font-semibold text-[#1E293B]">
                           Activar inmediatamente al guardar (archiva la versión vigente actual)
                         </span>
                       </label>
@@ -877,67 +872,67 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     <button
                       type="submit"
                       disabled={cargando}
-                      className="min-h-[44px] px-5 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-semibold hover:bg-slate-800 disabled:opacity-50 transition-colors inline-flex items-center gap-2 shadow-sm cursor-pointer"
+                      className="clay-btn-primary clay-interactive min-h-[50px] w-full sm:w-auto px-6 py-3 text-base font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>💾</span>
+                      <span aria-hidden="true">💾</span>
                       <span>Guardar Nueva Versión</span>
                     </button>
                   </form>
                 </section>
 
                 {/* 1.C Historial de Versiones Inmutables */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-3">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                     Historial de Versiones Inmutables ({configuraciones.length})
                   </h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px]">
-                          <th className="py-2.5 px-3">Versión</th>
-                          <th className="py-2.5 px-3">Estado</th>
-                          <th className="py-2.5 px-3">Motivo</th>
-                          <th className="py-2.5 px-3">Autor</th>
-                          <th className="py-2.5 px-3">Fecha</th>
-                          <th className="py-2.5 px-3 text-right">Acción</th>
+                  <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                    <table className="w-full text-left text-sm border-collapse">
+                      <thead className="bg-[#F0F3FF]">
+                        <tr className="border-b border-slate-200 text-[#475569] font-extrabold uppercase text-xs">
+                          <th className="py-3 px-3.5">Versión</th>
+                          <th className="py-3 px-3">Estado</th>
+                          <th className="py-3 px-3">Motivo</th>
+                          <th className="py-3 px-3">Autor</th>
+                          <th className="py-3 px-3">Fecha</th>
+                          <th className="py-3 px-3.5 text-right">Acción</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                      <tbody className="divide-y divide-slate-100 font-mono text-xs sm:text-sm bg-white">
                         {configuraciones.map((cfg) => (
-                          <tr key={cfg.id} className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 font-bold text-slate-900">v{cfg.version}</td>
-                            <td className="py-2.5 px-3">
+                          <tr key={cfg.id} className="hover:bg-[#F9F9FF]">
+                            <td className="py-3 px-3.5 font-bold text-[#111C2D]">v{cfg.version}</td>
+                            <td className="py-3 px-3">
                               <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                className={`clay-pill px-2.5 py-0.5 text-xs font-bold uppercase ${
                                   cfg.estado === 'vigente'
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                    ? 'bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]'
                                     : cfg.estado === 'borrador'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-slate-100 text-slate-600'
+                                    ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                                    : 'bg-slate-100 text-[#475569]'
                                 }`}
                               >
                                 {cfg.estado}
                               </span>
                             </td>
-                            <td className="py-2.5 px-3 font-sans text-slate-700 max-w-xs truncate">
+                            <td className="py-3 px-3 font-sans text-[#1E293B] max-w-xs truncate">
                               {cfg.motivo || 'Sin motivo'}
                             </td>
-                            <td className="py-2.5 px-3 text-slate-500">{cfg.autor_nombre || 'Sistema'}</td>
-                            <td className="py-2.5 px-3 text-slate-500">
+                            <td className="py-3 px-3 text-[#475569]">{cfg.autor_nombre || 'Sistema'}</td>
+                            <td className="py-3 px-3 text-[#475569]">
                               {new Date(cfg.creada_en).toLocaleDateString()}
                             </td>
-                            <td className="py-2.5 px-3 text-right">
+                            <td className="py-3 px-3.5 text-right">
                               {cfg.estado === 'borrador' && (
                                 <button
                                   type="button"
                                   onClick={() => handleActivarVersion(cfg.id, cfg.version)}
-                                  className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-semibold transition-colors cursor-pointer"
+                                  className="min-h-[38px] px-3 py-1.5 rounded-full bg-[#059669] hover:bg-[#065F46] text-white text-xs font-bold transition-colors cursor-pointer"
                                 >
                                   Activar versión
                                 </button>
                               )}
                               {cfg.estado === 'vigente' && (
-                                <span className="text-[10px] text-emerald-700 font-bold font-sans">
+                                <span className="text-xs text-[#065F46] font-bold font-sans">
                                   ✓ En uso
                                 </span>
                               )}
@@ -956,27 +951,26 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             {/* ============================================================= */}
             {seccionActiva === 'recomendaciones' && (
               <div className="space-y-6">
-                {/* Formulario de Alta de Recomendación */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-4">
-                  <div className="border-b border-slate-100 pb-3">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                <section className="clay-card p-5 sm:p-6 space-y-5">
+                  <div className="border-b border-slate-100 pb-4">
+                    <span className="swiss-chapter-badge">
                       Módulo 3: Comunicación Preventiva
                     </span>
-                    <h2 className="text-base font-bold text-slate-900">
+                    <h2 className="headline-md text-xl font-bold text-[#111C2D] mt-1">
                       Publicar / Actualizar Recomendaciones Preventivas Generales
                     </h2>
                   </div>
 
                   <form onSubmit={handleGuardarRecomendacion} className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           Nivel Informativo
                         </label>
                         <select
                           value={formRec.nivel}
                           onChange={(e) => setFormRec({ ...formRec, nivel: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"
+                          className="clay-input w-full px-3.5 py-2 text-base"
                         >
                           <option value="NORMAL">NORMAL</option>
                           <option value="PRECAUCION">PRECAUCION</option>
@@ -985,13 +979,13 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           Estado Publicación
                         </label>
                         <select
                           value={formRec.estado_publicacion}
                           onChange={(e) => setFormRec({ ...formRec, estado_publicacion: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"
+                          className="clay-input w-full px-3.5 py-2 text-base"
                         >
                           <option value="publicado">Publicado</option>
                           <option value="borrador">Borrador</option>
@@ -999,13 +993,13 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">
+                        <label className="text-sm font-bold text-[#111C2D] block mb-1">
                           Etiqueta de Origen
                         </label>
                         <select
                           value={formRec.origen}
                           onChange={(e) => setFormRec({ ...formRec, origen: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"
+                          className="clay-input w-full px-3.5 py-2 text-base"
                         >
                           <option value="demostracion">demostracion</option>
                           <option value="institucional_verificada">institucional_verificada</option>
@@ -1014,7 +1008,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-[#111C2D] block mb-1">
                         Título Descriptivo
                       </label>
                       <input
@@ -1022,13 +1016,13 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         value={formRec.titulo}
                         onChange={(e) => setFormRec({ ...formRec, titulo: e.target.value })}
                         placeholder="Ej. Medidas preventivas generales para lluvia intensa"
-                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs bg-white"
+                        className="clay-input w-full px-4 py-2.5 text-base"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-[#111C2D] block mb-1">
                         Contenido de la Recomendación
                       </label>
                       <textarea
@@ -1036,7 +1030,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         value={formRec.contenido}
                         onChange={(e) => setFormRec({ ...formRec, contenido: e.target.value })}
                         placeholder="Recomendaciones preventivas generales en cuenca Llojeta..."
-                        className="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs bg-white"
+                        className="clay-input w-full px-4 py-3 text-base"
                         required
                       />
                     </div>
@@ -1044,7 +1038,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     <button
                       type="submit"
                       disabled={cargando}
-                      className="min-h-[44px] px-5 py-2 rounded-xl bg-[#0F172A] text-white text-xs font-semibold hover:bg-slate-800 disabled:opacity-50 transition-colors cursor-pointer"
+                      className="clay-btn-primary clay-interactive min-h-[50px] w-full sm:w-auto px-6 py-3 text-base font-bold disabled:opacity-50 cursor-pointer"
                     >
                       Guardar Recomendación
                     </button>
@@ -1052,21 +1046,21 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                 </section>
 
                 {/* Listado con Filtros por Nivel */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                       Recomendaciones Registradas ({recomendacionesFiltradas.length})
                     </h3>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                       {['TODOS', 'NORMAL', 'PRECAUCION', 'ALERTA', 'EMERGENCIA'].map((n) => (
                         <button
                           key={n}
                           type="button"
                           onClick={() => setFiltroNivelRec(n)}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors cursor-pointer ${
+                          className={`clay-pill min-h-[40px] px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                             filtroNivelRec === n
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              ? 'bg-[#3525CD] text-white'
+                              : 'bg-[#F0F3FF] text-[#464555] hover:text-[#111C2D]'
                           }`}
                         >
                           {n}
@@ -1075,30 +1069,30 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                     </div>
                   </div>
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {recomendacionesFiltradas.map((rec) => (
                       <div
                         key={rec.id}
-                        className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 flex flex-col justify-between gap-2 text-xs"
+                        className="clay-card-sm p-4 bg-[#F9F9FF] flex flex-col justify-between gap-2"
                       >
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-extrabold text-slate-900">{rec.nivel}</span>
-                          <span className="font-mono text-[10px] text-slate-500">v{rec.version}</span>
+                          <span className="font-extrabold text-sm text-[#111C2D]">{rec.nivel}</span>
+                          <span className="font-mono text-xs text-[#475569]">v{rec.version}</span>
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            className={`clay-pill px-2.5 py-0.5 text-xs font-bold uppercase ${
                               rec.estado_publicacion === 'publicado'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-slate-200 text-slate-700'
+                                ? 'bg-[#ECFDF5] text-[#065F46]'
+                                : 'bg-slate-200 text-[#475569]'
                             }`}
                           >
                             {rec.estado_publicacion}
                           </span>
-                          <span className="text-[10px] text-amber-800 italic font-medium">
+                          <span className="text-xs text-[#92400E] italic font-semibold">
                             [{rec.origen}]
                           </span>
                         </div>
-                        <p className="font-bold text-slate-800">{rec.titulo}</p>
-                        <p className="text-slate-600 leading-relaxed">{rec.contenido}</p>
+                        <p className="font-bold text-base text-[#111C2D]">{rec.titulo}</p>
+                        <p className="text-base text-[#464555] leading-relaxed">{rec.contenido}</p>
                       </div>
                     ))}
                   </div>
@@ -1111,13 +1105,13 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             {/* ============================================================= */}
             {seccionActiva === 'contactos' && (
               <div className="space-y-6">
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-4">
-                  <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <h2 className="headline-md text-xl font-bold text-[#111C2D] border-b border-slate-100 pb-4">
                     Registrar Contacto de Auxilio Ciudadano
                   </h2>
-                  <form onSubmit={handleGuardarContacto} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <form onSubmit={handleGuardarContacto} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-[#111C2D] block mb-1">
                         Nombre / Institución
                       </label>
                       <input
@@ -1125,12 +1119,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         value={formContacto.nombre}
                         onChange={(e) => setFormContacto({ ...formContacto, nombre: e.target.value })}
                         placeholder="Ej. Red 114 — GAMLP"
-                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white"
+                        className="clay-input w-full px-3.5 py-2 text-base"
                         required
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      <label className="text-sm font-bold text-[#111C2D] block mb-1">
                         Teléfono / Línea
                       </label>
                       <input
@@ -1138,15 +1132,15 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         value={formContacto.telefono}
                         onChange={(e) => setFormContacto({ ...formContacto, telefono: e.target.value })}
                         placeholder="Ej. 114 / 800-140202"
-                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-mono bg-white"
+                        className="clay-input w-full px-3.5 py-2 text-base font-mono"
                         required
                       />
                     </div>
-                    <div className="flex items-end">
+                    <div className="flex items-end sm:col-span-2 lg:col-span-1">
                       <button
                         type="submit"
                         disabled={cargando}
-                        className="w-full min-h-[44px] px-4 py-2 rounded-xl bg-[#0F172A] text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="clay-btn-primary clay-interactive w-full min-h-[48px] px-4 py-2.5 text-base font-bold cursor-pointer"
                       >
                         Agregar Contacto
                       </button>
@@ -1154,28 +1148,28 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                   </form>
                 </section>
 
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                     Contactos de Emergencia Activos ({contactos.length})
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {contactos.map((c) => (
                       <div
                         key={c.id}
-                        className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 flex items-center justify-between text-xs"
+                        className="clay-card-sm p-4 bg-[#F9F9FF] flex items-center justify-between gap-3"
                       >
-                        <div className="space-y-0.5">
-                          <p className="font-bold text-slate-900">{c.nombre}</p>
-                          <p className="font-mono text-base font-extrabold text-slate-900">{c.telefono}</p>
-                          <p className="text-[10px] text-slate-400">{c.fuente || 'Directorio municipal La Paz'}</p>
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="font-bold text-base text-[#111C2D] break-words">{c.nombre}</p>
+                          <p className="telemetry-num text-xl font-extrabold text-[#111C2D]">{c.telefono}</p>
+                          <p className="text-xs text-[#475569]">{c.fuente || 'Directorio municipal La Paz'}</p>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleToggleContactoActivo(c)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                          className={`clay-pill min-h-[44px] px-4 py-1.5 text-sm font-bold transition-colors shrink-0 cursor-pointer ${
                             c.activo
-                              ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200'
-                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                              ? 'bg-[#ECFDF5] text-[#065F46] hover:bg-[#D1FAE5] border border-[#A7F3D0]'
+                              : 'bg-slate-200 text-[#475569] hover:bg-slate-300'
                           }`}
                         >
                           {c.activo ? 'Activo' : 'Inactivo'}
@@ -1192,33 +1186,33 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             {/* ============================================================= */}
             {seccionActiva === 'capas' && (
               <div className="space-y-6">
-                <div className="rounded-2xl border border-blue-200 bg-blue-50/90 p-4 text-xs text-blue-900 space-y-1 shadow-2xs">
-                  <p className="font-bold flex items-center gap-1.5">
-                    <span>ℹ️</span> Regla de Gobernanza Espacial (Salvaguarda Cartográfica):
+                <div className="clay-card-sm border border-[#E2DFFF] bg-[#EEF2FF] p-4 sm:p-5 text-base text-[#111C2D] space-y-1">
+                  <p className="font-bold flex items-center gap-2 text-[#3525CD]">
+                    <span aria-hidden="true">ℹ️</span> Regla de Gobernanza Espacial (Salvaguarda Cartográfica):
                   </p>
-                  <p className="leading-relaxed text-blue-950">
+                  <p className="leading-relaxed text-[#1E293B]">
                     Las geometrías GeoJSON y coordenadas se cargan mediante script y son inmutables desde la interfaz de usuario. Desde este panel solo se administran los atributos descriptivos, procedencia y estado de verificación.
                   </p>
                 </div>
 
                 {/* Zonas de Referencia */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                     Polígonos de Cuenca / Zonas de Referencia ({capas.zonas?.length || 0})
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {capas.zonas?.map((z) => (
                       <div
                         key={z.id}
-                        className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 space-y-3 text-xs"
+                        className="clay-card-sm p-4 bg-[#F9F9FF] space-y-3"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-900 text-sm">{z.nombre}</span>
-                          <span className="font-mono text-[10px] text-slate-500">ID: {z.id}</span>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-bold text-[#111C2D] text-base">{z.nombre}</span>
+                          <span className="font-mono text-xs text-[#475569]">ID: {z.id}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
-                            <label className="text-[10px] font-semibold text-slate-500 uppercase block mb-1">
+                            <label className="text-xs font-bold text-[#475569] uppercase block mb-1">
                               Fuente
                             </label>
                             <input
@@ -1230,11 +1224,11 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                                 );
                                 setCapas({ ...capas, zonas: actualizadas });
                               }}
-                              className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs bg-white"
+                              className="clay-input w-full px-3.5 py-2 text-sm sm:text-base"
                             />
                           </div>
                           <div>
-                            <label className="text-[10px] font-semibold text-slate-500 uppercase block mb-1">
+                            <label className="text-xs font-bold text-[#475569] uppercase block mb-1">
                               Advertencia de Demostración
                             </label>
                             <input
@@ -1246,14 +1240,14 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                                 );
                                 setCapas({ ...capas, zonas: actualizadas });
                               }}
-                              className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs bg-white"
+                              className="clay-input w-full px-3.5 py-2 text-sm sm:text-base"
                             />
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleGuardarZona(z)}
-                          className="px-3.5 py-1.5 rounded-xl bg-[#0F172A] text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                          className="clay-btn-primary clay-interactive min-h-[48px] w-full sm:w-auto px-5 py-2 text-sm font-bold cursor-pointer"
                         >
                           Guardar Atributos de Zona
                         </button>
@@ -1263,24 +1257,24 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                 </section>
 
                 {/* Puntos de Referencia */}
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm space-y-4">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <section className="clay-card p-5 sm:p-6 space-y-4">
+                  <h3 className="text-sm font-extrabold text-[#111C2D] uppercase tracking-wider">
                     Puntos de Referencia ({capas.puntos?.length || 0})
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {capas.puntos?.map((p) => (
                       <div
                         key={p.id}
-                        className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/70 space-y-3 text-xs"
+                        className="clay-card-sm p-4 bg-[#F9F9FF] space-y-3"
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-900">{p.nombre}</span>
-                          <span className="font-mono text-[10px] text-slate-500">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-bold text-base text-[#111C2D]">{p.nombre}</span>
+                          <span className="font-mono text-xs text-[#475569]">
                             [{p.latitud}, {p.longitud}]
                           </span>
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] font-semibold text-slate-500 uppercase block">
+                          <label className="text-xs font-bold text-[#475569] uppercase block">
                             Estado Verificación
                           </label>
                           <select
@@ -1291,7 +1285,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                               );
                               setCapas({ ...capas, puntos: actualizados });
                             }}
-                            className="w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs bg-white"
+                            className="clay-input w-full px-3.5 py-2 text-sm sm:text-base"
                           >
                             <option value="sin_verificar">sin_verificar</option>
                             <option value="verificado_por_autoridad">verificado_por_autoridad</option>
@@ -1300,7 +1294,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                         <button
                           type="button"
                           onClick={() => handleGuardarPunto(p)}
-                          className="px-3 py-1 rounded-xl bg-[#0F172A] text-white text-[11px] font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                          className="clay-btn-primary clay-interactive min-h-[48px] w-full sm:w-auto px-5 py-2 text-sm font-bold cursor-pointer"
                         >
                           Guardar Punto
                         </button>
@@ -1316,72 +1310,72 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             {/* ============================================================= */}
             {seccionActiva === 'simulacion' && (
               <div className="space-y-6">
-                <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-5">
-                  <div className="border-b border-slate-100 pb-3">
-                    <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">
+                <section className="clay-card p-5 sm:p-6 space-y-5">
+                  <div className="border-b border-slate-100 pb-4">
+                    <span className="swiss-chapter-badge">
                       Aislamiento Estricto P11
                     </span>
-                    <h2 className="text-base font-bold text-slate-900 mt-0.5">
+                    <h2 className="headline-md text-xl font-bold text-[#111C2D] mt-1">
                       Control de Simulación para Demostración Académica
                     </h2>
-                    <p className="text-xs text-slate-500 leading-relaxed mt-0.5">
+                    <p className="text-base text-[#464555] leading-relaxed mt-1">
                       Las lecturas de modalidad simulada se almacenan en un entorno aislado y nunca alteran el estado real ni su contador de descenso.
                     </p>
                   </div>
 
                   {/* 4 Botones de Demostración Rápida */}
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-slate-700 block uppercase">
+                  <div className="space-y-3">
+                    <span className="text-sm font-extrabold text-[#111C2D] block uppercase">
                       Presets Rápidos para Defensa
                     </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <button
                         type="button"
                         onClick={() => inyectarPreset(0.4, 2.0, 6.0, 'NORMAL')}
-                        className="p-3.5 rounded-xl border border-emerald-300 bg-emerald-50/70 hover:bg-emerald-100/70 text-emerald-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="clay-card-sm clay-interactive min-h-[76px] p-3.5 border border-[#A7F3D0] bg-[#ECFDF5] hover:bg-[#D1FAE5] text-[#065F46] font-bold text-sm flex flex-col items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#059669]" aria-hidden="true" />
                         <span>Demostrar NORMAL</span>
-                        <span className="font-mono text-[10px] font-normal text-emerald-800">0.4 mm/h · 2.0 mm</span>
+                        <span className="font-mono text-xs font-normal">0.4 mm/h · 2.0 mm</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => inyectarPreset(3.2, 14.0, 30.0, 'PRECAUCIÓN')}
-                        className="p-3.5 rounded-xl border border-amber-300 bg-amber-50/70 hover:bg-amber-100/70 text-amber-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="clay-card-sm clay-interactive min-h-[76px] p-3.5 border border-[#FDE68A] bg-[#FEF3C7] hover:bg-[#FDE68A]/70 text-[#92400E] font-bold text-sm flex flex-col items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-200"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#B45309]" aria-hidden="true" />
                         <span>Demostrar PRECAUCIÓN</span>
-                        <span className="font-mono text-[10px] font-normal text-amber-800">3.2 mm/h · 14.0 mm</span>
+                        <span className="font-mono text-xs font-normal">3.2 mm/h · 14.0 mm</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => inyectarPreset(7.5, 28.0, 64.0, 'ALERTA')}
-                        className="p-3.5 rounded-xl border border-orange-300 bg-orange-50/70 hover:bg-orange-100/70 text-orange-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="clay-card-sm clay-interactive min-h-[76px] p-3.5 border border-[#FED7AA] bg-[#FFEDD5] hover:bg-[#FED7AA]/70 text-[#9A3412] font-bold text-sm flex flex-col items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-orange-500 ring-2 ring-orange-200"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#C2410C]" aria-hidden="true" />
                         <span>Demostrar ALERTA</span>
-                        <span className="font-mono text-[10px] font-normal text-orange-800">7.5 mm/h · 28.0 mm</span>
+                        <span className="font-mono text-xs font-normal">7.5 mm/h · 28.0 mm</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => inyectarPreset(14.5, 48.0, 98.0, 'EMERGENCIA')}
-                        className="p-3.5 rounded-xl border border-red-300 bg-red-50/70 hover:bg-red-100/70 text-red-950 font-bold text-xs transition-colors flex flex-col items-center gap-1.5 cursor-pointer shadow-sm"
+                        className="clay-card-sm clay-interactive min-h-[76px] p-3.5 border border-[#FECACA] bg-[#FEE2E2] hover:bg-[#FECACA]/70 text-[#991B1B] font-bold text-sm flex flex-col items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" aria-hidden="true" />
                         <span>Demostrar EMERGENCIA</span>
-                        <span className="font-mono text-[10px] font-normal text-red-800">14.5 mm/h · 48.0 mm</span>
+                        <span className="font-mono text-xs font-normal">14.5 mm/h · 48.0 mm</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Formulario de Inyección Personalizada */}
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
-                    <span className="text-xs font-bold text-slate-800 block uppercase">
+                  <div className="clay-card-sm p-4 sm:p-5 bg-[#F9F9FF] space-y-4">
+                    <span className="text-sm font-extrabold text-[#111C2D] block uppercase">
                       Inyección Manual de Métricas Pluviométricas
                     </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="text-[11px] text-slate-600 block mb-1">
+                        <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                           Intensidad Horaria (mm/h)
                         </label>
                         <input
@@ -1389,11 +1383,11 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                           step="0.1"
                           value={simManual.intensidad}
                           onChange={(e) => setSimManual({ ...simManual, intensidad: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-slate-600 block mb-1">
+                        <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                           Acumulado 24h (mm)
                         </label>
                         <input
@@ -1401,11 +1395,11 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                           step="0.1"
                           value={simManual.acum_24h}
                           onChange={(e) => setSimManual({ ...simManual, acum_24h: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-slate-600 block mb-1">
+                        <label className="text-sm font-semibold text-[#1E293B] block mb-1">
                           Acumulado 72h (mm)
                         </label>
                         <input
@@ -1413,12 +1407,12 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                           step="0.1"
                           value={simManual.acum_72h}
                           onChange={(e) => setSimManual({ ...simManual, acum_72h: e.target.value })}
-                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-mono"
+                          className="clay-input w-full px-3.5 py-2 text-base font-mono"
                         />
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
                       <button
                         type="button"
                         onClick={() =>
@@ -1429,14 +1423,14 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                             'Manual'
                           )
                         }
-                        className="min-h-[40px] px-4 py-2 rounded-xl bg-[#0F172A] text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="clay-btn-primary clay-interactive min-h-[48px] px-5 py-2.5 text-sm sm:text-base font-bold cursor-pointer"
                       >
                         Inyectar Lectura Manual
                       </button>
                       <button
                         type="button"
                         onClick={handleLimpiarSimulacion}
-                        className="min-h-[40px] px-4 py-2 rounded-xl bg-red-100 text-red-900 hover:bg-red-200 text-xs font-semibold transition-colors cursor-pointer"
+                        className="clay-pill clay-interactive min-h-[48px] px-5 py-2.5 bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-sm sm:text-base font-bold cursor-pointer"
                       >
                         🧹 Limpiar Datos de Simulación
                       </button>
@@ -1450,24 +1444,24 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             {/* SECCIÓN 6: BITÁCORA DE CAMBIOS (AUDITORÍA) */}
             {/* ============================================================= */}
             {seccionActiva === 'bitacora' && (
-              <section className="rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <section className="clay-card p-5 sm:p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    <span className="swiss-chapter-badge">
                       Auditoría Inmutable
                     </span>
-                    <h2 className="text-base font-bold text-slate-900">
+                    <h2 className="headline-md text-xl font-bold text-[#111C2D] mt-1">
                       Bitácora Cronológica de Cambios ({bitacoraFiltrada.length} registros)
                     </h2>
                   </div>
 
                   {/* Filtro por Entidad */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-[11px] text-slate-500 font-medium">Filtrar entidad:</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="text-sm text-[#475569] font-semibold">Filtrar entidad:</label>
                     <select
                       value={filtroBitacora}
                       onChange={(e) => setFiltroBitacora(e.target.value)}
-                      className="rounded-xl border border-slate-300 px-2.5 py-1 text-xs bg-white text-slate-700"
+                      className="clay-input px-3.5 py-2 text-sm sm:text-base"
                     >
                       <option value="TODAS">Todas las entidades</option>
                       <option value="configuraciones_reglas">configuraciones_reglas</option>
@@ -1480,50 +1474,50 @@ export default function PanelAdministracion({ alCerrarSesion }) {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[10px]">
-                        <th className="py-2.5 px-3">Fecha / Hora</th>
-                        <th className="py-2.5 px-3">Usuario</th>
-                        <th className="py-2.5 px-3">Entidad</th>
-                        <th className="py-2.5 px-3">Acción</th>
-                        <th className="py-2.5 px-3">Resumen de Cambio</th>
+                <div className="overflow-x-auto rounded-xl border border-slate-200/80">
+                  <table className="w-full text-left text-sm border-collapse">
+                    <thead className="bg-[#F0F3FF]">
+                      <tr className="border-b border-slate-200 text-[#475569] font-extrabold uppercase text-xs">
+                        <th className="py-3 px-3.5">Fecha / Hora</th>
+                        <th className="py-3 px-3">Usuario</th>
+                        <th className="py-3 px-3">Entidad</th>
+                        <th className="py-3 px-3">Acción</th>
+                        <th className="py-3 px-3.5">Resumen de Cambio</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                    <tbody className="divide-y divide-slate-100 font-mono text-xs sm:text-sm bg-white">
                       {bitacoraFiltrada.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="py-4 text-center text-slate-400 font-sans italic">
+                          <td colSpan={5} className="py-6 text-center text-[#475569] font-sans italic">
                             No se encontraron registros de auditoría para el filtro seleccionado.
                           </td>
                         </tr>
                       ) : (
                         bitacoraFiltrada.map((b) => (
-                          <tr key={b.id} className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 text-slate-500 whitespace-nowrap">
+                          <tr key={b.id} className="hover:bg-[#F9F9FF]">
+                            <td className="py-3 px-3.5 text-[#475569] whitespace-nowrap">
                               {new Date(b.ocurrido_en).toLocaleString()}
                             </td>
-                            <td className="py-2.5 px-3 font-sans font-medium text-slate-800 whitespace-nowrap">
+                            <td className="py-3 px-3 font-sans font-semibold text-[#111C2D] whitespace-nowrap">
                               {b.usuario_nombre || 'Sistema'}
                             </td>
-                            <td className="py-2.5 px-3 text-slate-600 font-bold">{b.entidad}</td>
-                            <td className="py-2.5 px-3">
+                            <td className="py-3 px-3 text-[#1E293B] font-bold">{b.entidad}</td>
+                            <td className="py-3 px-3">
                               <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                className={`clay-pill px-2.5 py-0.5 text-xs font-bold uppercase ${
                                   b.accion === 'crear'
-                                    ? 'bg-blue-100 text-blue-800'
+                                    ? 'bg-[#EEF2FF] text-[#3525CD]'
                                     : b.accion === 'activar'
-                                    ? 'bg-emerald-100 text-emerald-800'
+                                    ? 'bg-[#ECFDF5] text-[#065F46]'
                                     : b.accion === 'modificar'
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : 'bg-slate-200 text-slate-700'
+                                    ? 'bg-[#FEF3C7] text-[#92400E]'
+                                    : 'bg-slate-200 text-[#475569]'
                                 }`}
                               >
                                 {b.accion}
                               </span>
                             </td>
-                            <td className="py-2.5 px-3 font-sans text-slate-600 max-w-sm truncate">
+                            <td className="py-3 px-3.5 font-sans text-[#464555] max-w-sm truncate">
                               {b.valor_nuevo ? JSON.stringify(b.valor_nuevo).substring(0, 90) + '...' : '-'}
                             </td>
                           </tr>

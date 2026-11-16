@@ -8,9 +8,9 @@ export const ESCENARIOS_DEMOSTRACION = [
   {
     clave: 'NORMAL',
     etiqueta: 'Simular Normal',
-    dotColor: 'bg-emerald-500',
+    dotColor: 'bg-[#059669]',
     estiloBtn:
-      'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200',
+      'bg-[#ECFDF5] hover:bg-[#D1FAE5] text-[#065F46] border border-[#A7F3D0]',
     payload: {
       intensidad_mm_h: 0.4,
       acum_24h_mm: 2.0,
@@ -27,9 +27,9 @@ export const ESCENARIOS_DEMOSTRACION = [
   {
     clave: 'PRECAUCION',
     etiqueta: 'Simular Precaución',
-    dotColor: 'bg-amber-500',
+    dotColor: 'bg-[#B45309]',
     estiloBtn:
-      'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200',
+      'bg-[#FEF3C7] hover:bg-[#FDE68A]/70 text-[#92400E] border border-[#FDE68A]',
     payload: {
       intensidad_mm_h: 3.2,
       acum_24h_mm: 14.0,
@@ -46,9 +46,9 @@ export const ESCENARIOS_DEMOSTRACION = [
   {
     clave: 'ALERTA',
     etiqueta: 'Simular Alerta',
-    dotColor: 'bg-orange-500',
+    dotColor: 'bg-[#C2410C]',
     estiloBtn:
-      'bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200',
+      'bg-[#FFEDD5] hover:bg-[#FED7AA]/70 text-[#9A3412] border border-[#FED7AA]',
     payload: {
       intensidad_mm_h: 7.5,
       acum_24h_mm: 28.0,
@@ -65,9 +65,9 @@ export const ESCENARIOS_DEMOSTRACION = [
   {
     clave: 'EMERGENCIA',
     etiqueta: 'Simular Emergencia',
-    dotColor: 'bg-red-600',
+    dotColor: 'bg-[#DC2626]',
     estiloBtn:
-      'bg-red-50 hover:bg-red-100 text-red-900 border border-red-200',
+      'bg-[#FEE2E2] hover:bg-[#FECACA]/70 text-[#991B1B] border border-[#FECACA]',
     payload: {
       intensidad_mm_h: 14.5,
       acum_24h_mm: 48.0,
@@ -107,7 +107,6 @@ export default function BannerModoSimulacion({
   cargando = false,
   ocultarSelector = false,
 }) {
-  // Si se solicita ocultar el selector y no estamos en modo simulación, no renderizar nada
   if (ocultarSelector && !esSimulacion) {
     return null;
   }
@@ -115,16 +114,16 @@ export default function BannerModoSimulacion({
   return (
     <section
       aria-label="Selector de modalidad y control de simulación"
-      className="space-y-4"
+      className="space-y-4 animate-fade-up"
     >
       {/* 1. Selector de Modalidad (solo visible si no está oculto por prop) */}
       {!ocultarSelector && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div>
-            <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase block">
+        <div className="clay-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="swiss-chapter-badge block">
               Modo de consulta
             </span>
-            <p className="text-xs text-slate-600">
+            <p className="text-base text-[#464555] mt-0.5">
               {esSimulacion
                 ? 'Visualizando datos académicos simulados aislados'
                 : 'Visualizando lecturas reales de modelo meteorológico'}
@@ -134,17 +133,17 @@ export default function BannerModoSimulacion({
           <div
             role="group"
             aria-label="Modo de consulta: Datos Reales (Open-Meteo) | Modo Simulación (Demostración)"
-            className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 self-start sm:self-auto"
+            className="grid grid-cols-1 sm:inline-grid sm:grid-cols-2 gap-1.5 rounded-2xl bg-[#F0F3FF] p-1.5 border border-slate-200/80 w-full sm:w-auto"
           >
             <button
               type="button"
               onClick={() => alCambiarModalidad('real')}
               disabled={cargando}
               aria-pressed={modalidad === 'real'}
-              className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`min-h-[48px] px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 modalidad === 'real'
-                  ? 'bg-[#0F172A] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#3525CD] text-white shadow-sm'
+                  : 'text-[#464555] hover:text-[#111C2D] hover:bg-white/60'
               }`}
             >
               Datos Reales (Open-Meteo)
@@ -154,10 +153,10 @@ export default function BannerModoSimulacion({
               onClick={() => alCambiarModalidad('simulada')}
               disabled={cargando}
               aria-pressed={modalidad === 'simulada'}
-              className={`min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`min-h-[48px] px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                 modalidad === 'simulada'
-                  ? 'bg-slate-800 text-teal-300 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#111C2D] text-white shadow-sm'
+                  : 'text-[#464555] hover:text-[#111C2D] hover:bg-white/60'
               }`}
             >
               Modo Simulación (Demostración)
@@ -166,42 +165,45 @@ export default function BannerModoSimulacion({
         </div>
       )}
 
-      {/* 2. Banner Bento Institucional en Modo Simulación (P11) */}
+      {/* 2. Banner Institucional en Modo Simulación (P11) */}
       {esSimulacion && (
         <div
           role="region"
           aria-label="Aviso de modo simulación activa"
-          className="rounded-2xl border border-slate-200/90 border-l-4 border-l-slate-900 bg-white p-5 shadow-sm space-y-4"
+          className="clay-card border-l-4 border-l-[#3525CD] bg-[#FFFFFF] p-5 sm:p-6 space-y-4"
         >
           {/* Encabezado y Aislamiento */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xl select-none" aria-hidden="true">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="flex items-start gap-3 min-w-0">
+              <span
+                className="w-10 h-10 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-xl shrink-0 clay-pill select-none"
+                aria-hidden="true"
+              >
                 🧪
               </span>
-              <div>
-                <span className="bg-slate-100 text-slate-800 border border-slate-300 font-bold text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full inline-block">
+              <div className="min-w-0 space-y-1.5">
+                <span className="clay-pill bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF] font-extrabold text-xs tracking-wider uppercase px-3 py-1 inline-block">
                   MODO DEMOSTRACIÓN ACADÉMICA ACTIVO (REGLA P11)
                 </span>
-                <p className="text-xs font-medium text-slate-700 leading-snug mt-1">
+                <p className="text-base font-medium text-[#111C2D] leading-relaxed">
                   MODO SIMULACIÓN ACADÉMICA ACTIVO — Los datos y el nivel mostrados son simulados para demostración y NO alteran el estado meteorológico real.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Botones de Escenarios Académicos */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+          {/* Botones de Escenarios Académicos (Grid 2 cols móvil -> 4 cols desktop) */}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-sm font-bold text-[#111C2D] uppercase tracking-wider">
                 Inyectar escenario académico de prueba:
               </span>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-sm text-[#464555]">
                 1 clic demuestra el nivel exacto
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {ESCENARIOS_DEMOSTRACION.map((esc) => {
                 const esActivo = nivelActual === esc.clave;
                 return (
@@ -210,26 +212,28 @@ export default function BannerModoSimulacion({
                     type="button"
                     onClick={() => alInyectarEscenario(esc.payload)}
                     disabled={cargando}
-                    className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-2xs disabled:opacity-50 inline-flex items-center gap-2 cursor-pointer ${
+                    className={`clay-pill clay-interactive min-h-[48px] w-full px-3 py-2.5 text-sm font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2 cursor-pointer ${
                       esc.estiloBtn
                     } ${
-                      esActivo ? 'ring-2 ring-offset-1 ring-slate-900 shadow-sm' : ''
+                      esActivo ? 'ring-2 ring-offset-2 ring-[#3525CD]' : ''
                     }`}
                   >
                     <span
                       className={`w-2.5 h-2.5 rounded-full ${esc.dotColor} shrink-0`}
                       aria-hidden="true"
                     />
-                    <span>{esc.etiqueta}</span>
+                    <span className="truncate">{esc.etiqueta}</span>
                   </button>
                 );
               })}
+            </div>
 
+            <div className="pt-1 flex justify-end">
               <button
                 type="button"
                 onClick={alLimpiarSimulacion}
                 disabled={cargando}
-                className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-all shadow-2xs disabled:opacity-50 inline-flex items-center gap-2 cursor-pointer"
+                className="clay-btn-secondary clay-interactive min-h-[48px] w-full sm:w-auto px-5 py-2.5 text-sm font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Limpiar Simulación</span>
               </button>

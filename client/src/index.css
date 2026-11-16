@@ -1,15 +1,295 @@
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  /* Familias Tipográficas Suizas */
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Lienzo y Superficies Clay */
+  --bg-canvas: #F6F8FA;
+  --bg-canvas-alt: #F9F9FF;
+  --surface-clay: #FFFFFF;
+  --surface-clay-muted: #F0F3FF;
+  --surface-clay-accent: #E7EEFF;
+
+  /* Tinta y Tipografía (WCAG AAA) */
+  --ink-primary: #111C2D;
+  --ink-slate: #1E293B;
+  --ink-secondary: #464555;
+  --ink-muted: #475569;
+
+  /* Color Primario Cívico (Índigo Institucional) */
+  --primary-civic: #3525CD;
+  --primary-civic-hover: #4F46E5;
+  --primary-civic-soft: #EEF2FF;
+  --primary-civic-pill: #E2DFFF;
+
+  /* Semántica Pastel Clay de los 4 Niveles Informativos de Lluvia */
+  --level-normal-bg: #ECFDF5;
+  --level-normal-surface: #D1FAE5;
+  --level-normal-border: #A7F3D0;
+  --level-normal-ink: #065F46;
+  --level-normal-accent: #059669;
+
+  --level-precaucion-bg: #FEF3C7;
+  --level-precaucion-border: #FDE68A;
+  --level-precaucion-ink: #92400E;
+  --level-precaucion-accent: #B45309;
+
+  --level-alerta-bg: #FFEDD5;
+  --level-alerta-border: #FED7AA;
+  --level-alerta-ink: #9A3412;
+  --level-alerta-accent: #C2410C;
+
+  --level-emergencia-bg: #FEE2E2;
+  --level-emergencia-surface: #FFDAD6;
+  --level-emergencia-border: #FECACA;
+  --level-emergencia-ink: #991B1B;
+  --level-emergencia-accent: #DC2626;
 }
 
+html,
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  max-width: 100%;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Superficie de tarjeta Clay en reposo */
+.clay-card {
+  background-color: var(--surface-clay);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(30, 41, 59, 0.08);
+  box-shadow:
+    0 10px 24px -6px rgba(17, 28, 45, 0.07),
+    0 2px 6px -1px rgba(17, 28, 45, 0.04),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -2px 5px 0 rgba(17, 28, 45, 0.03);
+}
+
+/* Tarjeta Clay secundaria compacta */
+.clay-card-sm {
+  background-color: var(--surface-clay);
+  border-radius: 1.125rem;
+  border: 1px solid rgba(30, 41, 59, 0.08);
+  box-shadow:
+    0 6px 16px -4px rgba(17, 28, 45, 0.06),
+    0 1px 4px -1px rgba(17, 28, 45, 0.03),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 3px 0 rgba(17, 28, 45, 0.025);
+}
+
+/* Píldora o badge pastel con relieve táctil */
+.clay-pill {
+  border-radius: 9999px;
+  box-shadow:
+    0 4px 12px -2px rgba(17, 28, 45, 0.08),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -2px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Botones táctiles accesibles (48px - 54px) con micro-compresión */
+.clay-btn-primary,
+.clay-btn-secondary,
+.clay-btn-danger {
+  min-height: 50px;
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.clay-btn-primary {
+  background-color: var(--primary-civic);
+  color: #FFFFFF;
+  box-shadow:
+    0 8px 18px -4px rgba(53, 37, 205, 0.28),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 4px 0 rgba(17, 28, 45, 0.18);
+}
+
+.clay-btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-civic-hover);
+  transform: translateY(-1px);
+}
+
+.clay-btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--ink-primary);
+  border: 1px solid rgba(30, 41, 59, 0.14);
+  box-shadow:
+    0 5px 12px -3px rgba(17, 28, 45, 0.07),
+    inset 0 2px 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 3px 0 rgba(17, 28, 45, 0.04);
+}
+
+.clay-btn-secondary:hover:not(:disabled) {
+  background-color: var(--surface-clay-muted);
+  transform: translateY(-1px);
+}
+
+.clay-btn-danger {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  box-shadow:
+    0 8px 18px -4px rgba(220, 38, 38, 0.28),
+    inset 0 2px 3px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 4px 0 rgba(127, 29, 29, 0.22);
+}
+
+.clay-btn-danger:hover:not(:disabled) {
+  background-color: #B91C1C;
+  transform: translateY(-1px);
+}
+
+.clay-btn-primary:active:not(:disabled),
+.clay-btn-secondary:active:not(:disabled),
+.clay-btn-danger:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+/* Campos de entrada suavemente hundidos para formularios */
+.clay-input {
+  min-height: 48px;
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 0.875rem;
+  color: var(--ink-primary);
+  box-shadow: inset 0 2px 4px rgba(30, 41, 59, 0.05);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.clay-input:focus {
+  border-color: var(--primary-civic-hover);
+  outline: 2px solid rgba(79, 70, 229, 0.2);
+  outline-offset: 1px;
+}
+
+/* Tipografía Suiza */
+.swiss-chapter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-civic);
+}
+
+.display-hero {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.headline-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.headline-md {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.headline-sm {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.telemetry-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Micro-animaciones suaves y táctiles */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.clay-interactive {
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 180ms ease, background-color 150ms ease;
+}
+
+.clay-interactive:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.clay-interactive:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+@keyframes clayBeaconPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(53, 37, 205, 0.35);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(53, 37, 205, 0);
+  }
+}
+
+.clay-beacon-pulse {
+  animation: clayBeaconPulse 2.4s ease-in-out infinite;
+}
+
+/* Utilidad para barras horizontales desplazables en móvil */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-up,
+  .clay-beacon-pulse,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+
+  .clay-interactive,
+  .clay-btn-primary,
+  .clay-btn-secondary,
+  .clay-btn-danger,
+  .clay-input {
+    transition: none !important;
+    transform: none !important;
+  }
 }

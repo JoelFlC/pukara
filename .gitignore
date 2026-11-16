@@ -32,3 +32,8 @@ Thumbs.db
 .vitest-cache/
 .vite/
 .system_generated/
+
+# Directorios de agentes locales
+.agent/
+.agents/
+skills-lock.json

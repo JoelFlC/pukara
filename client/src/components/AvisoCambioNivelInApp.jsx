@@ -1,35 +1,35 @@
 import React from 'react';
 
 /**
- * Paleta de colores y estilos visuales por nivel informativo
+ * Paleta Pastel Clay semántica de alto contraste AAA por nivel informativo.
  */
 const ESTILOS_NIVEL = {
   NORMAL: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-400',
-    text: 'text-emerald-950',
-    badge: 'bg-emerald-600 text-white',
+    bg: 'bg-[#ECFDF5]',
+    border: 'border-[#A7F3D0]',
+    text: 'text-[#065F46]',
+    badge: 'bg-[#059669] text-white',
     icono: '🟢',
   },
   PRECAUCION: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-400',
-    text: 'text-amber-950',
-    badge: 'bg-amber-500 text-white',
+    bg: 'bg-[#FEF3C7]',
+    border: 'border-[#FDE68A]',
+    text: 'text-[#92400E]',
+    badge: 'bg-[#B45309] text-white',
     icono: '🟡',
   },
   ALERTA: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-400',
-    text: 'text-orange-950',
-    badge: 'bg-orange-600 text-white',
+    bg: 'bg-[#FFEDD5]',
+    border: 'border-[#FED7AA]',
+    text: 'text-[#9A3412]',
+    badge: 'bg-[#C2410C] text-white',
     icono: '🟠',
   },
   EMERGENCIA: {
-    bg: 'bg-red-50',
-    border: 'border-red-500',
-    text: 'text-red-950',
-    badge: 'bg-red-600 text-white',
+    bg: 'bg-[#FEE2E2]',
+    border: 'border-[#FECACA]',
+    text: 'text-[#991B1B]',
+    badge: 'bg-[#DC2626] text-white',
     icono: '🔴',
   },
 };
@@ -72,25 +72,25 @@ export default function AvisoCambioNivelInApp({ cambioNivel, onCerrar }) {
       data-testid="aviso-cambio-nivel-inapp"
       role="status"
       aria-live="polite"
-      className={`w-full rounded-2xl border-2 ${estilos.border} ${estilos.bg} p-4 sm:p-5 shadow-md space-y-3 transition-all`}
+      className={`w-full clay-card border-2 ${estilos.border} ${estilos.bg} p-5 sm:p-6 space-y-4 animate-fade-up`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl select-none" aria-hidden="true">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          <span className="text-2xl select-none shrink-0 mt-0.5" aria-hidden="true">
             {estilos.icono}
           </span>
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+          <div className="min-w-0 space-y-1">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#464555] block">
               Aviso Visual In-App · Requisito P06 {modalidad === 'simulada' ? '(Demostración Simulación)' : ''}
             </span>
-            <h2 className={`text-sm sm:text-base font-extrabold ${estilos.text} leading-tight`}>
+            <h2 className={`headline-sm text-lg sm:text-xl font-extrabold ${estilos.text} leading-snug break-words`}>
               Cambio en el nivel informativo de lluvia: de {nivelAnterior} a {nivelNuevo}
             </h2>
           </div>
         </div>
 
         <span
-          className={`shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full ${estilos.badge} shadow-xs uppercase tracking-wide`}
+          className={`clay-pill self-start shrink-0 text-xs font-extrabold px-3.5 py-1.5 ${estilos.badge} uppercase tracking-wide`}
         >
           {esAscenso ? '▲ Nuevo nivel' : '▼ Descenso (histéresis)'}
         </span>
@@ -98,27 +98,27 @@ export default function AvisoCambioNivelInApp({ cambioNivel, onCerrar }) {
 
       {/* Resumen de la recomendación preventiva general vigente */}
       {recomendacion && (
-        <div className="rounded-xl bg-white/90 border border-slate-200/80 p-3 space-y-1">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold text-slate-900">
+        <div className="clay-card-sm bg-white/95 p-4 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-base font-bold text-[#111C2D]">
               {recomendacion.titulo || `Recomendación vigente para ${nivelNuevo}`}
             </p>
             {recomendacion.origen && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
+              <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#F0F3FF] text-[#1E293B] border border-slate-200/80">
                 {recomendacion.origen === 'institucional_verificada'
                   ? 'institucional_verificada'
                   : 'demostracion'}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-700 leading-relaxed">
+          <p className="text-base text-[#1E293B] leading-relaxed">
             {recomendacion.contenido}
           </p>
         </div>
       )}
 
       {/* Nota explícita obligatoria */}
-      <p className="text-[11px] text-slate-600 bg-white/60 p-2.5 rounded-lg border border-slate-200/60 leading-relaxed">
+      <p className="text-sm sm:text-base text-[#1E293B] bg-white/75 p-3.5 rounded-2xl border border-white/90 leading-relaxed">
         <strong>Nota importante:</strong> Aviso visual dentro de la aplicación (solo mientras la aplicación permanece abierta; no es una notificación remota ni sustituye canales oficiales). Ante emergencias, contacte a los servicios oficiales.
       </p>
 
@@ -127,7 +127,7 @@ export default function AvisoCambioNivelInApp({ cambioNivel, onCerrar }) {
         <button
           type="button"
           onClick={onCerrar}
-          className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors shadow-xs inline-flex items-center justify-center gap-1.5"
+          className="clay-btn-primary clay-interactive min-h-[48px] w-full sm:w-auto px-6 py-2.5 text-base font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
         >
           <span>✓</span>
           <span>Entendido / Cerrar aviso</span>
@@ -136,4 +136,3 @@ export default function AvisoCambioNivelInApp({ cambioNivel, onCerrar }) {
     </aside>
   );
 }
-
