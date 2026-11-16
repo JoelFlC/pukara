@@ -23,8 +23,39 @@ import {
   obtenerUltimoEstadoLocal,
 } from '../utils/offlineStorage';
 
+const ESCALA_NIVELES_V1 = [
+  {
+    clave: 'NORMAL',
+    titulo: 'Normal',
+    criterio: '< 2.5 mm/h · < 10 mm/24h',
+    dot: 'bg-[#059669]',
+    activoBg: 'bg-[#ECFDF5] border-[#A7F3D0] text-[#065F46]',
+  },
+  {
+    clave: 'PRECAUCION',
+    titulo: 'Precaución',
+    criterio: '≥ 2.5 mm/h · ≥ 10 mm/24h',
+    dot: 'bg-[#B45309]',
+    activoBg: 'bg-[#FEF3C7] border-[#FDE68A] text-[#92400E]',
+  },
+  {
+    clave: 'ALERTA',
+    titulo: 'Alerta',
+    criterio: '≥ 6.5 mm/h o saturación 72h',
+    dot: 'bg-[#C2410C]',
+    activoBg: 'bg-[#FFEDD5] border-[#FED7AA] text-[#9A3412]',
+  },
+  {
+    clave: 'EMERGENCIA',
+    titulo: 'Emergencia',
+    criterio: '≥ 12.0 mm/h · ≥ 40 mm/24h',
+    dot: 'bg-[#DC2626]',
+    activoBg: 'bg-[#FEE2E2] border-[#FECACA] text-[#991B1B]',
+  },
+];
+
 /**
- * Página principal institucional de PUKARA (Estilo Bento Desktop + Mobile-First).
+ * Página principal institucional de PUKARA (Swiss Grid + Claymorphism + Scrollytelling Mobile-First).
  * Conecta con GET /api/estado, GET /api/historial, gestiona el aviso visual in-app (P06)
  * y expone recomendaciones preventivas y contactos de auxilio ciudadano en La Paz.
  */
@@ -77,11 +108,9 @@ export default function InicioPage() {
           const nivelPrevio = ultimoNivelRef.current[modActual];
 
           if (!fueInicializado) {
-            // Primera carga: registrar referencia base sin disparar alerta
             inicializadoRef.current[modActual] = true;
             ultimoNivelRef.current[modActual] = nuevoNivel;
           } else if (nivelPrevio && nivelPrevio !== nuevoNivel) {
-            // Cambio posterior detectado en la misma modalidad: disparar aviso P06
             setCambioNivelDetectado({
               nivelAnterior: nivelPrevio,
               nivelNuevo: nuevoNivel,
@@ -109,7 +138,6 @@ export default function InicioPage() {
         setUltimaActualizacion(new Date());
       } catch (err) {
         if (err.name !== 'AbortError') {
-          // Intentar recuperación desde almacenamiento local offline (P08)
           const respaldoOffline = obtenerUltimoEstadoLocal();
           if (respaldoOffline && respaldoOffline.datos) {
             setEstado(respaldoOffline.datos);
@@ -188,18 +216,12 @@ export default function InicioPage() {
     };
   }, [cargarDatos, modalidad]);
 
-  /**
-   * Conmuta la modalidad activa ('real' vs 'simulada').
-   */
   const handleCambiarModalidad = (nuevaMod) => {
     if (nuevaMod === modalidad) return;
     setMensajeExito(null);
     setModalidad(nuevaMod);
   };
 
-  /**
-   * Dispara la inyección de un escenario académico en modo simulación (P11).
-   */
   const handleInyectarEscenario = async (payload) => {
     try {
       setCargandoAccion(true);
@@ -215,9 +237,6 @@ export default function InicioPage() {
     }
   };
 
-  /**
-   * Limpia los datos de simulación en base de datos sin tocar datos reales.
-   */
   const handleLimpiarSimulacion = async () => {
     try {
       setCargandoAccion(true);
@@ -234,21 +253,22 @@ export default function InicioPage() {
   };
 
   const estaOffline = usandoRespaldoOffline || sinConexionRed;
+  const nivelActivoActual = estado?.nivel_vigente || null;
 
   return (
-    <div id="monitoreo" className="min-h-screen bg-[#F4F7FB] text-slate-800 flex flex-col font-sans">
-      {/* 1. Barra de Navegación Institucional Sticky */}
+    <div id="monitoreo" className="min-h-screen bg-[#F6F8FA] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full">
+      {/* 1. Barra de Navegación Institucional Sticky (Swiss Grid) */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 min-h-[68px] py-2 flex items-center justify-between gap-3">
           {/* Logo y Denominación Institucional */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0F172A] text-teal-400 flex items-center justify-center shrink-0 shadow-xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center shrink-0 shadow-sm clay-pill">
               <svg
                 className="w-5 h-5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
@@ -258,63 +278,63 @@ export default function InicioPage() {
                 <path d="M12 16h.01" />
               </svg>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-slate-900">
+                <span className="display-hero font-extrabold text-lg tracking-tight text-[#111C2D]">
                   PUKARA
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/70">
+                <span className="clay-pill text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF]">
                   Llojeta
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Monitoreo Informativo de Lluvias · Sector Llojeta
+              <p className="text-xs text-[#464555] font-medium hidden sm:block truncate">
+                Consulta Informativa de Lluvias · Sector Llojeta
               </p>
             </div>
           </div>
 
-          {/* Enlaces de Navegación Desktop */}
-          <nav aria-label="Navegación principal desktop" className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
-            <a href="#monitoreo" className="hover:text-slate-900 transition-colors">
-              Monitoreo
+          {/* Enlaces de Navegación Desktop por Capítulos */}
+          <nav aria-label="Navegación principal desktop" className="hidden lg:flex items-center gap-1.5 text-sm font-semibold text-[#464555]">
+            <a href="#monitoreo" className="px-3 py-2 rounded-full hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors">
+              Estado en Vivo
             </a>
-            <a href="#telemetria" className="hover:text-slate-900 transition-colors">
-              Telemetría
+            <a href="#prevencion" className="px-3 py-2 rounded-full hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors">
+              01 Guía Preventiva
             </a>
-            <a href="#prevencion" className="hover:text-slate-900 transition-colors">
-              Prevención
+            <a href="#mapa" className="px-3 py-2 rounded-full hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors">
+              02 Mapa Referencial
             </a>
-            <a href="#mapa" className="hover:text-slate-900 transition-colors">
-              Mapa Referencial
+            <a href="#contactos" className="px-3 py-2 rounded-full hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors">
+              03 Teléfonos Rápidos
             </a>
-            <a href="#historial" className="hover:text-slate-900 transition-colors">
+            <a href="#historial" className="px-3 py-2 rounded-full hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors">
               Historial
             </a>
           </nav>
 
           {/* Indicador de Conexión y Acceso Administrativo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {estaOffline ? (
               <span
                 role="status"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+                className="clay-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]"
               >
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" aria-hidden="true" />
+                <span className="w-2 h-2 rounded-full bg-[#B45309] animate-pulse" aria-hidden="true" />
                 <span>Sin conexión</span>
               </span>
             ) : (
               <span
                 role="status"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"
+                className="clay-pill inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
-                <span>En línea</span>
+                <span className="w-2 h-2 rounded-full bg-[#059669] clay-beacon-pulse" aria-hidden="true" />
+                <span className="hidden xs:inline sm:inline">En línea</span>
               </span>
             )}
 
             <Link
               to="/admin"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors shrink-0"
+              className="clay-btn-secondary clay-interactive min-h-[44px] sm:min-h-[48px] inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-[#111C2D] shrink-0"
               title="Acceso administrativo"
             >
               <span>Acceso Admin →</span>
@@ -323,39 +343,39 @@ export default function InicioPage() {
         </div>
       </header>
 
-      {/* 2. Sub-barra de Control y Metadatos Operativos */}
-      <div className="bg-white border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-xs text-slate-500">
+      {/* 2. Sub-barra de Control de Modalidad y Metadatos Operativos */}
+      <div className="bg-white/80 border-b border-slate-200/80">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#464555] min-w-0">
             <div>
-              <span className="font-semibold text-slate-800">Sector Llojeta / Bajo Llojeta</span>
+              <span className="font-bold text-[#111C2D]">Sector Llojeta / Bajo Llojeta</span>
               <span className="hidden sm:inline"> · </span>
-              <span>Macrodistrito Cotahuma, La Paz</span>
+              <span className="block sm:inline">Macrodistrito Cotahuma, La Paz</span>
             </div>
             <span className="hidden md:inline text-slate-300">|</span>
-            <span className="font-mono text-[11px] text-slate-400">
+            <span className="font-mono text-xs sm:text-sm text-[#475569]">
               Lat -16.5235 · Lon -68.1425
             </span>
             {ultimaActualizacion && (
               <>
                 <span className="hidden md:inline text-slate-300">|</span>
-                <span className="font-mono text-[11px] text-slate-500">
+                <span className="font-mono text-xs sm:text-sm text-[#475569]">
                   Consulta: {ultimaActualizacion.toLocaleTimeString()}
                 </span>
               </>
             )}
           </div>
 
-          <div className="flex items-center justify-between md:justify-end gap-3">
-            {/* Segmented Pill Switcher de Modalidad */}
-            <div className="inline-flex rounded-xl bg-slate-100 p-0.5 text-xs font-semibold text-slate-600 border border-slate-200/60">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between lg:justify-end gap-2.5 w-full lg:w-auto">
+            {/* Segmented Pill Switcher de Modalidad (Táctil 48px+) */}
+            <div className="grid grid-cols-1 sm:inline-grid sm:grid-cols-2 gap-1 rounded-2xl bg-[#F0F3FF] p-1 text-xs sm:text-sm font-bold border border-[#E2DFFF] w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => handleCambiarModalidad('real')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`min-h-[48px] px-3.5 py-2 rounded-xl transition-all cursor-pointer ${
                   modalidad === 'real'
-                    ? 'bg-[#0F172A] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#3525CD] text-white shadow-sm'
+                    : 'text-[#464555] hover:text-[#111C2D]'
                 }`}
               >
                 Datos Reales (Open-Meteo)
@@ -363,23 +383,23 @@ export default function InicioPage() {
               <button
                 type="button"
                 onClick={() => handleCambiarModalidad('simulada')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
+                className={`min-h-[48px] px-3.5 py-2 rounded-xl transition-all cursor-pointer ${
                   modalidad === 'simulada'
-                    ? 'bg-slate-800 text-teal-300 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#111C2D] text-white shadow-sm'
+                    : 'text-[#464555] hover:text-[#111C2D]'
                 }`}
               >
                 Modo Simulación (Demostración)
               </button>
             </div>
 
-            {/* Botón táctil de actualización accesible (>= 44px) */}
+            {/* Botón táctil de actualización accesible (>= 48px) */}
             <button
               type="button"
               onClick={() => cargarDatos()}
               disabled={cargando || cargandoAccion}
               aria-label="Actualizar datos meteorológicos"
-              className="min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0F172A] text-white hover:bg-slate-800 active:bg-slate-950 disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
+              className="clay-btn-primary clay-interactive min-h-[48px] min-w-[48px] px-5 py-2 text-sm font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2 shrink-0 cursor-pointer"
             >
               <span
                 className={cargando ? 'animate-spin inline-block' : ''}
@@ -393,8 +413,8 @@ export default function InicioPage() {
         </div>
       </div>
 
-      {/* 3. Contenedor Principal Bento Layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-12 w-full flex-1">
+      {/* 3. Contenedor Principal Scrollytelling sobre Retícula Suiza */}
+      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 sm:space-y-10 pb-24 md:pb-12 w-full flex-1">
         {/* Banner de instalación PWA (Requisito P12) */}
         <EstadoPwaBanner />
 
@@ -432,7 +452,7 @@ export default function InicioPage() {
         {mensajeExito && (
           <div
             role="status"
-            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs text-emerald-900 font-medium flex items-center gap-2 shadow-xs"
+            className="clay-card-sm border border-[#A7F3D0] bg-[#ECFDF5] p-4 text-base text-[#065F46] font-semibold flex items-center gap-2.5 animate-fade-up"
           >
             <span aria-hidden="true">✅</span>
             <span>{mensajeExito}</span>
@@ -443,25 +463,26 @@ export default function InicioPage() {
         {errorConexion && (
           <div
             role="alert"
-            className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs text-red-900 space-y-2 shadow-sm"
+            className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 sm:p-5 text-base text-[#991B1B] space-y-3"
           >
-            <p className="font-semibold flex items-center gap-1.5">
-              <span>⚠️</span> Incidencia de comunicación con la API
+            <p className="font-bold flex items-center gap-2">
+              <span aria-hidden="true">⚠️</span> Incidencia de comunicación con la API
             </p>
-            <p className="text-red-800/90 leading-relaxed">{errorConexion}</p>
+            <p className="leading-relaxed">{errorConexion}</p>
             <button
               type="button"
               onClick={() => cargarDatos()}
-              className="min-h-[44px] px-3.5 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-900 font-semibold text-xs transition-colors"
+              className="clay-btn-danger clay-interactive min-h-[48px] px-5 py-2 text-sm font-bold cursor-pointer"
             >
               Reintentar consulta
             </button>
           </div>
         )}
 
-        {/* FILA 1 (HERO): Banner Nivel Informativo + Bento Card Resumen Espacial */}
-        <section aria-label="Nivel informativo y ámbito espacial" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-7 xl:col-span-8">
+        {/* FILA 1 (HERO DIAGNÓSTICO + ESCALA DE 4 NIVELES Y ÁMBITO ESPACIAL) */}
+        <section aria-label="Nivel informativo y ámbito espacial" className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+          {/* Diagnóstico Principal (Primero en móvil) */}
+          <div className="lg:col-span-7">
             <BannerNivelInformativo
               estado={estado}
               alInyectarPreset={(nivel, int, a24, a72) =>
@@ -475,92 +496,115 @@ export default function InicioPage() {
             />
           </div>
 
-          <div className="lg:col-span-5 xl:col-span-4 rounded-2xl border border-slate-200/80 bg-white p-5 md:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          {/* Columna Derecha: Escala de los 4 Niveles + Ámbito Espacial Llojeta */}
+          <div className="lg:col-span-5 clay-card p-5 sm:p-6 flex flex-col justify-between space-y-5 animate-fade-up">
+            {/* Escala de 4 Niveles */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Ámbito Espacial de Consulta
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <span className="swiss-chapter-badge">
+                  Escala de 4 Niveles
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                <span className="clay-pill px-2.5 py-0.5 text-xs font-bold bg-[#F0F3FF] text-[#3525CD] border border-[#E2DFFF]">
+                  Umbrales v{estado?.version_reglas?.version ?? 1}
+                </span>
+              </div>
+
+              <ul className="space-y-2">
+                {ESCALA_NIVELES_V1.map((item) => {
+                  const esVigente = nivelActivoActual === item.clave;
+                  return (
+                    <li
+                      key={item.clave}
+                      className={`p-3 rounded-2xl border flex items-center justify-between gap-2 transition-all ${
+                        esVigente
+                          ? `${item.activoBg} shadow-xs font-bold`
+                          : 'bg-[#F9F9FF] border-slate-200/80 text-[#464555]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className={`w-3 h-3 rounded-full ${item.dot} shrink-0`} aria-hidden="true" />
+                        <span className="text-sm sm:text-base font-bold text-[#111C2D]">
+                          {item.titulo}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-mono hidden sm:inline">
+                          {item.criterio}
+                        </span>
+                        {esVigente && (
+                          <span className="clay-pill bg-white/95 text-[#111C2D] px-2.5 py-0.5 text-xs font-extrabold border border-black/10">
+                            Vigente
+                          </span>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Ámbito Espacial Compacto */}
+            <div className="space-y-3 pt-2 border-t border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="headline-sm text-base sm:text-lg font-bold text-[#111C2D]">
+                  Sector Llojeta / Bajo Llojeta
+                </h2>
+                <span className="clay-pill px-2.5 py-0.5 text-xs font-bold bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]">
                   Sector Piloto Activo
                 </span>
               </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-900">
-                  Sector Llojeta / Bajo Llojeta
-                </h2>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  Lat -16.5235 · Lon -68.1425 (La Paz, BOT)
-                </p>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                El nivel informativo de lluvia se calcula con una sola consulta meteorológica para toda la zona piloto de Llojeta y no varía espacialmente dentro del sector.
+              <p className="text-xs sm:text-sm text-[#475569] font-mono">
+                Lat -16.5235 · Lon -68.1425 (La Paz, BOT)
               </p>
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                  <span className="block text-lg font-extrabold text-slate-800">
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="clay-card-sm bg-[#F9F9FF] p-3 text-center">
+                  <span className="telemetry-num block text-2xl font-extrabold text-[#111C2D]">
                     {(estado?.zonas_referencia || estado?.capas_referencia?.zonas || []).length || 2}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium">
+                  <span className="text-xs sm:text-sm text-[#464555] font-medium">
                     Polígonos en cuenca
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                  <span className="block text-lg font-extrabold text-slate-800">
+                <div className="clay-card-sm bg-[#F9F9FF] p-3 text-center">
+                  <span className="telemetry-num block text-2xl font-extrabold text-[#111C2D]">
                     {(estado?.puntos_referencia || estado?.capas_referencia?.puntos || []).length || 6}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium">
+                  <span className="text-xs sm:text-sm text-[#464555] font-medium">
                     Puntos referenciales
                   </span>
                 </div>
               </div>
-              <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-3 text-xs text-slate-700 space-y-1">
-                <div className="flex items-center gap-1.5 font-semibold text-[11px] text-slate-900">
-                  <span>📍</span>
-                  <span>Proximidad Haversine en el Dispositivo</span>
-                </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Cálculo ejecutado 100% en el dispositivo móvil. Sus coordenadas GPS jamás se envían ni se almacenan en el servidor.
-                </p>
-              </div>
-            </div>
 
-            <a
-              href="#mapa"
-              className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs text-center transition-colors block mt-2"
-            >
-              Explorar mapa y puntos referenciales ↓
-            </a>
+              <a
+                href="#mapa"
+                className="clay-btn-secondary clay-interactive min-h-[48px] w-full px-4 py-2.5 text-sm sm:text-base font-bold text-[#111C2D] inline-flex items-center justify-center gap-2 text-center"
+              >
+                <span>Explorar mapa y puntos referenciales ↓</span>
+              </a>
+            </div>
           </div>
         </section>
 
-        {/* FILA 2: Telemetría Pluviométrica */}
+        {/* FILA 2: Telemetría Pluviométrica Esencial */}
         <section id="telemetria" aria-label="Telemetría meteorológica">
           <TarjetaLecturaMeteorologica meteorologia={estado?.meteorologia} />
         </section>
 
-        {/* FILA 3: Recomendaciones Preventivas y Contactos de Emergencia */}
-        <section id="prevencion" aria-label="Prevención y auxilio" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <div className="lg:col-span-7">
-            <SeccionRecomendaciones
-              nivelVigente={estado?.nivel_vigente || 'NORMAL'}
-              estadoSistema={estado?.estado_sistema || 'NORMAL'}
-              recomendacionVigente={estado?.recomendacion || estado?.recomendacion_vigente}
-              recomendacionesPublicadas={
-                estado?.recomendaciones_publicadas || estado?.recomendaciones || []
-              }
-            />
-          </div>
-
-          <div id="contactos" className="lg:col-span-5">
-            <SeccionContactosEmergencia
-              contactos={estado?.contactos_emergencia || estado?.contactos || []}
-            />
-          </div>
+        {/* CAPÍTULO 01: Guía de Acción Preventiva */}
+        <section id="prevencion" aria-label="Capítulo 01: Recomendaciones preventivas">
+          <SeccionRecomendaciones
+            nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+            estadoSistema={estado?.estado_sistema || 'NORMAL'}
+            recomendacionVigente={estado?.recomendacion || estado?.recomendacion_vigente}
+            recomendacionesPublicadas={
+              estado?.recomendaciones_publicadas || estado?.recomendaciones || []
+            }
+          />
         </section>
 
-        {/* FILA 4: Mapa Referencial Leaflet y Distancias Haversine */}
-        <section id="mapa" aria-label="Mapa cartográfico referencial">
+        {/* CAPÍTULO 02: Cartografía de Referencia y Cercanía Haversine */}
+        <section id="mapa" aria-label="Capítulo 02: Mapa cartográfico referencial">
           <MapaReferencial
             zonasReferencia={
               estado?.zonas_referencia || estado?.capas_referencia?.zonas || []
@@ -580,8 +624,15 @@ export default function InicioPage() {
           />
         </section>
 
-        {/* FILA 5: Historial Reciente de Evaluaciones */}
-        <section id="historial" aria-label="Historial de evaluaciones">
+        {/* CAPÍTULO 03: Teléfonos Rápidos de Emergencia */}
+        <section id="contactos" aria-label="Capítulo 03: Contactos rápidos de emergencia">
+          <SeccionContactosEmergencia
+            contactos={estado?.contactos_emergencia || estado?.contactos || []}
+          />
+        </section>
+
+        {/* TRAZABILIDAD TÉCNICA SECUNDARIA: Historial y Resumen Espacial */}
+        <section id="historial" aria-label="Historial de evaluaciones y detalle de zona" className="space-y-6">
           <HistorialEvaluaciones
             items={historial?.items}
             total={historial?.total}
@@ -589,10 +640,7 @@ export default function InicioPage() {
             alRecargar={() => cargarDatos()}
             cargando={cargando}
           />
-        </section>
 
-        {/* FILA 6: Resumen Detallado de la Zona Piloto Llojeta */}
-        <section aria-label="Detalle de zona piloto y capas referenciales">
           <ResumenZonaPiloto
             zonaPiloto={estado?.zona_piloto}
             capasReferencia={estado?.capas_referencia}
@@ -600,46 +648,48 @@ export default function InicioPage() {
         </section>
       </main>
 
-      {/* 4. Barra de Navegación Inferior Móvil (Mobile Bottom Bar) */}
+      {/* 4. Barra de Navegación Inferior Móvil (Mobile Bottom Bar Ergonométrica) */}
       <nav
         aria-label="Navegación móvil inferior"
-        className="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 z-40 py-2 px-3 flex items-center justify-around text-xs shadow-lg"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1.5 shadow-lg"
       >
-        <a
-          href="#monitoreo"
-          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
-        >
-          <span className="text-base" aria-hidden="true">🌧️</span>
-          <span className="text-[10px] font-semibold">Monitoreo</span>
-        </a>
-        <a
-          href="#telemetria"
-          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
-        >
-          <span className="text-base" aria-hidden="true">📊</span>
-          <span className="text-[10px] font-semibold">Telemetría</span>
-        </a>
-        <a
-          href="#prevencion"
-          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
-        >
-          <span className="text-base" aria-hidden="true">🛡️</span>
-          <span className="text-[10px] font-semibold">Prevención</span>
-        </a>
-        <a
-          href="#mapa"
-          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
-        >
-          <span className="text-base" aria-hidden="true">🗺️</span>
-          <span className="text-[10px] font-semibold">Mapa</span>
-        </a>
-        <Link
-          to="/admin"
-          className="flex flex-col items-center gap-0.5 text-slate-600 hover:text-slate-900 active:text-indigo-600 py-1 px-2"
-        >
-          <span className="text-base" aria-hidden="true">⚙️</span>
-          <span className="text-[10px] font-semibold">Admin</span>
-        </Link>
+        <div className="grid grid-cols-5 gap-1 items-center max-w-md mx-auto">
+          <a
+            href="#monitoreo"
+            className="min-h-[48px] flex flex-col items-center justify-center gap-0.5 rounded-xl text-[#464555] hover:text-[#3525CD] active:bg-[#EEF2FF] py-1 px-1"
+          >
+            <span className="text-lg leading-none" aria-hidden="true">🌧️</span>
+            <span className="text-[11px] font-bold">Estado</span>
+          </a>
+          <a
+            href="#prevencion"
+            className="min-h-[48px] flex flex-col items-center justify-center gap-0.5 rounded-xl text-[#464555] hover:text-[#3525CD] active:bg-[#EEF2FF] py-1 px-1"
+          >
+            <span className="text-lg leading-none" aria-hidden="true">🛡️</span>
+            <span className="text-[11px] font-bold">Guía</span>
+          </a>
+          <a
+            href="#mapa"
+            className="min-h-[48px] flex flex-col items-center justify-center gap-0.5 rounded-xl text-[#464555] hover:text-[#3525CD] active:bg-[#EEF2FF] py-1 px-1"
+          >
+            <span className="text-lg leading-none" aria-hidden="true">🗺️</span>
+            <span className="text-[11px] font-bold">Mapa</span>
+          </a>
+          <a
+            href="#contactos"
+            className="min-h-[48px] flex flex-col items-center justify-center gap-0.5 rounded-xl text-[#991B1B] hover:text-[#DC2626] active:bg-[#FEE2E2] py-1 px-1"
+          >
+            <span className="text-lg leading-none" aria-hidden="true">📞</span>
+            <span className="text-[11px] font-bold">Auxilio</span>
+          </a>
+          <Link
+            to="/admin"
+            className="min-h-[48px] flex flex-col items-center justify-center gap-0.5 rounded-xl text-[#464555] hover:text-[#3525CD] active:bg-[#EEF2FF] py-1 px-1"
+          >
+            <span className="text-lg leading-none" aria-hidden="true">⚙️</span>
+            <span className="text-[11px] font-bold">Admin</span>
+          </Link>
+        </div>
       </nav>
     </div>
   );

@@ -24,10 +24,10 @@ function formatearFechaVerificacion(fecha) {
 }
 
 /**
- * Componente SeccionContactosEmergencia (Módulo 3)
+ * Componente SeccionContactosEmergencia (Capítulo 03 — Asistencia Oficial, Módulo 3)
  *
  * Muestra los teléfonos de asistencia inmediata y servicios de auxilio de La Paz / Cotahuma / Llojeta,
- * con trazabilidad de verificación oficial y enlaces táctiles para marcado telefónico.
+ * con trazabilidad de verificación oficial y enlaces táctiles de ancho completo (54px+) para marcado telefónico.
  *
  * @param {Object} props
  * @param {Array<Object>} [props.contactos=[]] Lista de contactos de emergencia activos
@@ -38,28 +38,28 @@ export default function SeccionContactosEmergencia({ contactos = [] }) {
   return (
     <section
       aria-label="Contactos de asistencia y emergencia"
-      className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4"
+      className="clay-card p-5 sm:p-7 space-y-5 animate-fade-up"
     >
-      <header className="space-y-1.5 border-b border-slate-100 pb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-base" aria-hidden="true">
-            📞
+      <header className="space-y-2 border-b border-slate-100 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="swiss-chapter-badge">
+            03 CAPÍTULO TRES — ASISTENCIA OFICIAL
           </span>
-          <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-            Módulo 3 · Servicios de Auxilio Ciudadano
+          <span className="clay-pill px-3 py-1 text-xs font-bold bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]">
+            Llamada Directa 24/7
           </span>
         </div>
-        <h2 className="text-base font-bold text-slate-900 leading-snug">
+        <h2 className="headline-lg text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111C2D] leading-snug break-words">
           Contactos de Emergencia — La Paz / Cotahuma
         </h2>
-        <p className="text-xs text-slate-500 leading-relaxed">
+        <p className="text-base text-[#464555] leading-relaxed">
           Líneas telefónicas de asistencia directa para el sector Llojeta / Bajo Llojeta.
         </p>
       </header>
 
       {/* Advertencia institucional destacada */}
-      <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-950 font-medium flex items-start gap-2 shadow-xs">
-        <span className="text-base select-none shrink-0" aria-hidden="true">
+      <div className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 text-base text-[#991B1B] font-medium flex items-start gap-3">
+        <span className="text-xl select-none shrink-0 mt-0.5" aria-hidden="true">
           🚨
         </span>
         <p className="leading-relaxed">
@@ -68,11 +68,11 @@ export default function SeccionContactosEmergencia({ contactos = [] }) {
       </div>
 
       {contactosActivos.length === 0 ? (
-        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-center text-xs text-slate-500">
+        <div className="clay-card-sm bg-[#F9F9FF] p-5 text-center text-base text-[#464555]">
           No hay contactos de emergencia registrados en la base de datos en este momento.
         </div>
       ) : (
-        <ul className="divide-y divide-slate-100 text-xs">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {contactosActivos.map((contacto) => {
             const fechaTxt = formatearFechaVerificacion(contacto.verificado_en);
             const tieneFecha = Boolean(contacto.verificado_en);
@@ -80,27 +80,32 @@ export default function SeccionContactosEmergencia({ contactos = [] }) {
             return (
               <li
                 key={contacto.id}
-                className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 first:pt-1 last:pb-1"
+                className="clay-card-sm clay-interactive bg-[#F9F9FF] p-4 sm:p-5 flex flex-col justify-between gap-4"
               >
-                <div className="space-y-0.5">
-                  <h3 className="font-bold text-slate-900 text-sm">
+                <div className="space-y-1.5 min-w-0">
+                  <h3 className="headline-sm font-bold text-[#111C2D] text-base sm:text-lg leading-snug break-words">
                     {contacto.nombre}
                   </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Fuente: <span className="font-mono text-slate-600">{contacto.fuente || 'Institucional'}</span>
+                  <p className="text-sm text-[#464555] break-words">
+                    Fuente:{' '}
+                    <span className="font-mono text-[#1E293B]">
+                      {contacto.fuente || 'Institucional'}
+                    </span>
                   </p>
-                  <p className="text-[10px] text-slate-400 font-mono">
+                  <p className="text-xs sm:text-sm text-[#475569] font-mono">
                     {tieneFecha ? `Verificado el: ${fechaTxt}` : fechaTxt}
                   </p>
                 </div>
 
                 <a
                   href={`tel:${contacto.telefono}`}
-                  className="min-h-[44px] min-w-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-mono font-bold text-xs inline-flex items-center justify-center gap-2 transition-colors shadow-xs shrink-0 self-start sm:self-center"
+                  className="clay-btn-danger clay-interactive w-full min-h-[54px] px-4 py-3 text-white inline-flex items-center justify-center gap-2.5"
                   title={`Llamar a ${contacto.nombre} (${contacto.telefono})`}
                 >
-                  <span aria-hidden="true">📞</span>
-                  <span>{contacto.telefono}</span>
+                  <span className="text-lg" aria-hidden="true">📞</span>
+                  <span className="telemetry-num text-xl sm:text-2xl font-extrabold tabular-nums">
+                    {contacto.telefono}
+                  </span>
                 </a>
               </li>
             );
@@ -108,10 +113,9 @@ export default function SeccionContactosEmergencia({ contactos = [] }) {
         </ul>
       )}
 
-      <footer className="pt-2 border-t border-slate-100 text-[10px] text-slate-400 text-center font-mono">
+      <footer className="pt-3 border-t border-slate-100 text-xs sm:text-sm text-[#475569] text-center font-mono">
         PUKARA · Datos de referencia institucional no comercial
       </footer>
     </section>
   );
 }
-

@@ -16,50 +16,50 @@ export default function RecomendacionesNivelVigente({
   return (
     <section
       aria-label="Recomendaciones preventivas generales"
-      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
+      className="clay-card p-5 sm:p-6 space-y-4 animate-fade-up"
     >
-      <div className="space-y-1 border-b border-slate-100 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+      <div className="space-y-1.5 border-b border-slate-100 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="swiss-chapter-badge">
             Medidas Preventivas Generales
           </span>
-          <span className="text-[10px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+          <span className="clay-pill text-xs font-bold text-[#111C2D] bg-[#F0F3FF] px-3 py-1 border border-[#E2DFFF]">
             Nivel: {nivelVigente}
           </span>
         </div>
-        <h2 className="text-base font-bold text-slate-900 leading-snug">
+        <h2 className="headline-md text-xl sm:text-2xl font-bold text-[#111C2D] leading-snug">
           Recomendaciones Preventivas para {nivelVigente}
         </h2>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          Pautas y consejos generales ante el nivel meteorológico informado. No constituyen instrucciones de evacuación ni reemplazan las indicaciones de las autoridades oficiales.
+        <p className="text-base text-[#464555] leading-relaxed">
+          Pautas y consejos generales ante el nivel meteorológico informado. No sustituyen las indicaciones de las autoridades oficiales.
         </p>
       </div>
 
       {(!recomendaciones || recomendaciones.length === 0) ? (
-        <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 text-center">
-          <p className="text-xs text-slate-500">
+        <div className="clay-card-sm bg-[#F9F9FF] p-5 text-center">
+          <p className="text-base text-[#464555]">
             No hay recomendaciones específicas publicadas para este nivel informativo en este momento.
           </p>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3.5">
           {recomendaciones.map((rec) => {
             const esVerificada = rec.origen === 'institucional_verificada';
 
             return (
               <li
                 key={rec.id}
-                className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-2 text-xs transition-all hover:bg-slate-50"
+                className="clay-card-sm bg-[#F9F9FF] p-4 sm:p-5 space-y-2.5 transition-all"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-bold text-slate-900 text-sm leading-snug">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <h3 className="headline-sm font-bold text-[#111C2D] text-lg leading-snug">
                     {rec.titulo}
                   </h3>
                   <span
-                    className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                    className={`clay-pill shrink-0 text-xs font-bold px-3 py-1 border ${
                       esVerificada
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                        ? 'bg-[#EEF2FF] text-[#3525CD] border-[#E2DFFF]'
+                        : 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]'
                     }`}
                   >
                     {esVerificada
@@ -68,12 +68,12 @@ export default function RecomendacionesNivelVigente({
                   </span>
                 </div>
 
-                <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                <p className="text-base text-[#1E293B] leading-relaxed whitespace-pre-line">
                   {rec.contenido}
                 </p>
 
                 {rec.fuente && (
-                  <p className="text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-200/50">
+                  <p className="text-xs sm:text-sm text-[#475569] font-mono pt-2 border-t border-slate-200/70">
                     Fuente de referencia: {rec.fuente}
                   </p>
                 )}
@@ -85,4 +85,3 @@ export default function RecomendacionesNivelVigente({
     </section>
   );
 }
-

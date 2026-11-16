@@ -5,7 +5,7 @@ import { loginAdmin } from '../api/adminApi';
 
 /**
  * Componente AdminLogin
- * Formulario accesible, estilizado y refinado para el acceso administrativo institucional de PUKARA.
+ * Formulario accesible Swiss Grid + Claymorphism para el acceso administrativo institucional de PUKARA.
  *
  * @param {Object} props
  * @param {Function} props.alIniciarSesion Callback ejecutado tras autenticación exitosa
@@ -64,13 +64,13 @@ export default function AdminLogin({ alIniciarSesion }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F7FB] p-4 text-slate-800 md:p-6 flex flex-col items-center justify-center">
-      <main className="w-full max-w-md space-y-6 bg-white p-7 sm:p-8 rounded-3xl shadow-md border border-slate-200/80">
+    <div className="min-h-screen bg-[#F6F8FA] p-4 text-[#111C2D] sm:p-6 flex flex-col items-center justify-center overflow-x-hidden max-w-full">
+      <main className="clay-card w-full max-w-md space-y-6 p-6 sm:p-8 animate-fade-up">
         {/* Encabezado Institucional */}
-        <header className="space-y-2 text-center flex flex-col items-center">
-          <div className="w-12 h-12 rounded-2xl bg-[#0F172A] text-teal-400 flex items-center justify-center shadow-xs">
+        <header className="space-y-2.5 text-center flex flex-col items-center">
+          <div className="w-14 h-14 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center clay-pill shadow-sm">
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -79,21 +79,21 @@ export default function AdminLogin({ alIniciarSesion }) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.2}
                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
               />
             </svg>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-900" aria-hidden="true" />
+          <span className="clay-pill inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF]">
+            <span className="h-2 w-2 rounded-full bg-[#3525CD]" aria-hidden="true" />
             Consola de Gestión y Reglas
           </span>
 
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
+          <h1 className="headline-md text-2xl font-extrabold tracking-tight text-[#111C2D]">
             Acceso Administrativo
           </h1>
-          <p className="text-xs text-slate-500 leading-snug">
+          <p className="text-sm sm:text-base text-[#464555] leading-snug">
             PUKARA · Monitoreo y Configuración de Reglas (Sector Llojeta)
           </p>
         </header>
@@ -101,15 +101,15 @@ export default function AdminLogin({ alIniciarSesion }) {
         {error && (
           <div
             role="alert"
-            className="rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-900 space-y-1 shadow-2xs"
+            className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 text-sm sm:text-base text-[#991B1B] space-y-1"
           >
-            <p className="font-semibold flex items-center gap-1.5">
-              <span>⚠️</span>{' '}
+            <p className="font-bold flex items-center gap-1.5">
+              <span aria-hidden="true">⚠️</span>{' '}
               {error.codigo === 'DEMASIADOS_INTENTOS'
                 ? 'Límite de Intentos Superado'
                 : 'No se pudo iniciar sesión'}
             </p>
-            <p className="text-red-800/90 leading-relaxed">{error.mensaje}</p>
+            <p className="leading-relaxed">{error.mensaje}</p>
           </div>
         )}
 
@@ -118,12 +118,12 @@ export default function AdminLogin({ alIniciarSesion }) {
           <div className="space-y-1.5">
             <label
               htmlFor="admin-email"
-              className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+              className="block text-sm sm:text-base font-bold text-[#111C2D]"
             >
               Correo Institucional
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569] text-base font-bold">
                 @
               </span>
               <input
@@ -135,30 +135,30 @@ export default function AdminLogin({ alIniciarSesion }) {
                 required
                 autoComplete="email"
                 disabled={cargando}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/80 pl-9 pr-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-colors disabled:bg-slate-100"
+                className="clay-input w-full pl-10 pr-4 py-2.5 text-base placeholder-slate-400 disabled:bg-slate-100"
               />
             </div>
           </div>
 
           {/* Campo Contraseña */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <label
                 htmlFor="admin-password"
-                className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                className="block text-sm sm:text-base font-bold text-[#111C2D]"
               >
                 Contraseña
               </label>
               <button
                 type="button"
                 onClick={() => setMostrarPassword(!mostrarPassword)}
-                className="text-[11px] text-slate-500 hover:text-slate-800 transition-colors font-medium"
+                className="min-h-[36px] px-2 text-sm text-[#3525CD] hover:text-[#4F46E5] transition-colors font-bold cursor-pointer"
               >
                 {mostrarPassword ? 'Ocultar' : 'Mostrar'}
               </button>
             </div>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569] text-base">
                 🔒
               </span>
               <input
@@ -170,7 +170,7 @@ export default function AdminLogin({ alIniciarSesion }) {
                 required
                 autoComplete="current-password"
                 disabled={cargando}
-                className="w-full rounded-xl border border-slate-300 bg-slate-50/80 pl-9 pr-10 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-colors disabled:bg-slate-100 font-mono"
+                className="clay-input w-full pl-10 pr-4 py-2.5 text-base placeholder-slate-400 disabled:bg-slate-100 font-mono"
               />
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function AdminLogin({ alIniciarSesion }) {
           <button
             type="button"
             onClick={autocompletarDemo}
-            className="w-full text-center text-[11px] text-slate-500 hover:text-slate-900 bg-slate-100/70 hover:bg-slate-100 border border-slate-200 py-1.5 px-3 rounded-lg transition-colors cursor-pointer"
+            className="clay-btn-secondary clay-interactive min-h-[48px] w-full text-center text-sm font-bold text-[#464555] px-4 py-2 cursor-pointer"
           >
             💡 Autocompletar credenciales de demostración (admin@pukara.bo)
           </button>
@@ -188,7 +188,7 @@ export default function AdminLogin({ alIniciarSesion }) {
           <button
             type="submit"
             disabled={cargando}
-            className="w-full min-h-[44px] rounded-xl bg-[#0F172A] px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-slate-800 active:bg-slate-950 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            className="clay-btn-primary clay-interactive w-full min-h-[52px] px-5 py-3 text-base font-bold disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
             {cargando ? (
               <>
@@ -208,7 +208,7 @@ export default function AdminLogin({ alIniciarSesion }) {
         <footer className="text-center pt-2 border-t border-slate-100">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors py-1 px-2"
+            className="min-h-[48px] inline-flex items-center justify-center gap-2 text-sm sm:text-base font-bold text-[#3525CD] hover:text-[#4F46E5] transition-colors px-4 py-2 rounded-full hover:bg-[#EEF2FF]"
           >
             ← Volver a la Consulta Pública
           </Link>

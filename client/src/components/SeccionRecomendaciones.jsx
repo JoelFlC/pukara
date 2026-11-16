@@ -4,37 +4,37 @@ const NIVELES_ORDEN = ['NORMAL', 'PRECAUCION', 'ALERTA', 'EMERGENCIA'];
 
 const COLORES_NIVEL = {
   NORMAL: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-300',
-    text: 'text-emerald-900',
-    badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    bg: 'bg-[#ECFDF5]',
+    border: 'border-[#A7F3D0]',
+    text: 'text-[#065F46]',
+    badge: 'bg-[#D1FAE5] text-[#065F46] border-[#A7F3D0]',
     icono: '🟢',
   },
   PRECAUCION: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-300',
-    text: 'text-amber-900',
-    badge: 'bg-amber-100 text-amber-800 border-amber-300',
+    bg: 'bg-[#FEF3C7]',
+    border: 'border-[#FDE68A]',
+    text: 'text-[#92400E]',
+    badge: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
     icono: '🟡',
   },
   ALERTA: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-300',
-    text: 'text-orange-900',
-    badge: 'bg-orange-100 text-orange-800 border-orange-300',
+    bg: 'bg-[#FFEDD5]',
+    border: 'border-[#FED7AA]',
+    text: 'text-[#9A3412]',
+    badge: 'bg-[#FFEDD5] text-[#9A3412] border-[#FED7AA]',
     icono: '🟠',
   },
   EMERGENCIA: {
-    bg: 'bg-red-50',
-    border: 'border-red-300',
-    text: 'text-red-900',
-    badge: 'bg-red-100 text-red-800 border-red-300',
+    bg: 'bg-[#FEE2E2]',
+    border: 'border-[#FECACA]',
+    text: 'text-[#991B1B]',
+    badge: 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]',
     icono: '🔴',
   },
 };
 
 /**
- * Componente SeccionRecomendaciones (Módulo 3 y Requisito P06)
+ * Componente SeccionRecomendaciones (Capítulo 01 — Guía Preventiva, Módulo 3 y Requisito P06)
  *
  * Presenta las recomendaciones preventivas generales priorizando el nivel vigente,
  * con trazabilidad del origen institucional o de demostración y desglose de los 4 niveles.
@@ -56,29 +56,23 @@ export default function SeccionRecomendaciones({
   const nivelEfectivo = nivelVigente || 'NORMAL';
   const esDatosDesactualizados = estadoSistema === 'DATOS_DESACTUALIZADOS';
 
-  // Buscar recomendación vigente en el arreglo si no se pasó directamente
   const recomActual =
     recomendacionVigente ||
     recomendacionesPublicadas.find((r) => r.nivel === nivelEfectivo) ||
     null;
 
-  // Filtrar las recomendaciones de los otros niveles para la vista desplegable
-  const otrasRecomendaciones = recomendacionesPublicadas.filter(
-    (r) => r.nivel !== nivelEfectivo
-  );
-
   const renderBadgeOrigen = (origen) => {
     if (origen === 'institucional_verificada') {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-          <span>🏛️</span>
+        <span className="clay-pill inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF]">
+          <span aria-hidden="true">🏛️</span>
           <span>Origen: Institucional verificada</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-        <span>🧪</span>
+      <span className="clay-pill inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold bg-white/90 text-[#92400E] border border-[#FDE68A]">
+        <span aria-hidden="true">🧪</span>
         <span>Origen: Demostración (contenido académico)</span>
       </span>
     );
@@ -89,26 +83,26 @@ export default function SeccionRecomendaciones({
   return (
     <section
       aria-label="Recomendaciones preventivas generales"
-      className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-4"
+      className="clay-card p-5 sm:p-7 space-y-5 animate-fade-up"
     >
-      <header className="space-y-1.5 border-b border-slate-100 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
-            Módulo 3 · Medidas de Prevención
+      <header className="space-y-2 border-b border-slate-100 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="swiss-chapter-badge">
+            01 CAPÍTULO UNO — GUÍA PREVENTIVA
           </span>
           <span
-            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${estiloActual.badge}`}
+            className={`clay-pill text-xs font-extrabold px-3 py-1 border ${estiloActual.badge}`}
           >
             {esDatosDesactualizados
               ? `Último nivel: ${nivelEfectivo}`
               : `Nivel vigente: ${nivelEfectivo}`}
           </span>
         </div>
-        <h2 className="text-base font-bold text-slate-900 leading-snug">
+        <h2 className="headline-lg text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111C2D] leading-snug break-words">
           Recomendaciones Preventivas para {nivelEfectivo}
         </h2>
         {esDatosDesactualizados && (
-          <p className="text-xs text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200">
+          <p className="text-base text-[#92400E] bg-[#FEF3C7] p-3.5 rounded-2xl border border-[#FDE68A]">
             ⚠️ Información basada en el último nivel informativo conocido ante antigüedad de lecturas superior a T_max.
           </p>
         )}
@@ -117,20 +111,20 @@ export default function SeccionRecomendaciones({
       {/* 1. Recomendación destacada para el nivel vigente actual */}
       {recomActual ? (
         <article
-          className={`rounded-2xl border-2 ${estiloActual.border} ${estiloActual.bg} p-4 space-y-2.5 shadow-xs`}
+          className={`clay-card-sm border-2 ${estiloActual.border} ${estiloActual.bg} p-5 sm:p-6 space-y-3`}
         >
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <h3 className="text-sm font-extrabold text-slate-900 leading-snug">
+          <div className="flex flex-wrap items-start justify-between gap-2.5">
+            <h3 className="headline-sm text-lg sm:text-xl font-extrabold text-[#111C2D] leading-snug">
               {recomActual.titulo}
             </h3>
             {renderBadgeOrigen(recomActual.origen)}
           </div>
 
-          <p className="text-xs text-slate-800 leading-relaxed font-medium">
+          <p className="text-base sm:text-lg text-[#1E293B] leading-relaxed font-medium">
             {recomActual.contenido}
           </p>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 font-mono pt-2 border-t border-slate-200/60">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-[#475569] font-mono pt-3 border-t border-black/10">
             <span>Versión: v{recomActual.version || 1}</span>
             {recomActual.fuente && (
               <span>Fuente: {recomActual.fuente}</span>
@@ -138,28 +132,28 @@ export default function SeccionRecomendaciones({
           </div>
         </article>
       ) : (
-        <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-center text-xs text-slate-500">
+        <div className="clay-card-sm bg-[#F9F9FF] p-5 text-center text-base text-[#464555]">
           No hay una recomendación vigente registrada para este nivel en este momento.
         </div>
       )}
 
       {/* 2. Acordeón / Despliegue para consultar los otros niveles */}
-      <div className="pt-1">
+      <div className="pt-1 space-y-4">
         <button
           type="button"
           onClick={() => setMostrarTodos(!mostrarTodos)}
-          className="w-full min-h-[44px] px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors flex items-center justify-between gap-2"
+          className="clay-btn-secondary clay-interactive w-full min-h-[48px] px-4 py-3 text-sm sm:text-base font-bold text-[#111C2D] flex items-center justify-between gap-3 text-left cursor-pointer"
         >
-          <span>
+          <span className="leading-snug">
             {mostrarTodos
               ? 'Ocultar recomendaciones de otros niveles'
               : 'Consultar recomendaciones generales de los cuatro niveles (NORMAL, PRECAUCIÓN, ALERTA, EMERGENCIA)'}
           </span>
-          <span aria-hidden="true">{mostrarTodos ? '▲' : '▼'}</span>
+          <span className="shrink-0" aria-hidden="true">{mostrarTodos ? '▲' : '▼'}</span>
         </button>
 
         {mostrarTodos && (
-          <div className="mt-3 space-y-3 pt-2 border-t border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pt-2 border-t border-slate-100">
             {NIVELES_ORDEN.map((nivel) => {
               const recNivel = recomendacionesPublicadas.find(
                 (r) => r.nivel === nivel
@@ -171,26 +165,33 @@ export default function SeccionRecomendaciones({
               return (
                 <div
                   key={nivel}
-                  className={`rounded-xl border ${est.border} ${est.bg} p-3.5 space-y-2 text-xs`}
+                  className={`clay-card-sm border-2 ${est.border} ${est.bg} p-4 space-y-2.5 flex flex-col justify-between ${
+                    esVigente ? 'ring-2 ring-offset-2 ring-[#3525CD]' : ''
+                  }`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                      <span>{est.icono}</span>
-                      <span>Nivel {nivel}</span>
-                      {esVigente && (
-                        <span className="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded font-mono">
-                          (Vigente)
-                        </span>
-                      )}
+                  <div className="space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 font-extrabold text-sm text-[#111C2D]">
+                        <span aria-hidden="true">{est.icono}</span>
+                        <span>Nivel {nivel}</span>
+                        {esVigente && (
+                          <span className="text-xs bg-[#3525CD] text-white px-2.5 py-0.5 rounded-full font-mono">
+                            (Vigente)
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    {renderBadgeOrigen(recNivel.origen)}
+                    <div>{renderBadgeOrigen(recNivel.origen)}</div>
+                    <h4 className="font-bold text-base text-[#111C2D] leading-snug">
+                      {recNivel.titulo}
+                    </h4>
+                    <p className="text-base text-[#1E293B] leading-relaxed">
+                      {recNivel.contenido}
+                    </p>
                   </div>
-                  <h4 className="font-bold text-slate-800">{recNivel.titulo}</h4>
-                  <p className="text-slate-700 leading-relaxed">
-                    {recNivel.contenido}
-                  </p>
+
                   {recNivel.fuente && (
-                    <p className="text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-200/50">
+                    <p className="text-xs text-[#475569] font-mono pt-2 border-t border-black/10">
                       Fuente: {recNivel.fuente} · Versión: v{recNivel.version || 1}
                     </p>
                   )}
@@ -202,10 +203,9 @@ export default function SeccionRecomendaciones({
       </div>
 
       {/* Recordatorio legal obligatorio del Módulo 3 */}
-      <footer className="rounded-xl bg-slate-50 p-3 text-[11px] text-slate-500 border border-slate-200/70 leading-relaxed">
-        <strong>Aviso preventivo:</strong> Recomendaciones preventivas generales de carácter informativo. El sistema no emite instrucciones de desplazamiento ni sustituye a las autoridades competentes.
+      <footer className="clay-card-sm bg-[#F9F9FF] p-4 text-sm sm:text-base text-[#464555] leading-relaxed">
+        <strong className="text-[#111C2D]">Aviso preventivo:</strong> Recomendaciones preventivas generales de carácter informativo. El sistema no emite instrucciones de desplazamiento ni sustituye a las autoridades competentes.
       </footer>
     </section>
   );
 }
-
