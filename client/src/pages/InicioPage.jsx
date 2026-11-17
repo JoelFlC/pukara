@@ -302,19 +302,19 @@ export default function InicioPage() {
         className="sticky top-0 z-40 border-b backdrop-blur-md"
       >
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-2.5 flex flex-wrap items-center justify-between gap-3">
-          {/* Izquierda: Logo e Identidad con logo.png y pukara.png */}
-          <div className="flex items-center gap-3 min-w-0">
+          {/* Izquierda: Logo e Identidad con logo.png transparente y pukara.png */}
+          <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
             <img
               src="/logo.png"
               alt="Logo PUKARA"
-              className="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-xl bg-white/95 p-1 shadow-xs border border-black/10 shrink-0"
+              className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 select-none"
             />
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <img
                   src="/pukara.png"
                   alt="PUKARA"
-                  className="h-5 sm:h-6 w-auto object-contain shrink-0"
+                  className="h-6 sm:h-7 w-auto object-contain shrink-0 select-none"
                 />
                 {estaOffline ? (
                   <span
@@ -598,16 +598,16 @@ export default function InicioPage() {
       <footer className="bg-white/90 border-t border-slate-200/80 py-10 pb-28 md:pb-12">
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-[#464555]">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <img
                 src="/logo.png"
                 alt="Logo PUKARA"
-                className="w-9 h-9 object-contain rounded-xl bg-white p-1 border border-slate-200 shrink-0"
+                className="w-12 h-12 object-contain shrink-0 select-none"
               />
               <img
                 src="/pukara.png"
                 alt="PUKARA"
-                className="h-5 w-auto object-contain shrink-0"
+                className="h-6 w-auto object-contain shrink-0 select-none"
               />
               <span className="text-xs font-bold text-[#3525CD] bg-[#EEF2FF] px-2 py-0.5 rounded-full">
                 Llojeta

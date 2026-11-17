@@ -361,14 +361,14 @@ export default function PanelAdministracion({ alCerrarSesion }) {
             <img
               src="/logo.png"
               alt="Logo PUKARA"
-              className="w-10 h-10 object-contain rounded-xl bg-white p-1 shadow-sm border border-slate-200/80 shrink-0"
+              className="w-12 h-12 object-contain shrink-0 select-none"
             />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <img
                   src="/pukara.png"
                   alt="PUKARA"
-                  className="h-5 w-auto object-contain shrink-0 hidden sm:inline-block"
+                  className="h-6 w-auto object-contain shrink-0 hidden sm:inline-block select-none"
                 />
                 <h1 className="headline-sm font-extrabold text-base sm:text-lg tracking-tight text-[#111C2D] leading-snug">
                   Panel de Administración PUKARA

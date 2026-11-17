@@ -68,16 +68,16 @@ export default function AdminLogin({ alIniciarSesion }) {
       <main className="clay-card w-full max-w-md space-y-6 p-6 sm:p-8 animate-fade-up">
         {/* Encabezado Institucional */}
         <header className="space-y-2.5 text-center flex flex-col items-center">
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3.5">
             <img
               src="/logo.png"
               alt="Logo PUKARA"
-              className="w-12 h-12 object-contain rounded-2xl bg-white p-1.5 shadow-sm border border-slate-200/80"
+              className="w-16 h-16 object-contain shrink-0 select-none"
             />
             <img
               src="/pukara.png"
               alt="PUKARA"
-              className="h-7 w-auto object-contain"
+              className="h-8 w-auto object-contain select-none"
             />
           </div>
 
