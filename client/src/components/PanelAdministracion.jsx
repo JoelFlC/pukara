@@ -358,24 +358,18 @@ export default function PanelAdministracion({ alCerrarSesion }) {
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Marca e Identidad Institucional */}
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center shrink-0 clay-pill shadow-sm">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="M12 8v4" />
-                <path d="M12 16h.01" />
-              </svg>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Logo PUKARA"
+              className="w-10 h-10 object-contain rounded-xl bg-white p-1 shadow-sm border border-slate-200/80 shrink-0"
+            />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
+                <img
+                  src="/pukara.png"
+                  alt="PUKARA"
+                  className="h-5 w-auto object-contain shrink-0 hidden sm:inline-block"
+                />
                 <h1 className="headline-sm font-extrabold text-base sm:text-lg tracking-tight text-[#111C2D] leading-snug">
                   Panel de Administración PUKARA
                 </h1>

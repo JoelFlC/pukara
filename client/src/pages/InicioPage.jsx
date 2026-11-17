@@ -23,14 +23,41 @@ import {
   obtenerUltimoEstadoLocal,
 } from '../utils/offlineStorage';
 
-const TINTE_NAVBAR_TOPE = {
-  NORMAL: 'bg-[#D1FAE5] border-transparent',
-  PRECAUCION: 'bg-[#FEF3C7] border-transparent',
-  ALERTA: 'bg-[#FFEDD5] border-transparent',
-  EMERGENCIA: 'bg-[#FEE2E2] border-transparent',
-  SIN_DATOS: 'bg-slate-200/80 border-transparent',
-  DATOS_DESACTUALIZADOS: 'bg-[#FEF3C7] border-transparent',
+const RGB_NAVBAR_INICIAL = {
+  NORMAL: [209, 250, 229], // #D1FAE5
+  PRECAUCION: [254, 243, 199], // #FEF3C7
+  ALERTA: [255, 237, 213], // #FFEDD5
+  EMERGENCIA: [254, 226, 226], // #FEE2E2
+  SIN_DATOS: [226, 232, 240], // #E2E8F0
+  DATOS_DESACTUALIZADOS: [254, 243, 199], // #FEF3C7
+  DEFAULT: [247, 249, 255], // #F7F9FF
 };
+
+const RGB_NAVBAR_FONDO = [245, 250, 248]; // #F5FAF8 (color del fondo al final de la web)
+
+function calcularEstiloNavbarScroll(claveNavbar, progreso) {
+  const [r0, g0, b0] =
+    RGB_NAVBAR_INICIAL[claveNavbar] || RGB_NAVBAR_INICIAL.DEFAULT;
+  const [r1, g1, b1] = RGB_NAVBAR_FONDO;
+  const t = Math.min(1, Math.max(0, progreso));
+
+  const r = Math.round(r0 + (r1 - r0) * t);
+  const g = Math.round(g0 + (g1 - g0) * t);
+  const b = Math.round(b0 + (b1 - b0) * t);
+  const alpha = (1 - t * 0.04).toFixed(3);
+  const borderAlpha = (t * 0.35).toFixed(3);
+  const shadowAlpha = (t * 0.14).toFixed(3);
+
+  return {
+    backgroundColor: `rgba(${r}, ${g}, ${b}, ${alpha})`,
+    borderBottomColor: `rgba(148, 163, 184, ${borderAlpha})`,
+    boxShadow:
+      t > 0.02
+        ? `0 6px 20px -10px rgba(17, 28, 45, ${shadowAlpha})`
+        : 'none',
+    transition: 'background-color 120ms linear, border-color 180ms linear',
+  };
+}
 
 /**
  * Página principal institucional de PUKARA (Swiss Grid + Claymorphism + Scrollytelling Mobile-First).
@@ -53,7 +80,7 @@ export default function InicioPage() {
   const [infoRespaldoOffline, setInfoRespaldoOffline] = useState(null);
 
   const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
-  const [enTope, setEnTope] = useState(true);
+  const [progresoScroll, setProgresoScroll] = useState(0);
   const ultimoNivelRef = useRef({ real: null, simulada: null });
   const inicializadoRef = useRef({ real: false, simulada: false });
 
@@ -144,12 +171,23 @@ export default function InicioPage() {
     if (typeof window === 'undefined') return undefined;
 
     const handleScroll = () => {
-      setEnTope(window.scrollY < 24);
+      const docEl = document.documentElement;
+      const maxScroll = Math.max(0, docEl.scrollHeight - window.innerHeight);
+      if (maxScroll === 0) {
+        setProgresoScroll(0);
+        return;
+      }
+      const progreso = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      setProgresoScroll(progreso);
     };
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -243,9 +281,10 @@ export default function InicioPage() {
         ? 'DATOS_DESACTUALIZADOS'
         : estado?.nivel_vigente;
 
-  const claseNavbar = enTope
-    ? TINTE_NAVBAR_TOPE[claveNavbar] || 'bg-[#F7F9FF] border-transparent'
-    : 'bg-[#F7F9FF]/95 backdrop-blur-md border-slate-200/80 shadow-sm';
+  const estiloNavbarDinamico = calcularEstiloNavbarScroll(
+    claveNavbar,
+    progresoScroll
+  );
 
   return (
     <div
@@ -257,32 +296,26 @@ export default function InicioPage() {
         • MONITOREO PREVENTIVO ACTIVO · SECTOR LLOJETA — COTAHUMA •
       </div>
 
-      {/* 2. Header Siempre Visible con Transición Cromática al Scrollear */}
-      <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${claseNavbar}`}>
+      {/* 2. Header Sticky Siempre Visible con Degradado Gradual al Scroll */}
+      <header
+        style={estiloNavbarDinamico}
+        className="sticky top-0 z-40 border-b backdrop-blur-md"
+      >
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-2.5 flex flex-wrap items-center justify-between gap-3">
-          {/* Izquierda: Logo e Identidad */}
+          {/* Izquierda: Logo e Identidad con logo.png y pukara.png */}
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center shrink-0 shadow-sm clay-pill">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                <path d="M12 8v4" />
-                <path d="M12 16h.01" />
-              </svg>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Logo PUKARA"
+              className="w-10 h-10 sm:w-11 sm:h-11 object-contain rounded-xl bg-white/95 p-1 shadow-xs border border-black/10 shrink-0"
+            />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="display-hero font-extrabold text-lg tracking-tight text-[#111C2D]">
-                  PUKARA
-                </span>
+                <img
+                  src="/pukara.png"
+                  alt="PUKARA"
+                  className="h-5 sm:h-6 w-auto object-contain shrink-0"
+                />
                 {estaOffline ? (
                   <span
                     role="status"
@@ -565,8 +598,17 @@ export default function InicioPage() {
       <footer className="bg-white/90 border-t border-slate-200/80 py-10 pb-28 md:pb-12">
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-[#464555]">
           <div className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="display-hero font-extrabold text-base text-[#111C2D]">PUKARA</span>
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/logo.png"
+                alt="Logo PUKARA"
+                className="w-9 h-9 object-contain rounded-xl bg-white p-1 border border-slate-200 shrink-0"
+              />
+              <img
+                src="/pukara.png"
+                alt="PUKARA"
+                className="h-5 w-auto object-contain shrink-0"
+              />
               <span className="text-xs font-bold text-[#3525CD] bg-[#EEF2FF] px-2 py-0.5 rounded-full">
                 Llojeta
               </span>
