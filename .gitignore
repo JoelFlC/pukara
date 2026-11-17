@@ -10,6 +10,7 @@ package-lock.json.bak
 
 # Compilación y producción
 dist/
+dev-dist/
 build/
 coverage/
 
