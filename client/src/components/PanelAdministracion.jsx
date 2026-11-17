@@ -355,7 +355,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
     <div className="min-h-screen bg-[#F6F8FA] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full">
       {/* 1. Cabecera Superior del Panel Administrativo */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-3 flex flex-wrap items-center justify-between gap-3">
           {/* Marca e Identidad Institucional */}
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-[#3525CD] text-white flex items-center justify-center shrink-0 clay-pill shadow-sm">
@@ -431,7 +431,7 @@ export default function PanelAdministracion({ alCerrarSesion }) {
       </div>
 
       {/* 3. Contenedor Principal Swiss Grid con Sidebar Desktop */}
-      <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 w-full flex-1">
+      <main className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-6 space-y-6 w-full flex-1">
         {/* Notificaciones globales */}
         {mensajeExito && (
           <div
