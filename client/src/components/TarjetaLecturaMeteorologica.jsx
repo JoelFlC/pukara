@@ -6,8 +6,9 @@ import {
 
 /**
  * Componente TarjetaLecturaMeteorologica
- * Grilla Suiza + Claymorfismo de Telemetría Pluviométrica y Atmosférica de Llojeta
- * con trazabilidad explícita de procedencia (Open-Meteo), horas de observación y control de calidad.
+ * Presenta las 3 lecturas pluviométricas rectoras en tarjetas grandes y limpias
+ * (Lluvia Actual 1h, Acumulada 24h y Saturación 72h) y agrupa las variables atmosféricas
+ * complementarias en una barra compacta inferior para cero fatiga visual.
  *
  * @param {Object} props
  * @param {Object} [props.meteorologia] Bloque de meteorología proveniente de GET /api/estado
@@ -18,7 +19,7 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
     return (
       <section
         aria-label="Estado meteorológico sin datos"
-        className="clay-card p-5 sm:p-7 space-y-3 animate-fade-up"
+        className="clay-card p-6 sm:p-7 space-y-3 animate-fade-up"
       >
         <div className="flex items-center gap-2.5">
           <span className="h-3 w-3 rounded-full bg-slate-400 shrink-0" />
@@ -48,169 +49,156 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
       aria-label="Lectura meteorológica en Llojeta"
       className="space-y-4 animate-fade-up"
     >
-      {/* 1. Barra de Trazabilidad y Estado de Fuente */}
-      <div className="clay-card-sm px-4 py-3.5 sm:px-5 flex flex-wrap items-center justify-between gap-3 text-sm sm:text-base">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="clay-pill inline-flex items-center gap-2 px-3 py-1 text-xs sm:text-sm font-bold bg-[#EEF2FF] text-[#3525CD] border border-[#E2DFFF]">
-            <span className="h-2 w-2 rounded-full bg-[#3525CD]" aria-hidden="true" />
-            Fuente: Open-Meteo (modelo meteorológico)
-          </span>
-          <span className="text-[#464555]">
-            Obs: <strong className="text-[#111C2D]">{formatearFechaHoraLaPaz(lectura.observado_en)}</strong>
-          </span>
+      {fallo_api_reciente && (
+        <div
+          role="status"
+          className="clay-card-sm border border-[#FDE68A] bg-[#FEF3C7] p-4 text-base text-[#92400E] leading-snug"
+        >
+          ⚠️ Servicio externo no disponible en este momento; mostrando última lectura válida almacenada y su antigüedad real.
         </div>
+      )}
 
-        <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs sm:text-sm text-[#475569]">
-          <span>Antigüedad: {formatearAntiguedad(lectura.antiguedad_minutos)}</span>
-          <span>·</span>
-          <span>Origen: {origen_respuesta}</span>
-        </div>
-
-        {fallo_api_reciente && (
-          <div
-            role="status"
-            className="w-full rounded-xl border border-[#FDE68A] bg-[#FEF3C7] p-3 text-sm sm:text-base text-[#92400E] leading-snug"
-          >
-            ⚠️ Servicio externo no disponible en este momento; mostrando última lectura válida almacenada y su antigüedad real.
-          </div>
-        )}
-      </div>
-
-      {/* 2. Tres Tarjetas Principales de Lluvia (Protagonistas en Móvil y Desktop) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Tarjeta 1: Intensidad Horaria */}
-        <div className="clay-card clay-interactive p-5 sm:p-6 flex flex-col justify-between gap-2">
+      {/* 1. Tres Tarjetas Principales de Lluvia (Protagonistas, limpias y legibles) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Tarjeta 1: Lluvia Actual 1 Hora */}
+        <article className="clay-card clay-interactive p-6 sm:p-7 flex flex-col justify-between gap-4">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
-              Intensidad (1h)
+              LLUVIA ACTUAL · 1 HORA
             </span>
-            <span className="text-xl" aria-hidden="true">
+            <span
+              className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
+              aria-hidden="true"
+            >
               ⚡
             </span>
           </div>
-          <div className="my-1">
+
+          <div className="space-y-1.5">
             {lectura.intensidad_mm_h !== null ? (
-              <p className="telemetry-num text-3xl sm:text-[40px] lg:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
+              <p className="telemetry-num text-4xl sm:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
                 {lectura.intensidad_mm_h}
-                <span className="text-base sm:text-lg font-bold text-[#475569] ml-1.5">mm/h</span>
+                <span className="text-lg sm:text-xl font-bold text-[#475569] ml-1.5">mm/h</span>
               </p>
             ) : (
-              <p className="text-base font-bold text-[#92400E]">Sin dato</p>
+              <p className="text-xl font-extrabold text-[#92400E]">Sin dato</p>
             )}
+            <p className="text-base text-[#464555]">
+              Precipitación registrada en la última hora
+            </p>
           </div>
-          <span className="text-sm text-[#464555]">Tasa horaria instantánea</span>
-        </div>
 
-        {/* Tarjeta 2: Acumulado 24 Horas */}
-        <div className="clay-card clay-interactive p-5 sm:p-6 flex flex-col justify-between gap-2">
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="clay-pill px-3 py-1 font-bold bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]">
+              Lectura activa
+            </span>
+            <span className="text-[#475569] font-medium">
+              Antigüedad: {formatearAntiguedad(lectura.antiguedad_minutos)}
+            </span>
+          </div>
+        </article>
+
+        {/* Tarjeta 2: Lluvia Acumulada 24 Horas */}
+        <article className="clay-card clay-interactive p-6 sm:p-7 flex flex-col justify-between gap-4">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
-              Acumulado 24h
+              LLUVIA ACUMULADA · 24 HORAS
             </span>
-            <span className="text-xl" aria-hidden="true">
+            <span
+              className="w-9 h-9 rounded-full bg-[#ECFDF5] text-[#059669] flex items-center justify-center text-lg shrink-0"
+              aria-hidden="true"
+            >
               ⏱️
             </span>
           </div>
-          <div className="my-1">
+
+          <div className="space-y-1.5">
             {lectura.acum_24h_mm !== null ? (
-              <p className="telemetry-num text-3xl sm:text-[40px] lg:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
+              <p className="telemetry-num text-4xl sm:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
                 {lectura.acum_24h_mm}
-                <span className="text-base sm:text-lg font-bold text-[#475569] ml-1.5">mm</span>
+                <span className="text-lg sm:text-xl font-bold text-[#475569] ml-1.5">mm</span>
               </p>
             ) : (
-              <p className="text-base font-bold text-[#92400E] leading-snug">
+              <p className="text-lg sm:text-xl font-extrabold text-[#92400E] leading-snug">
                 Acumulado incompleto ({lectura.horas_validas_24h ?? 0}/24 h)
               </p>
             )}
+            <p className="text-base text-[#464555]">
+              Agua acumulada en las últimas 24 horas
+            </p>
           </div>
-          <span className="text-sm text-[#464555]">
-            {lectura.horas_validas_24h ?? 0}/24 horas válidas
-          </span>
-        </div>
 
-        {/* Tarjeta 3: Acumulado 72 Horas (Saturación) */}
-        <div className="clay-card clay-interactive p-5 sm:p-6 flex flex-col justify-between gap-2">
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="clay-pill px-3 py-1 font-bold bg-[#F0F3FF] text-[#3525CD] border border-[#E2DFFF]">
+              {lectura.horas_validas_24h ?? 0}/24 horas válidas
+            </span>
+          </div>
+        </article>
+
+        {/* Tarjeta 3: Saturación de Cuenca 72 Horas */}
+        <article className="clay-card clay-interactive p-6 sm:p-7 flex flex-col justify-between gap-4">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
-              Acumulado 72h
+              SATURACIÓN DE CUENCA · 72 HORAS
             </span>
-            <span className="text-xl" aria-hidden="true">
+            <span
+              className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
+              aria-hidden="true"
+            >
               🌊
             </span>
           </div>
-          <div className="my-1">
+
+          <div className="space-y-1.5">
             {lectura.acum_72h_mm !== null ? (
-              <p className="telemetry-num text-3xl sm:text-[40px] lg:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
+              <p className="telemetry-num text-4xl sm:text-[44px] font-extrabold tabular-nums text-[#111C2D] tracking-tight">
                 {lectura.acum_72h_mm}
-                <span className="text-base sm:text-lg font-bold text-[#475569] ml-1.5">mm</span>
+                <span className="text-lg sm:text-xl font-bold text-[#475569] ml-1.5">mm</span>
               </p>
             ) : (
-              <p className="text-base font-bold text-[#92400E] leading-snug">
+              <p className="text-lg sm:text-xl font-extrabold text-[#92400E] leading-snug">
                 Acumulado incompleto ({lectura.horas_validas_72h ?? 0}/72 h)
               </p>
             )}
+            <p className="text-base text-[#464555]">
+              Agua acumulada en 3 días (umbral 60mm)
+            </p>
           </div>
-          <span className="text-sm text-[#464555]">
-            {lectura.horas_validas_72h ?? 0}/72 horas válidas · Umbral: 60mm
+
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="clay-pill px-3 py-1 font-bold bg-[#F0F3FF] text-[#3525CD] border border-[#E2DFFF]">
+              {lectura.horas_validas_72h ?? 0}/72 horas válidas · Umbral: 60mm
+            </span>
+          </div>
+        </article>
+      </div>
+
+      {/* 2. Barra Compacta de Variables Secundarias y Procedencia */}
+      <div className="clay-card-sm bg-white/85 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#464555]">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-medium text-[#111C2D]">
+          <span>
+            🌡️ Temp: <strong>{lectura.temperatura !== null ? lectura.temperatura : 'N/D'} °C</strong>
+          </span>
+          <span>
+            💧 Humedad: <strong>{lectura.humedad !== null ? lectura.humedad : 'N/D'} %</strong>
+          </span>
+          <span>
+            💨 Viento: <strong>{lectura.viento !== null ? lectura.viento : 'N/D'} km/h</strong>
           </span>
         </div>
-      </div>
 
-      {/* 3. Tres Variables Atmosféricas Complementarias (Compactas y centradas en móvil) */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        {/* Temperatura */}
-        <div className="clay-card-sm bg-[#F9F9FF] p-3 sm:p-4 flex flex-col items-center sm:items-start justify-between text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-between w-full gap-1">
-            <span className="text-[11px] sm:text-xs font-extrabold text-[#475569] uppercase tracking-wider truncate">
-              Temperatura
-            </span>
-            <span className="text-base hidden sm:inline" aria-hidden="true">
-              🌡️
-            </span>
-          </div>
-          <p className="telemetry-num text-xl sm:text-2xl font-extrabold tabular-nums text-[#111C2D] my-1">
-            {lectura.temperatura !== null ? lectura.temperatura : 'N/D'}
-            <span className="text-xs sm:text-sm font-semibold text-[#475569] ml-0.5">°C</span>
-          </p>
-          <span className="text-xs text-[#464555] hidden sm:inline">Ambiente en cuenca Llojeta</span>
-        </div>
-
-        {/* Humedad */}
-        <div className="clay-card-sm bg-[#F9F9FF] p-3 sm:p-4 flex flex-col items-center sm:items-start justify-between text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-between w-full gap-1">
-            <span className="text-[11px] sm:text-xs font-extrabold text-[#475569] uppercase tracking-wider truncate">
-              Humedad
-            </span>
-            <span className="text-base hidden sm:inline" aria-hidden="true">
-              💧
-            </span>
-          </div>
-          <p className="telemetry-num text-xl sm:text-2xl font-extrabold tabular-nums text-[#111C2D] my-1">
-            {lectura.humedad !== null ? lectura.humedad : 'N/D'}
-            <span className="text-xs sm:text-sm font-semibold text-[#475569] ml-0.5">%</span>
-          </p>
-          <span className="text-xs text-[#464555] hidden sm:inline">Humedad relativa del aire</span>
-        </div>
-
-        {/* Viento */}
-        <div className="clay-card-sm bg-[#F9F9FF] p-3 sm:p-4 flex flex-col items-center sm:items-start justify-between text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-between w-full gap-1">
-            <span className="text-[11px] sm:text-xs font-extrabold text-[#475569] uppercase tracking-wider truncate">
-              Viento (10m)
-            </span>
-            <span className="text-base hidden sm:inline" aria-hidden="true">
-              💨
-            </span>
-          </div>
-          <p className="telemetry-num text-xl sm:text-2xl font-extrabold tabular-nums text-[#111C2D] my-1">
-            {lectura.viento !== null ? lectura.viento : 'N/D'}
-            <span className="text-xs sm:text-sm font-semibold text-[#475569] ml-0.5">km/h</span>
-          </p>
-          <span className="text-xs text-[#464555] hidden sm:inline">Velocidad media estimada</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#475569]">
+          <span className="font-semibold text-[#3525CD]">
+            Fuente: Open-Meteo (modelo meteorológico)
+          </span>
+          <span>·</span>
+          <span>Obs: {formatearFechaHoraLaPaz(lectura.observado_en)}</span>
+          <span>·</span>
+          <span className="font-mono">Origen: {origen_respuesta}</span>
         </div>
       </div>
 
-      {/* 4. Aviso de Calidad Parcial de Datos si corresponde */}
+      {/* 3. Aviso de Calidad Parcial de Datos si corresponde */}
       {esParcial && (
         <div
           role="note"
@@ -223,8 +211,8 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
         </div>
       )}
 
-      {/* 5. Nota Metodológica al pie */}
-      <footer className="text-sm text-[#475569] leading-relaxed px-1">
+      {/* 4. Nota Metodológica discreta */}
+      <footer className="text-xs sm:text-sm text-[#475569] leading-relaxed px-1">
         ℹ️ {nota_modelo || 'Datos provenientes de modelo meteorológico (Open-Meteo), no equivalen a mediciones de estación pluviométrica local.'}
       </footer>
     </section>
