@@ -70,6 +70,10 @@ export default function EstadoPwaBanner({
   }
 
   const plataforma = detectarPlataformaMovil();
+  const esContextoSeguro =
+    typeof window === 'undefined' ? true : Boolean(window.isSecureContext);
+  const origenActual =
+    typeof window === 'undefined' ? '' : window.location?.origin || '';
 
   return (
     <div
@@ -117,7 +121,20 @@ export default function EstadoPwaBanner({
         </button>
       ) : (
         <div className="rounded-2xl bg-[#F4F6FB] border border-slate-200/80 p-3.5 text-xs sm:text-sm text-[#1E293B] space-y-2 leading-relaxed">
-          {plataforma === 'ios' ? (
+          {!esContextoSeguro ? (
+            <>
+              <p className="font-bold text-[#92400E]">
+                Estás en HTTP local no seguro ({origenActual || 'IP LAN'})
+              </p>
+              <p>
+                Chrome Android desactiva los Service Workers en direcciones <code>http://</code> locales y por eso solo ofrece <strong>Crear acceso directo</strong> en lugar de instalar la app real.
+              </p>
+              <ol className="list-decimal pl-4 space-y-1">
+                <li>Ábrela por <strong>HTTPS</strong> o mediante <code>http://localhost</code> (con cable USB <code>adb reverse</code>).</li>
+                <li>O en Chrome del móvil abre <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code>, pega <code>{origenActual}</code> y reinicia Chrome.</li>
+              </ol>
+            </>
+          ) : plataforma === 'ios' ? (
             <>
               <p className="font-bold text-[#111C2D]">En iPhone / iPad (Safari):</p>
               <ol className="list-decimal pl-4 space-y-1">
@@ -132,9 +149,6 @@ export default function EstadoPwaBanner({
                 <li>Abre el menú del navegador (<strong>⋮</strong> arriba a la derecha).</li>
                 <li>Selecciona <strong>Instalar aplicación</strong> o <strong>Agregar a la pantalla principal</strong>.</li>
               </ol>
-              <p className="text-[11px] text-[#475569]">
-                La instalación directa en un toque se activa automáticamente cuando el sitio carga bajo HTTPS o localhost.
-              </p>
             </>
           )}
         </div>
