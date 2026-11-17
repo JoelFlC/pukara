@@ -54,7 +54,8 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: var(--bg-canvas);
+  background: linear-gradient(180deg, #F7F9FF 0%, #F2F6FC 48%, #F5FAF8 100%);
+  background-attachment: fixed;
   color: var(--ink-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;

@@ -23,10 +23,17 @@ import {
   obtenerUltimoEstadoLocal,
 } from '../utils/offlineStorage';
 
+const TINTE_NAVBAR_POR_NIVEL = {
+  NORMAL: 'bg-[#ECFDF5]/80 border-[#A7F3D0]/70',
+  PRECAUCION: 'bg-[#FEF3C7]/80 border-[#FDE68A]/80',
+  ALERTA: 'bg-[#FFEDD5]/80 border-[#FED7AA]/80',
+  EMERGENCIA: 'bg-[#FEE2E2]/80 border-[#FECACA]/80',
+};
+
 /**
  * Página principal institucional de PUKARA (Swiss Grid + Claymorphism + Scrollytelling Mobile-First).
  * Diseño simplificado para lectura inmediata por personas jóvenes y adultos mayores,
- * con amplitud de pantalla completa y jerarquía clara por capítulos.
+ * con degradado pastel suave, Hero destacado e integración visual con el navbar.
  */
 export default function InicioPage() {
   const [modalidad, setModalidad] = useState('real');
@@ -209,16 +216,22 @@ export default function InicioPage() {
   };
 
   const estaOffline = usandoRespaldoOffline || sinConexionRed;
+  const tinteNavbar =
+    TINTE_NAVBAR_POR_NIVEL[estado?.nivel_vigente] ||
+    'bg-[#F7F9FF]/90 border-indigo-100/80';
 
   return (
-    <div id="monitoreo" className="min-h-screen bg-[#F6F8FA] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full">
+    <div
+      id="monitoreo"
+      className="min-h-screen bg-gradient-to-b from-[#F7F9FF] via-[#F2F6FC] to-[#F5FAF8] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full"
+    >
       {/* 1. Cinta Superior Institucional Oscura */}
       <div className="bg-[#111C2D] text-white text-[11px] font-bold tracking-wider uppercase py-1.5 px-4 text-center">
         • MONITOREO PREVENTIVO ACTIVO · SECTOR LLOJETA — COTAHUMA •
       </div>
 
-      {/* 2. Header Unificado en 1 Sola Barra Limpia */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+      {/* 2. Header Unificado e Integrado Cromáticamente con el Hero Banner */}
+      <header className={`sticky top-0 z-30 backdrop-blur-md border-b shadow-2xs transition-colors ${tinteNavbar}`}>
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Izquierda: Logo e Identidad */}
           <div className="flex items-center gap-3 min-w-0">
@@ -246,7 +259,7 @@ export default function InicioPage() {
                 {estaOffline ? (
                   <span
                     role="status"
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-white/90 text-[#92400E] border border-[#FDE68A]"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B45309] animate-pulse" aria-hidden="true" />
                     <span>Sin conexión</span>
@@ -254,7 +267,7 @@ export default function InicioPage() {
                 ) : (
                   <span
                     role="status"
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0]"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-white/90 text-[#065F46] border border-[#A7F3D0]"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#059669] clay-beacon-pulse" aria-hidden="true" />
                     <span>En línea</span>
@@ -277,28 +290,27 @@ export default function InicioPage() {
             </a>
             <a
               href="#prevencion"
-              className="px-4 py-2 rounded-full text-[#464555] hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors"
+              className="px-4 py-2 rounded-full text-[#1E293B] hover:bg-white/80 hover:text-[#3525CD] transition-colors"
             >
               Guía de Lluvia
             </a>
             <a
               href="#mapa"
-              className="px-4 py-2 rounded-full text-[#464555] hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors"
+              className="px-4 py-2 rounded-full text-[#1E293B] hover:bg-white/80 hover:text-[#3525CD] transition-colors"
             >
               Mapa y Puntos
             </a>
             <a
               href="#contactos"
-              className="px-4 py-2 rounded-full text-[#464555] hover:bg-[#F0F3FF] hover:text-[#3525CD] transition-colors"
+              className="px-4 py-2 rounded-full text-[#1E293B] hover:bg-white/80 hover:text-[#3525CD] transition-colors"
             >
               Teléfonos
             </a>
           </nav>
 
-          {/* Derecha: Conmutador Compacto + Actualizar + Auxilio + Admin */}
+          {/* Derecha: Conmutador Compacto + Auxilio + Admin */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            {/* Conmutador compacto de modalidad */}
-            <div className="inline-flex rounded-full bg-[#F0F3FF] p-1 border border-[#E2DFFF]">
+            <div className="inline-flex rounded-full bg-white/80 p-1 border border-black/10 shadow-2xs">
               <button
                 type="button"
                 onClick={() => handleCambiarModalidad('real')}
@@ -323,22 +335,6 @@ export default function InicioPage() {
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => cargarDatos()}
-              disabled={cargando || cargandoAccion}
-              aria-label="Actualizar datos meteorológicos"
-              className="clay-btn-secondary clay-interactive min-h-[44px] px-3.5 py-2 text-xs sm:text-sm font-bold disabled:opacity-50 inline-flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <span
-                className={cargando ? 'animate-spin inline-block' : ''}
-                aria-hidden="true"
-              >
-                🔄
-              </span>
-              <span className="hidden sm:inline">{cargando ? 'Consultando...' : 'Actualizar'}</span>
-            </button>
-
             <a
               href="#contactos"
               className="clay-btn-danger clay-interactive min-h-[44px] px-4 py-2 text-xs sm:text-sm font-extrabold hidden sm:inline-flex items-center justify-center gap-1.5 shrink-0"
@@ -349,7 +345,7 @@ export default function InicioPage() {
 
             <Link
               to="/admin"
-              className="min-h-[44px] inline-flex items-center justify-center px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#F4F6FB] hover:bg-[#EEF2FF] text-[#111C2D] border border-slate-200 transition-colors shrink-0"
+              className="min-h-[44px] inline-flex items-center justify-center px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/90 hover:bg-white text-[#111C2D] border border-black/10 transition-colors shrink-0"
               title="Acceso administrativo"
             >
               <span>Acceso Admin →</span>
@@ -358,9 +354,8 @@ export default function InicioPage() {
         </div>
       </header>
 
-      {/* 3. Contenedor Principal Amplio sobre Lienzo Limpio */}
+      {/* 3. Contenedor Principal Amplio sobre Degradado Pastel Suave */}
       <main className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-8 sm:space-y-12 pb-24 md:pb-12 flex-1">
-        {/* Banners Condicionales de Resiliencia y Simulación */}
         <EstadoPwaBanner />
 
         <BannerModoOffline
@@ -416,10 +411,12 @@ export default function InicioPage() {
           </div>
         )}
 
-        {/* HERO UNIFICADO DE 2 COLUMNAS */}
+        {/* HERO PRINCIPAL DESTACADO CON BOTÓN DISCRETO DE ACTUALIZACIÓN */}
         <section aria-label="Nivel informativo vigente y escala">
           <BannerNivelInformativo
             estado={estado}
+            alActualizar={() => cargarDatos()}
+            cargando={cargando || cargandoAccion}
             alInyectarPreset={(nivel, int, a24, a72) =>
               handleInyectarEscenario({
                 intensidad_mm_h: int,
@@ -436,7 +433,7 @@ export default function InicioPage() {
           <TarjetaLecturaMeteorologica meteorologia={estado?.meteorologia} />
         </section>
 
-        {/* CAPÍTULO 01: GUÍA DE LLUVIA (4 TARJETAS DIRECTAS) */}
+        {/* CAPÍTULO 01: GUÍA DE LLUVIA SIMPLIFICADA CON ILUSTRACIONES */}
         <section id="prevencion" aria-label="Capítulo 01: Recomendaciones preventivas">
           <SeccionRecomendaciones
             nivelVigente={estado?.nivel_vigente || 'NORMAL'}
@@ -448,7 +445,7 @@ export default function InicioPage() {
           />
         </section>
 
-        {/* CAPÍTULO 02: MAPA Y PUNTOS DE REFERENCIA */}
+        {/* CAPÍTULO 02: MAPA CON PUNTOS/ZONAS EN MODAL AMPLIABLE */}
         <section id="mapa" aria-label="Capítulo 02: Mapa cartográfico referencial">
           <MapaReferencial
             zonasReferencia={
@@ -507,7 +504,7 @@ export default function InicioPage() {
       </main>
 
       {/* 4. Pie de Página Institucional de 4 Columnas */}
-      <footer className="bg-white border-t border-slate-200/80 py-10 pb-28 md:pb-12">
+      <footer className="bg-white/90 border-t border-slate-200/80 py-10 pb-28 md:pb-12">
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-[#464555]">
           <div className="space-y-2.5">
             <div className="flex items-center gap-2">
