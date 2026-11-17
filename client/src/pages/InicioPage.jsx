@@ -22,6 +22,12 @@ import {
   guardarUltimoEstadoLocal,
   obtenerUltimoEstadoLocal,
 } from '../utils/offlineStorage';
+import {
+  esModoStandalone,
+  configurarPromptInstalacion,
+  dispararPromptInstalacion,
+  hayPromptInstalacionDisponible,
+} from '../utils/pwaRegister';
 
 const RGB_NAVBAR_INICIAL = {
   NORMAL: [209, 250, 229], // #D1FAE5
@@ -81,6 +87,9 @@ export default function InicioPage() {
 
   const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
   const [progresoScroll, setProgresoScroll] = useState(0);
+  const [esPwaInstalada, setEsPwaInstalada] = useState(false);
+  const [promptPwaDisponible, setPromptPwaDisponible] = useState(false);
+  const [guiaPwaAbierta, setGuiaPwaAbierta] = useState(false);
   const ultimoNivelRef = useRef({ real: null, simulada: null });
   const inicializadoRef = useRef({ real: false, simulada: false });
 
@@ -189,6 +198,32 @@ export default function InicioPage() {
       window.removeEventListener('resize', handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    setEsPwaInstalada(esModoStandalone());
+    setPromptPwaDisponible(hayPromptInstalacionDisponible());
+
+    const desuscribir = configurarPromptInstalacion((listo) => {
+      setPromptPwaDisponible(listo);
+      if (!listo) {
+        setEsPwaInstalada(esModoStandalone());
+      }
+    });
+
+    return () => desuscribir();
+  }, []);
+
+  const handleSolicitarInstalacionPwa = async () => {
+    if (hayPromptInstalacionDisponible()) {
+      const aceptado = await dispararPromptInstalacion();
+      if (aceptado) {
+        setMensajeExito('PUKARA instalada como aplicación en tu dispositivo.');
+        setTimeout(() => setMensajeExito(null), 4000);
+        return;
+      }
+    }
+    setGuiaPwaAbierta((prev) => !prev);
+  };
 
   useEffect(() => {
     const handleOnline = () => {
@@ -395,6 +430,23 @@ export default function InicioPage() {
               </button>
             </div>
 
+            {!esPwaInstalada && (
+              <button
+                type="button"
+                onClick={handleSolicitarInstalacionPwa}
+                aria-label="Instalar aplicación PWA en tu dispositivo"
+                title={
+                  promptPwaDisponible
+                    ? 'Instalar aplicación PUKARA'
+                    : 'Cómo instalar la app en tu móvil'
+                }
+                className="min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-[#EEF2FF] hover:bg-[#E2DFFF] text-[#3525CD] border border-[#3525CD]/20 transition-colors shrink-0 cursor-pointer"
+              >
+                <span aria-hidden="true">📲</span>
+                <span>Instalar App</span>
+              </button>
+            )}
+
             <a
               href="#contactos"
               className="clay-btn-danger clay-interactive min-h-[44px] px-4 py-2 text-xs sm:text-sm font-extrabold hidden sm:inline-flex items-center justify-center gap-1.5 shrink-0"
@@ -415,7 +467,10 @@ export default function InicioPage() {
       </header>
 
       {/* 3. Modales y Avisos Flotantes (no interfieren con el Hero Banner) */}
-      <EstadoPwaBanner />
+      <EstadoPwaBanner
+        abiertoManual={guiaPwaAbierta}
+        onCerrarManual={() => setGuiaPwaAbierta(false)}
+      />
 
       <BannerModoOffline
         activo={estaOffline}

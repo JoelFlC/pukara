@@ -2,9 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { registrarServiceWorker } from './utils/pwaRegister.js'
+import {
+  iniciarCapturaPromptInstalacion,
+  registrarServiceWorker,
+} from './utils/pwaRegister.js'
 
-// Registro no bloqueante del Service Worker (P12)
+// Captura temprana del prompt PWA y registro del Service Worker (P12)
+iniciarCapturaPromptInstalacion();
 registrarServiceWorker();
 
 createRoot(document.getElementById('root')).render(

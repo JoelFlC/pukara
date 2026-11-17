@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import {
   esModoStandalone,
+  detectarPlataformaMovil,
   configurarPromptInstalacion,
   dispararPromptInstalacion,
 } from '../utils/pwaRegister.js';
 
 /**
  * Componente EstadoPwaBanner (Requisito P12 / Sección 9.4)
- * Muestra una opción discreta y accesible para instalar la PWA cuando el navegador
- * lo permite (evento beforeinstallprompt) o indica que ya está operando como aplicación independiente.
+ * Muestra el prompt nativo de instalación PWA cuando `beforeinstallprompt` está disponible
+ * o una guía rápida para instalar PUKARA como app en Android / iPhone cuando el usuario
+ * lo solicita manualmente desde el botón "Instalar App".
  *
  * @param {Object} props
  * @param {boolean} [props.instalableInicial=false] Permite forzar visibilidad en pruebas unitarias
+ * @param {boolean} [props.abiertoManual=false] Permite abrir la guía de instalación móvil manualmente
+ * @param {Function} [props.onCerrarManual] Callback al cerrar la guía manual
  * @param {Function} [props.alInstalar] Callback opcional para pruebas
  */
 export default function EstadoPwaBanner({
   instalableInicial = false,
+  abiertoManual = false,
+  onCerrarManual,
   alInstalar,
 }) {
   const [instalable, setInstalable] = useState(instalableInicial);
@@ -27,6 +33,9 @@ export default function EstadoPwaBanner({
 
     const desuscribir = configurarPromptInstalacion((listo) => {
       setInstalable(listo);
+      if (listo) {
+        setDescartado(false);
+      }
     });
 
     return () => {
@@ -41,41 +50,55 @@ export default function EstadoPwaBanner({
     const resultado = await dispararPromptInstalacion();
     if (resultado) {
       setInstalable(false);
+      if (onCerrarManual) onCerrarManual();
     }
   };
 
-  if (descartado || esStandalone || !instalable) {
+  const handleCerrar = () => {
+    if (abiertoManual && onCerrarManual) {
+      onCerrarManual();
+      return;
+    }
+    setDescartado(true);
+  };
+
+  const mostrarAutomatico = !descartado && !esStandalone && instalable;
+  const mostrarManual = abiertoManual && !esStandalone;
+
+  if (!mostrarAutomatico && !mostrarManual) {
     return null;
   }
+
+  const plataforma = detectarPlataformaMovil();
 
   return (
     <div
       data-testid="banner-instalacion-pwa"
       role="region"
       aria-label="Instalación de aplicación PWA"
-      className="fixed bottom-20 md:bottom-6 right-4 left-4 sm:left-auto z-40 sm:max-w-sm clay-card bg-white/95 backdrop-blur-md border-2 border-[#3525CD]/25 p-4 text-[#111C2D] space-y-3 shadow-2xl animate-fade-up"
+      className="fixed bottom-20 md:bottom-6 right-4 left-4 sm:left-auto z-50 sm:max-w-sm clay-card bg-white/95 backdrop-blur-md border-2 border-[#3525CD]/25 p-4 sm:p-5 text-[#111C2D] space-y-3.5 shadow-2xl animate-fade-up"
     >
       <div className="flex items-start justify-between gap-2.5">
         <div className="flex items-start gap-3 min-w-0">
-          <span
-            className="w-10 h-10 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0 clay-pill"
+          <img
+            src="/logo.png"
+            alt=""
             aria-hidden="true"
-          >
-            📲
-          </span>
+            className="w-10 h-10 object-contain shrink-0"
+          />
           <div className="min-w-0">
             <p className="headline-sm text-base font-bold text-[#111C2D] leading-snug">
               Instalar PUKARA en este dispositivo
             </p>
             <p className="text-sm text-[#464555] leading-snug mt-0.5">
-              Acceso rápido y consulta sin conexión.
+              Úsala como app en tu pantalla de inicio, incluso sin conexión.
             </p>
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => setDescartado(true)}
+          onClick={handleCerrar}
           aria-label="Cerrar sugerencia de instalación"
           className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[#475569] hover:text-[#111C2D] transition-colors inline-flex items-center justify-center text-sm font-bold shrink-0 cursor-pointer"
         >
@@ -83,14 +106,39 @@ export default function EstadoPwaBanner({
         </button>
       </div>
 
-      <button
-        type="button"
-        data-testid="btn-instalar-pwa"
-        onClick={handleInstalar}
-        className="clay-btn-primary clay-interactive min-h-[48px] w-full px-4 py-2 text-sm font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
-      >
-        <span>Instalar aplicación PWA para consulta sin conexión</span>
-      </button>
+      {instalable ? (
+        <button
+          type="button"
+          data-testid="btn-instalar-pwa"
+          onClick={handleInstalar}
+          className="clay-btn-primary clay-interactive min-h-[48px] w-full px-4 py-2 text-sm font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>Instalar aplicación PWA para consulta sin conexión</span>
+        </button>
+      ) : (
+        <div className="rounded-2xl bg-[#F4F6FB] border border-slate-200/80 p-3.5 text-xs sm:text-sm text-[#1E293B] space-y-2 leading-relaxed">
+          {plataforma === 'ios' ? (
+            <>
+              <p className="font-bold text-[#111C2D]">En iPhone / iPad (Safari):</p>
+              <ol className="list-decimal pl-4 space-y-1">
+                <li>Toca el botón <strong>Compartir</strong> en la barra inferior.</li>
+                <li>Elige <strong>Agregar a pantalla de inicio</strong> y pulsa <strong>Agregar</strong>.</li>
+              </ol>
+            </>
+          ) : (
+            <>
+              <p className="font-bold text-[#111C2D]">En Android / Chrome o Edge:</p>
+              <ol className="list-decimal pl-4 space-y-1">
+                <li>Abre el menú del navegador (<strong>⋮</strong> arriba a la derecha).</li>
+                <li>Selecciona <strong>Instalar aplicación</strong> o <strong>Agregar a la pantalla principal</strong>.</li>
+              </ol>
+              <p className="text-[11px] text-[#475569]">
+                La instalación directa en un toque se activa automáticamente cuando el sitio carga bajo HTTPS o localhost.
+              </p>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

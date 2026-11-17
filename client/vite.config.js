@@ -13,7 +13,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 export const CONFIG_PWA_PUKARA = {
   registerType: 'autoUpdate',
   injectRegister: 'auto',
+  devOptions: {
+    enabled: true,
+    navigateFallback: 'index.html',
+  },
   manifest: {
+    id: '/',
     name: 'PUKARA — Consulta Informativa de Lluvias (Sector Llojeta)',
     short_name: 'PUKARA',
     description:
