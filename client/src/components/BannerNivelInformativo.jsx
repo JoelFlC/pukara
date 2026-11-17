@@ -10,8 +10,8 @@ import {
 const ESTILOS_NIVEL = {
   NORMAL: {
     heroSurface:
-      'bg-gradient-to-br from-[#D1FAE5]/85 via-[#ECFDF5] to-[#FFFFFF] border-2 border-[#6EE7B7] shadow-[0_22px_48px_-14px_rgba(5,150,105,0.20)]',
-    pill: 'bg-white/90 text-[#065F46] border border-[#6EE7B7]',
+      'w-full bg-gradient-to-b from-[#D1FAE5] via-[#ECFDF5]/95 to-[#F7F9FF] border-b border-[#A7F3D0]/70',
+    pill: 'bg-white/95 text-[#065F46] border border-[#6EE7B7]',
     dot: 'bg-[#059669]',
     icono: '🟢',
     titulo: 'Nivel informativo de lluvia: NORMAL',
@@ -21,8 +21,8 @@ const ESTILOS_NIVEL = {
   },
   PRECAUCION: {
     heroSurface:
-      'bg-gradient-to-br from-[#FDE68A]/70 via-[#FEF3C7]/85 to-[#FFFFFF] border-2 border-[#FBBF24] shadow-[0_22px_48px_-14px_rgba(217,119,6,0.22)]',
-    pill: 'bg-white/90 text-[#92400E] border border-[#FBBF24]',
+      'w-full bg-gradient-to-b from-[#FEF3C7] via-[#FFFBEB]/95 to-[#F7F9FF] border-b border-[#FDE68A]/80',
+    pill: 'bg-white/95 text-[#92400E] border border-[#FBBF24]',
     dot: 'bg-[#B45309]',
     icono: '🟡',
     titulo: 'Nivel informativo de lluvia: PRECAUCIÓN',
@@ -32,8 +32,8 @@ const ESTILOS_NIVEL = {
   },
   ALERTA: {
     heroSurface:
-      'bg-gradient-to-br from-[#FED7AA]/75 via-[#FFEDD5]/85 to-[#FFFFFF] border-2 border-[#FB923C] shadow-[0_22px_48px_-14px_rgba(234,88,12,0.22)]',
-    pill: 'bg-white/90 text-[#9A3412] border border-[#FB923C]',
+      'w-full bg-gradient-to-b from-[#FFEDD5] via-[#FFF7ED]/95 to-[#F7F9FF] border-b border-[#FED7AA]/80',
+    pill: 'bg-white/95 text-[#9A3412] border border-[#FB923C]',
     dot: 'bg-[#C2410C]',
     icono: '🟠',
     titulo: 'Nivel informativo de lluvia: ALERTA',
@@ -43,8 +43,8 @@ const ESTILOS_NIVEL = {
   },
   EMERGENCIA: {
     heroSurface:
-      'bg-gradient-to-br from-[#FECACA]/80 via-[#FEE2E2]/85 to-[#FFFFFF] border-2 border-[#F87171] shadow-[0_22px_48px_-14px_rgba(220,38,38,0.24)]',
-    pill: 'bg-white/90 text-[#991B1B] border border-[#F87171]',
+      'w-full bg-gradient-to-b from-[#FEE2E2] via-[#FEF2F2]/95 to-[#F7F9FF] border-b border-[#FECACA]/80',
+    pill: 'bg-white/95 text-[#991B1B] border border-[#F87171]',
     dot: 'bg-[#DC2626]',
     icono: '🔴',
     titulo: 'Nivel informativo de lluvia: EMERGENCIA',
@@ -161,39 +161,41 @@ export default function BannerNivelInformativo({
       <section
         role="region"
         aria-label="Estado del sistema: Sin datos"
-        className="relative rounded-[28px] border-2 border-slate-200 bg-gradient-to-br from-slate-100/90 via-white to-white p-6 sm:p-8 lg:p-10 shadow-sm animate-fade-up"
+        className="w-full border-b border-slate-200/80 bg-gradient-to-b from-slate-200/80 via-slate-100/80 to-[#F7F9FF] animate-fade-up"
       >
-        {botonActualizarDiscreto && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-            {botonActualizarDiscreto}
-          </div>
-        )}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-          <div className="lg:col-span-7 space-y-4 pr-10 sm:pr-0">
-            <span className="clay-pill inline-flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm font-bold bg-white text-[#475569] border border-slate-200">
-              <span aria-hidden="true">⚪</span>
-              <span>Sector Piloto Llojeta / Bajo Llojeta</span>
-            </span>
-            <h1 className="display-hero text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-[#111C2D] leading-[1.1] tracking-tight break-words">
-              Estado: SIN DATOS METEOROLÓGICOS VÁLIDOS
-            </h1>
-            <p className="text-lg sm:text-xl text-[#464555] leading-relaxed">
-              Actualmente no se cuenta con observaciones pluviométricas válidas procesadas para el sector piloto Llojeta. El sistema no asume normalidad por ausencia de datos.
-            </p>
-            <div className="pt-2 flex flex-wrap gap-3 text-sm text-[#475569] font-mono">
-              <span>Modalidad: {modalidad}</span>
-              <span>·</span>
-              <span>Versión de configuración: v{version_reglas?.version ?? 1}</span>
+        <div className="relative max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-11">
+          {botonActualizarDiscreto && (
+            <div className="absolute top-5 right-4 sm:top-7 sm:right-6 lg:right-10">
+              {botonActualizarDiscreto}
             </div>
-          </div>
+          )}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+            <div className="lg:col-span-7 space-y-4 pr-10 sm:pr-0">
+              <span className="clay-pill inline-flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm font-bold bg-white text-[#475569] border border-slate-200">
+                <span aria-hidden="true">⚪</span>
+                <span>Sector Piloto Llojeta / Bajo Llojeta</span>
+              </span>
+              <h1 className="display-hero text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-[#111C2D] leading-[1.1] tracking-tight break-words">
+                Estado: SIN DATOS METEOROLÓGICOS VÁLIDOS
+              </h1>
+              <p className="text-lg sm:text-xl text-[#464555] leading-relaxed">
+                Actualmente no se cuenta con observaciones pluviométricas válidas procesadas para el sector piloto Llojeta. El sistema no asume normalidad por ausencia de datos.
+              </p>
+              <div className="pt-2 flex flex-wrap gap-3 text-sm text-[#475569] font-mono">
+                <span>Modalidad: {modalidad}</span>
+                <span>·</span>
+                <span>Versión de configuración: v{version_reglas?.version ?? 1}</span>
+              </div>
+            </div>
 
-          <div className="lg:col-span-5 bg-white/90 rounded-3xl p-6 border border-slate-200/80 space-y-2 text-center">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-[#475569]">
-              Escala Informativa en Espera
-            </p>
-            <p className="text-base text-[#464555] leading-relaxed">
-              En cuanto se reciba una lectura válida de lluvia, se activará el indicador correspondiente de las 4 fases.
-            </p>
+            <div className="lg:col-span-5 bg-white/90 rounded-3xl p-6 border border-slate-200/80 space-y-2 text-center shadow-sm">
+              <p className="text-xs font-extrabold uppercase tracking-wider text-[#475569]">
+                Escala Informativa en Espera
+              </p>
+              <p className="text-base text-[#464555] leading-relaxed">
+                En cuanto se reciba una lectura válida de lluvia, se activará el indicador correspondiente de las 4 fases.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -211,49 +213,51 @@ export default function BannerNivelInformativo({
       <section
         role="region"
         aria-label="Estado del sistema: Datos desactualizados"
-        className="relative rounded-[28px] border-2 border-[#FBBF24] bg-gradient-to-br from-[#FEF3C7]/90 via-[#FFFBEB] to-white p-6 sm:p-8 lg:p-10 shadow-md animate-fade-up"
+        className="w-full border-b border-[#FDE68A]/80 bg-gradient-to-b from-[#FEF3C7] via-[#FFFBEB]/95 to-[#F7F9FF] animate-fade-up"
       >
-        {botonActualizarDiscreto && (
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
-            {botonActualizarDiscreto}
-          </div>
-        )}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-          <div className="lg:col-span-7 space-y-4 pr-10 sm:pr-0">
-            <span className="clay-pill inline-flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm font-extrabold bg-white text-[#92400E] border border-[#FBBF24] uppercase tracking-wider">
-              <span aria-hidden="true">⏳</span>
-              <span>Regla T6 · Vencimiento Temporal</span>
-            </span>
-            <h1 className="display-hero text-2xl sm:text-4xl font-extrabold text-[#111C2D] leading-tight tracking-tight break-words">
-              DATOS DESACTUALIZADOS (supera el límite de vigencia T_max)
-            </h1>
-            <p className="text-base sm:text-lg text-[#1E293B] leading-relaxed">
-              La última lectura disponible tiene una antigüedad de{' '}
-              <strong className="text-[#111C2D]">{formatearAntiguedad(antiguedad_minutos)}</strong>, superando el límite de vigencia configurado de {t_max_minutos} minutos. Se muestra el{' '}
-              <strong className="text-[#111C2D]">último nivel informativo conocido</strong> sin alteración.
-            </p>
-
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#475569] pt-1">
-              <span>
-                <strong className="text-[#111C2D]">Última observación:</strong> {formatearFechaHoraLaPaz(observadoEn)}
-              </span>
-              <span className="font-mono">Fuente: {fuente}</span>
-              <span className="font-mono">Modalidad: {modalidad}</span>
-              <span className="font-mono">Versión de configuración: v{version_reglas?.version ?? 1}</span>
+        <div className="relative max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-11">
+          {botonActualizarDiscreto && (
+            <div className="absolute top-5 right-4 sm:top-7 sm:right-6 lg:right-10">
+              {botonActualizarDiscreto}
             </div>
-          </div>
+          )}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
+            <div className="lg:col-span-7 space-y-4 pr-10 sm:pr-0">
+              <span className="clay-pill inline-flex items-center gap-2 px-3.5 py-1.5 text-xs sm:text-sm font-extrabold bg-white text-[#92400E] border border-[#FBBF24] uppercase tracking-wider">
+                <span aria-hidden="true">⏳</span>
+                <span>Regla T6 · Vencimiento Temporal</span>
+              </span>
+              <h1 className="display-hero text-2xl sm:text-4xl font-extrabold text-[#111C2D] leading-tight tracking-tight break-words">
+                DATOS DESACTUALIZADOS (supera el límite de vigencia T_max)
+              </h1>
+              <p className="text-base sm:text-lg text-[#1E293B] leading-relaxed">
+                La última lectura disponible tiene una antigüedad de{' '}
+                <strong className="text-[#111C2D]">{formatearAntiguedad(antiguedad_minutos)}</strong>, superando el límite de vigencia configurado de {t_max_minutos} minutos. Se muestra el{' '}
+                <strong className="text-[#111C2D]">último nivel informativo conocido</strong> sin alteración.
+              </p>
 
-          <div className="lg:col-span-5 bg-white/90 rounded-3xl p-6 border border-[#FDE68A] space-y-3">
-            <span className="text-xs font-extrabold text-[#92400E] uppercase tracking-wider block">
-              Último nivel informativo conocido
-            </span>
-            <div className="flex items-center justify-between gap-3 bg-[#FFFBEB] rounded-2xl p-4 border border-[#FDE68A]">
-              <span className="headline-md text-2xl font-extrabold text-[#111C2D]">
-                {nivel_vigente || 'No disponible'}
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#475569] pt-1">
+                <span>
+                  <strong className="text-[#111C2D]">Última observación:</strong> {formatearFechaHoraLaPaz(observadoEn)}
+                </span>
+                <span className="font-mono">Fuente: {fuente}</span>
+                <span className="font-mono">Modalidad: {modalidad}</span>
+                <span className="font-mono">Versión de configuración: v{version_reglas?.version ?? 1}</span>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 bg-white/95 rounded-3xl p-6 border border-[#FDE68A] space-y-3 shadow-sm">
+              <span className="text-xs font-extrabold text-[#92400E] uppercase tracking-wider block">
+                Último nivel informativo conocido
               </span>
-              <span className={`clay-pill px-3.5 py-1 text-sm font-extrabold ${estiloUltimoNivel.pill}`}>
-                {nivel_vigente}
-              </span>
+              <div className="flex items-center justify-between gap-3 bg-[#FFFBEB] rounded-2xl p-4 border border-[#FDE68A]">
+                <span className="headline-md text-2xl font-extrabold text-[#111C2D]">
+                  {nivel_vigente || 'No disponible'}
+                </span>
+                <span className={`clay-pill px-3.5 py-1 text-sm font-extrabold ${estiloUltimoNivel.pill}`}>
+                  {nivel_vigente}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -262,7 +266,7 @@ export default function BannerNivelInformativo({
   }
 
   // =========================================================================
-  // CASO 3: NIVELES INFORMATIVOS VIGENTES (Hero Destacado por Color Pastel)
+  // CASO 3: NIVELES INFORMATIVOS VIGENTES (Hero Full-Bleed Destacado)
   // =========================================================================
   const estilo = ESTILOS_NIVEL[nivel_vigente] || ESTILOS_NIVEL.NORMAL;
 
@@ -270,16 +274,17 @@ export default function BannerNivelInformativo({
     <section
       role="region"
       aria-label={`Nivel informativo vigente: ${nivel_vigente}`}
-      className={`relative rounded-[28px] p-6 sm:p-8 lg:p-10 animate-fade-up transition-all ${estilo.heroSurface}`}
+      className={`animate-fade-up transition-colors duration-300 ${estilo.heroSurface}`}
     >
-      {/* Botón discreto de actualización en esquina superior derecha */}
-      {botonActualizarDiscreto && (
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
-          {botonActualizarDiscreto}
-        </div>
-      )}
+      <div className="relative max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-11">
+        {/* Botón discreto de actualización en esquina superior derecha */}
+        {botonActualizarDiscreto && (
+          <div className="absolute top-5 right-4 sm:top-7 sm:right-6 lg:right-10 z-10">
+            {botonActualizarDiscreto}
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-10 items-center">
         {/* Columna Izquierda: Diagnóstico Humano y Sencillo */}
         <div className="lg:col-span-7 space-y-5 min-w-0 pr-10 lg:pr-0">
           <div className="flex flex-wrap items-center gap-2.5">
@@ -489,6 +494,7 @@ export default function BannerNivelInformativo({
             })}
           </ul>
         </div>
+      </div>
       </div>
     </section>
   );

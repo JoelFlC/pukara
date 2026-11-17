@@ -68,71 +68,62 @@ export default function AvisoCambioNivelInApp({ cambioNivel, onCerrar }) {
     (nivelNuevo === 'PRECAUCION' && nivelAnterior === 'NORMAL');
 
   return (
-    <aside
-      data-testid="aviso-cambio-nivel-inapp"
-      role="status"
-      aria-live="polite"
-      className={`w-full clay-card border-2 ${estilos.border} ${estilos.bg} p-5 sm:p-6 space-y-4 animate-fade-up`}
-    >
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-        <div className="flex items-start gap-3 min-w-0">
-          <span className="text-2xl select-none shrink-0 mt-0.5" aria-hidden="true">
-            {estilos.icono}
-          </span>
-          <div className="min-w-0 space-y-1">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#464555] block">
-              Aviso Visual In-App · Requisito P06 {modalidad === 'simulada' ? '(Demostración Simulación)' : ''}
+    <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center p-4">
+      <aside
+        data-testid="aviso-cambio-nivel-inapp"
+        role="status"
+        aria-live="polite"
+        aria-modal="true"
+        className={`w-full max-w-lg clay-card border-2 ${estilos.border} ${estilos.bg} p-5 sm:p-6 space-y-4 shadow-2xl animate-fade-up`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <span className="text-2xl select-none shrink-0 mt-0.5" aria-hidden="true">
+              {estilos.icono}
             </span>
-            <h2 className={`headline-sm text-lg sm:text-xl font-extrabold ${estilos.text} leading-snug break-words`}>
-              Cambio en el nivel informativo de lluvia: de {nivelAnterior} a {nivelNuevo}
-            </h2>
-          </div>
-        </div>
-
-        <span
-          className={`clay-pill self-start shrink-0 text-xs font-extrabold px-3.5 py-1.5 ${estilos.badge} uppercase tracking-wide`}
-        >
-          {esAscenso ? '▲ Nuevo nivel' : '▼ Descenso (histéresis)'}
-        </span>
-      </div>
-
-      {/* Resumen de la recomendación preventiva general vigente */}
-      {recomendacion && (
-        <div className="clay-card-sm bg-white/95 p-4 space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-base font-bold text-[#111C2D]">
-              {recomendacion.titulo || `Recomendación vigente para ${nivelNuevo}`}
-            </p>
-            {recomendacion.origen && (
-              <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#F0F3FF] text-[#1E293B] border border-slate-200/80">
-                {recomendacion.origen === 'institucional_verificada'
-                  ? 'institucional_verificada'
-                  : 'demostracion'}
+            <div className="min-w-0 space-y-1">
+              <span
+                className={`clay-pill inline-block text-[11px] font-extrabold px-2.5 py-0.5 ${estilos.badge} uppercase tracking-wide`}
+              >
+                {esAscenso ? '▲ Cambio de nivel' : '▼ Descenso'}
+                {modalidad === 'simulada' ? ' · Simulación' : ''}
               </span>
-            )}
+              <h2 className={`headline-sm text-lg font-extrabold ${estilos.text} leading-snug break-words`}>
+                Cambio en el nivel informativo de lluvia: de {nivelAnterior} a {nivelNuevo}
+              </h2>
+            </div>
           </div>
-          <p className="text-base text-[#1E293B] leading-relaxed">
-            {recomendacion.contenido}
-          </p>
         </div>
-      )}
 
-      {/* Nota explícita obligatoria */}
-      <p className="text-sm sm:text-base text-[#1E293B] bg-white/75 p-3.5 rounded-2xl border border-white/90 leading-relaxed">
-        <strong>Nota importante:</strong> Aviso visual dentro de la aplicación (solo mientras la aplicación permanece abierta; no es una notificación remota ni sustituye canales oficiales). Ante emergencias, contacte a los servicios oficiales.
-      </p>
+        {/* Resumen corto de la recomendación preventiva */}
+        {recomendacion && (
+          <div className="clay-card-sm bg-white/95 p-3.5 space-y-1">
+            <p className="text-base font-bold text-[#111C2D]">
+              {recomendacion.titulo || `Recomendación para ${nivelNuevo}`}
+            </p>
+            <p className="text-sm sm:text-base text-[#1E293B] leading-relaxed">
+              {recomendacion.contenido}
+            </p>
+          </div>
+        )}
 
-      {/* Botón táctil de confirmación */}
-      <div className="flex justify-end pt-1">
-        <button
-          type="button"
-          onClick={onCerrar}
-          className="clay-btn-primary clay-interactive min-h-[48px] w-full sm:w-auto px-6 py-2.5 text-base font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <span>✓</span>
-          <span>Entendido / Cerrar aviso</span>
-        </button>
-      </div>
-    </aside>
+        {/* Nota breve obligatoria */}
+        <p className="text-xs sm:text-sm text-[#1E293B] bg-white/75 p-3 rounded-xl border border-white/90 leading-relaxed">
+          Aviso visual dentro de la aplicación (solo mientras la aplicación permanece abierta; no es una notificación remota ni sustituye canales oficiales).
+        </p>
+
+        {/* Botón táctil de confirmación */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={onCerrar}
+            className="clay-btn-primary clay-interactive min-h-[48px] w-full sm:w-auto px-6 py-2.5 text-base font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>✓</span>
+            <span>Entendido / Cerrar aviso</span>
+          </button>
+        </div>
+      </aside>
+    </div>
   );
 }

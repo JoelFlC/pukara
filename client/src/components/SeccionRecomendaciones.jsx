@@ -48,35 +48,31 @@ function IlustracionPreventiva({ nivel }) {
 
 const ESTILOS_TARJETA_NIVEL = {
   NORMAL: {
-    etiquetaCorta: 'NORMAL',
-    accionVisual: 'Revisión de hogar',
-    pill: 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]',
-    bordeActivo: 'border-[#059669] ring-4 ring-[#ECFDF5]',
+    cardSurface: 'bg-gradient-to-b from-[#ECFDF5]/85 to-white border-[#A7F3D0]',
+    bordeActivo: 'border-[#059669] ring-4 ring-[#ECFDF5] shadow-lg',
+    acento: 'bg-[#059669]',
   },
   PRECAUCION: {
-    etiquetaCorta: 'PRECAUCIÓN',
-    accionVisual: 'Limpiar desagües',
-    pill: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
-    bordeActivo: 'border-[#D97706] ring-4 ring-[#FEF3C7]',
+    cardSurface: 'bg-gradient-to-b from-[#FEF3C7]/85 to-white border-[#FDE68A]',
+    bordeActivo: 'border-[#D97706] ring-4 ring-[#FEF3C7] shadow-lg',
+    acento: 'bg-[#D97706]',
   },
   ALERTA: {
-    etiquetaCorta: 'ALERTA',
-    accionVisual: 'Alejarse de cauces',
-    pill: 'bg-[#FFEDD5] text-[#9A3412] border-[#FED7AA]',
-    bordeActivo: 'border-[#EA580C] ring-4 ring-[#FFEDD5]',
+    cardSurface: 'bg-gradient-to-b from-[#FFEDD5]/85 to-white border-[#FED7AA]',
+    bordeActivo: 'border-[#EA580C] ring-4 ring-[#FFEDD5] shadow-lg',
+    acento: 'bg-[#EA580C]',
   },
   EMERGENCIA: {
-    etiquetaCorta: 'EMERGENCIA',
-    accionVisual: 'Llamar al 114 / 119',
-    pill: 'bg-[#FEE2E2] text-[#991B1B] border-[#FECACA]',
-    bordeActivo: 'border-[#DC2626] ring-4 ring-[#FEE2E2]',
+    cardSurface: 'bg-gradient-to-b from-[#FEE2E2]/85 to-white border-[#FECACA]',
+    bordeActivo: 'border-[#DC2626] ring-4 ring-[#FEE2E2] shadow-lg',
+    acento: 'bg-[#DC2626]',
   },
 };
 
 /**
  * Componente SeccionRecomendaciones (Capítulo 01 — Guía Preventiva)
- * Diseño visual simplificado con ilustraciones vectoriales amigables,
- * texto mínimo indispensable y tarjetas comparativas claras para todas las edades.
+ * Diseño visual minimalista basado en color semántico por nivel, ilustración amigable,
+ * título de cada tarjeta y contenido preventivo esencial.
  *
  * @param {Object} props
  * @param {string} [props.nivelVigente='NORMAL'] Nivel informativo vigente
@@ -93,22 +89,10 @@ export default function SeccionRecomendaciones({
   const nivelEfectivo = nivelVigente || 'NORMAL';
   const esDatosDesactualizados = estadoSistema === 'DATOS_DESACTUALIZADOS';
 
-  const renderBadgeOrigen = (origen) => {
-    if (origen === 'institucional_verificada') {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF2FF] text-[#3525CD]">
-          <span aria-hidden="true">🏛️</span>
-          <span>Origen: Institucional verificada</span>
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF3C7] text-[#92400E]">
-        <span aria-hidden="true">🧪</span>
-        <span>Origen: Demostración (contenido académico)</span>
-      </span>
-    );
-  };
+  const etiquetaOrigen = (origen) =>
+    origen === 'institucional_verificada'
+      ? 'Origen: Institucional verificada'
+      : 'Origen: Demostración (contenido académico)';
 
   const tarjetas = NIVELES_ORDEN.map((nivel) => {
     const encontrada = recomendacionesPublicadas.find((r) => r.nivel === nivel);
@@ -145,7 +129,7 @@ export default function SeccionRecomendaciones({
         )}
       </header>
 
-      {/* Grilla Visual de 4 Tarjetas con Ilustración + Texto Esencial */}
+      {/* Grilla Visual Limpia: Color del Nivel + Ilustración + Título + Contenido Esencial */}
       {tarjetas.length === 0 ? (
         <div className="clay-card p-6 text-center text-base text-[#464555]">
           No hay recomendaciones vigentes registradas en este momento.
@@ -159,63 +143,62 @@ export default function SeccionRecomendaciones({
             return (
               <article
                 key={nivel}
-                className={`clay-card clay-interactive p-5 sm:p-6 flex flex-col justify-between gap-4 border-2 transition-all ${
-                  esVigente
-                    ? `${est.bordeActivo} shadow-lg`
-                    : 'border-slate-200/70'
+                aria-label={`${rec.titulo}${esVigente ? ' (Vigente)' : ''}`}
+                className={`clay-card clay-interactive relative overflow-hidden p-5 sm:p-6 flex flex-col gap-4 border-2 transition-all ${est.cardSurface} ${
+                  esVigente ? est.bordeActivo : ''
                 }`}
               >
-                <div className="space-y-3.5">
-                  {/* Ilustración + Badge de Nivel */}
-                  <div className="flex items-start justify-between gap-3">
-                    <IlustracionPreventiva nivel={nivel} />
-                    <div className="flex flex-col items-end gap-1.5">
-                      <span
-                        className={`clay-pill px-3 py-0.5 text-xs font-extrabold border ${est.pill}`}
-                      >
-                        {est.etiquetaCorta}
-                      </span>
-                      {esVigente && (
-                        <span className="text-[11px] bg-[#111C2D] text-white px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wide">
-                          (Vigente)
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                <span
+                  className={`absolute top-0 inset-x-0 h-1.5 ${est.acento}`}
+                  aria-hidden="true"
+                />
 
-                  {/* Acción clave rápida + Título */}
-                  <div className="space-y-1">
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#3525CD] block">
-                      {est.accionVisual}
-                    </span>
-                    <h3 className="headline-sm text-lg font-extrabold text-[#111C2D] leading-snug">
-                      {rec.titulo}
-                    </h3>
-                  </div>
-
-                  {/* Contenido preventivo esencial */}
-                  <p className="text-base text-[#1E293B] leading-relaxed">
-                    {rec.contenido}
-                  </p>
+                <div className="flex items-start justify-between gap-3 pt-1">
+                  <IlustracionPreventiva nivel={nivel} />
+                  {esVigente && (
+                    <span
+                      className={`w-3.5 h-3.5 rounded-full ${est.acento} clay-beacon-pulse shrink-0 mt-1`}
+                      title="Nivel vigente actualmente"
+                      aria-hidden="true"
+                    />
+                  )}
                 </div>
 
-                {/* Pie discreto de trazabilidad */}
-                <div className="pt-3 border-t border-slate-100 space-y-1.5">
-                  <div>{renderBadgeOrigen(rec.origen)}</div>
-                  <p className="text-[11px] text-[#475569] font-mono truncate">
-                    Versión: v{rec.version || 1}
-                    {rec.fuente ? ` · ${rec.fuente}` : ''}
-                  </p>
-                </div>
+                <h3 className="headline-sm text-lg font-extrabold text-[#111C2D] leading-snug">
+                  {rec.titulo}
+                </h3>
+
+                <p className="text-base text-[#1E293B] leading-relaxed">
+                  {rec.contenido}
+                </p>
               </article>
             );
           })}
         </div>
       )}
 
-      {/* Recordatorio legal obligatorio compacto */}
-      <footer className="text-xs sm:text-sm text-[#475569] px-1 leading-relaxed">
-        ℹ️ Recomendaciones preventivas generales de carácter informativo. El sistema no emite instrucciones de desplazamiento ni sustituye a las autoridades competentes.
+      {/* Recordatorio legal obligatorio y ficha documental colapsada */}
+      <footer className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm text-[#475569] px-1 leading-relaxed">
+        <span>
+          ℹ️ Recomendaciones preventivas generales de carácter informativo. El sistema no emite instrucciones de desplazamiento ni sustituye a las autoridades competentes.
+        </span>
+
+        {tarjetas.length > 0 && (
+          <details className="shrink-0 group">
+            <summary className="cursor-pointer select-none font-semibold text-[#475569] hover:text-[#3525CD] inline-flex items-center gap-1">
+              <span>Ficha documental</span>
+              <span className="text-[10px] transition-transform group-open:rotate-180" aria-hidden="true">▼</span>
+            </summary>
+            <ul className="mt-2 clay-card-sm bg-white/95 p-3 space-y-1.5 text-xs text-[#475569] font-mono max-w-md">
+              {tarjetas.map(({ nivel, rec }) => (
+                <li key={nivel}>
+                  <strong>{rec.titulo}:</strong> {etiquetaOrigen(rec.origen)} · Versión: v{rec.version || 1}
+                  {rec.fuente ? ` · ${rec.fuente}` : ''}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </footer>
     </section>
   );

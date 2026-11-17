@@ -11,6 +11,7 @@ import { obtenerConfigZonaPiloto } from '../config/zonaPiloto.js';
 import {
   consultarYRegistrarLecturaReal,
   obtenerUltimaLecturaRegistrada,
+  limpiarCacheLecturas,
 } from './lecturas.service.js';
 import { obtenerConfiguracionVigente } from './configuracion.service.js';
 import {
@@ -94,11 +95,35 @@ export async function obtenerEstadoActualSistema(opciones = {}) {
     falloApiReciente = resultadoLectura.fallo_api;
     banderasCalidad = resultadoLectura.banderas_calidad;
 
-    // 3. Orquestar evaluación con motor de reglas
+    // 3. Orquestar evaluación con motor de reglas (auto-recuperación si el caché RAM quedó huérfano)
     if (lectura) {
-      resEvaluacion = await evaluarLecturaConConfiguracionVigente(lectura, {
-        db,
-      });
+      try {
+        resEvaluacion = await evaluarLecturaConConfiguracionVigente(lectura, {
+          db,
+        });
+      } catch (errEval) {
+        if (origenRespuesta === 'cache_servidor' && errEval?.code === '23503') {
+          limpiarCacheLecturas();
+          const recarga = await consultarYRegistrarLecturaReal({
+            db,
+            consultarMeteoFn,
+            ahoraFn,
+            forzarConsultaExterna: true,
+          });
+          lectura = recarga.lectura;
+          origenRespuesta = recarga.origen_respuesta;
+          falloApiReciente = recarga.fallo_api;
+          banderasCalidad = recarga.banderas_calidad;
+          if (lectura) {
+            resEvaluacion = await evaluarLecturaConConfiguracionVigente(
+              lectura,
+              { db }
+            );
+          }
+        } else {
+          throw errEval;
+        }
+      }
     }
   } else {
     // Modalidad simulada

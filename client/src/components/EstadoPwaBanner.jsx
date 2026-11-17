@@ -53,44 +53,44 @@ export default function EstadoPwaBanner({
       data-testid="banner-instalacion-pwa"
       role="region"
       aria-label="Instalación de aplicación PWA"
-      className="clay-card bg-[#EEF2FF]/95 border-[#3525CD]/20 p-4 sm:p-5 text-[#111C2D] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 animate-fade-up"
+      className="fixed bottom-20 md:bottom-6 right-4 left-4 sm:left-auto z-40 sm:max-w-sm clay-card bg-white/95 backdrop-blur-md border-2 border-[#3525CD]/25 p-4 text-[#111C2D] space-y-3 shadow-2xl animate-fade-up"
     >
-      <div className="flex items-start sm:items-center gap-3 min-w-0">
-        <span
-          className="w-10 h-10 rounded-full bg-white text-[#3525CD] flex items-center justify-center text-lg shrink-0 clay-pill"
-          aria-hidden="true"
-        >
-          📲
-        </span>
-        <div className="min-w-0">
-          <p className="headline-sm text-base sm:text-lg font-bold text-[#111C2D]">
-            Instalar PUKARA en este dispositivo
-          </p>
-          <p className="text-sm sm:text-base text-[#464555] leading-snug">
-            Permite la consulta rápida y la disponibilidad de datos recientes sin conexión.
-          </p>
+      <div className="flex items-start justify-between gap-2.5">
+        <div className="flex items-start gap-3 min-w-0">
+          <span
+            className="w-10 h-10 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0 clay-pill"
+            aria-hidden="true"
+          >
+            📲
+          </span>
+          <div className="min-w-0">
+            <p className="headline-sm text-base font-bold text-[#111C2D] leading-snug">
+              Instalar PUKARA en este dispositivo
+            </p>
+            <p className="text-sm text-[#464555] leading-snug mt-0.5">
+              Acceso rápido y consulta sin conexión.
+            </p>
+          </div>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
-        <button
-          type="button"
-          data-testid="btn-instalar-pwa"
-          onClick={handleInstalar}
-          className="clay-btn-primary clay-interactive min-h-[48px] flex-1 sm:flex-initial px-5 py-2.5 text-sm sm:text-base font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
-        >
-          <span>Instalar aplicación PWA para consulta sin conexión</span>
-        </button>
 
         <button
           type="button"
           onClick={() => setDescartado(true)}
           aria-label="Cerrar sugerencia de instalación"
-          className="min-h-[48px] min-w-[48px] rounded-full bg-white/80 hover:bg-white text-[#475569] hover:text-[#111C2D] border border-slate-200/80 transition-colors inline-flex items-center justify-center text-base font-bold shrink-0 cursor-pointer"
+          className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[#475569] hover:text-[#111C2D] transition-colors inline-flex items-center justify-center text-sm font-bold shrink-0 cursor-pointer"
         >
           ✕
         </button>
       </div>
+
+      <button
+        type="button"
+        data-testid="btn-instalar-pwa"
+        onClick={handleInstalar}
+        className="clay-btn-primary clay-interactive min-h-[48px] w-full px-4 py-2 text-sm font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
+      >
+        <span>Instalar aplicación PWA para consulta sin conexión</span>
+      </button>
     </div>
   );
 }

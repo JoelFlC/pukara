@@ -23,11 +23,13 @@ import {
   obtenerUltimoEstadoLocal,
 } from '../utils/offlineStorage';
 
-const TINTE_NAVBAR_POR_NIVEL = {
-  NORMAL: 'bg-[#ECFDF5]/80 border-[#A7F3D0]/70',
-  PRECAUCION: 'bg-[#FEF3C7]/80 border-[#FDE68A]/80',
-  ALERTA: 'bg-[#FFEDD5]/80 border-[#FED7AA]/80',
-  EMERGENCIA: 'bg-[#FEE2E2]/80 border-[#FECACA]/80',
+const TINTE_NAVBAR_TOPE = {
+  NORMAL: 'bg-[#D1FAE5] border-transparent',
+  PRECAUCION: 'bg-[#FEF3C7] border-transparent',
+  ALERTA: 'bg-[#FFEDD5] border-transparent',
+  EMERGENCIA: 'bg-[#FEE2E2] border-transparent',
+  SIN_DATOS: 'bg-slate-200/80 border-transparent',
+  DATOS_DESACTUALIZADOS: 'bg-[#FEF3C7] border-transparent',
 };
 
 /**
@@ -51,6 +53,7 @@ export default function InicioPage() {
   const [infoRespaldoOffline, setInfoRespaldoOffline] = useState(null);
 
   const [cambioNivelDetectado, setCambioNivelDetectado] = useState(null);
+  const [enTope, setEnTope] = useState(true);
   const ultimoNivelRef = useRef({ real: null, simulada: null });
   const inicializadoRef = useRef({ real: false, simulada: false });
 
@@ -64,7 +67,9 @@ export default function InicioPage() {
           obtenerEstadoSistema(modActual, { signal }),
           obtenerHistorialEvaluaciones(modActual, 10, { signal }).catch(
             (err) => {
-              console.warn('Historial no disponible:', err.message);
+              if (err?.name === 'AbortError' || signal?.aborted) {
+                throw err;
+              }
               return { items: [], total: 0 };
             }
           ),
@@ -127,11 +132,25 @@ export default function InicioPage() {
           }
         }
       } finally {
-        setCargando(false);
+        if (!signal?.aborted) {
+          setCargando(false);
+        }
       }
     },
     [modalidad]
   );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleScroll = () => {
+      setEnTope(window.scrollY < 24);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -216,22 +235,30 @@ export default function InicioPage() {
   };
 
   const estaOffline = usandoRespaldoOffline || sinConexionRed;
-  const tinteNavbar =
-    TINTE_NAVBAR_POR_NIVEL[estado?.nivel_vigente] ||
-    'bg-[#F7F9FF]/90 border-indigo-100/80';
+  const claveNavbar =
+    estado?.estado_sistema === 'SIN_DATOS'
+      ? 'SIN_DATOS'
+      : estado?.estado_sistema === 'DATOS_DESACTUALIZADOS' ||
+          estado?.datos_desactualizados
+        ? 'DATOS_DESACTUALIZADOS'
+        : estado?.nivel_vigente;
+
+  const claseNavbar = enTope
+    ? TINTE_NAVBAR_TOPE[claveNavbar] || 'bg-[#F7F9FF] border-transparent'
+    : 'bg-[#F7F9FF]/95 backdrop-blur-md border-slate-200/80 shadow-sm';
 
   return (
     <div
       id="monitoreo"
-      className="min-h-screen bg-gradient-to-b from-[#F7F9FF] via-[#F2F6FC] to-[#F5FAF8] text-[#111C2D] flex flex-col font-sans overflow-x-hidden max-w-full"
+      className="min-h-screen bg-gradient-to-b from-[#F7F9FF] via-[#F2F6FC] to-[#F5FAF8] text-[#111C2D] flex flex-col font-sans overflow-x-clip max-w-full"
     >
       {/* 1. Cinta Superior Institucional Oscura */}
       <div className="bg-[#111C2D] text-white text-[11px] font-bold tracking-wider uppercase py-1.5 px-4 text-center">
         • MONITOREO PREVENTIVO ACTIVO · SECTOR LLOJETA — COTAHUMA •
       </div>
 
-      {/* 2. Header Unificado e Integrado Cromáticamente con el Hero Banner */}
-      <header className={`sticky top-0 z-30 backdrop-blur-md border-b shadow-2xs transition-colors ${tinteNavbar}`}>
+      {/* 2. Header Siempre Visible con Transición Cromática al Scrollear */}
+      <header className={`sticky top-0 z-40 border-b transition-all duration-300 ${claseNavbar}`}>
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Izquierda: Logo e Identidad */}
           <div className="flex items-center gap-3 min-w-0">
@@ -354,18 +381,100 @@ export default function InicioPage() {
         </div>
       </header>
 
-      {/* 3. Contenedor Principal Amplio sobre Degradado Pastel Suave */}
+      {/* 3. Modales y Avisos Flotantes (no interfieren con el Hero Banner) */}
+      <EstadoPwaBanner />
+
+      <BannerModoOffline
+        activo={estaOffline}
+        fechaDatoIso={infoRespaldoOffline?.fechaDatoIso}
+        avisoOffline={infoRespaldoOffline?.avisoOffline}
+        guardadoEnIso={infoRespaldoOffline?.guardadoEnIso}
+        onReintentar={() => cargarDatos()}
+      />
+
+      <AvisoCambioNivelInApp
+        cambioNivel={cambioNivelDetectado}
+        onCerrar={() => setCambioNivelDetectado(null)}
+      />
+
+      {mensajeExito && (
+        <div
+          role="status"
+          className="fixed bottom-20 md:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-sm z-40 clay-card-sm border border-[#A7F3D0] bg-[#ECFDF5]/95 backdrop-blur-md p-4 text-sm sm:text-base text-[#065F46] font-semibold flex items-center justify-between gap-3 shadow-lg animate-fade-up"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span aria-hidden="true">✅</span>
+            <span>{mensajeExito}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMensajeExito(null)}
+            aria-label="Cerrar notificación"
+            className="text-[#065F46] font-bold px-1.5 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {errorConexion && (
+        <div className="fixed inset-0 z-50 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center p-4">
+          <div
+            role="alert"
+            aria-modal="true"
+            className="w-full max-w-md clay-card border-2 border-[#FECACA] bg-[#FEF2F2] p-5 sm:p-6 text-base text-[#991B1B] space-y-4 shadow-2xl animate-fade-up"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="font-extrabold flex items-center gap-2">
+                <span aria-hidden="true">⚠️</span> Problema temporal de conexión
+              </p>
+              <button
+                type="button"
+                onClick={() => setErrorConexion(null)}
+                aria-label="Cerrar aviso de error"
+                className="w-8 h-8 rounded-full bg-white text-[#991B1B] border border-[#FECACA] flex items-center justify-center text-sm font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-sm sm:text-base leading-relaxed">{errorConexion}</p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setErrorConexion(null)}
+                className="min-h-[44px] px-4 py-2 rounded-full text-sm font-bold bg-white text-[#991B1B] border border-[#FECACA] cursor-pointer"
+              >
+                Cerrar
+              </button>
+              <button
+                type="button"
+                onClick={() => cargarDatos()}
+                className="clay-btn-danger clay-interactive min-h-[44px] px-5 py-2 text-sm font-bold cursor-pointer"
+              >
+                Reintentar consulta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. HERO FULL-BLEED DE BORDE A BORDE */}
+      <BannerNivelInformativo
+        estado={estado}
+        alActualizar={() => cargarDatos()}
+        cargando={cargando || cargandoAccion}
+        alInyectarPreset={(nivel, int, a24, a72) =>
+          handleInyectarEscenario({
+            intensidad_mm_h: int,
+            acum_24h_mm: a24,
+            acum_72h_mm: a72,
+            observado_en: new Date().toISOString(),
+          })
+        }
+      />
+
+      {/* 5. Contenedor Principal Amplio sobre Degradado Pastel Suave */}
       <main className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-8 sm:space-y-12 pb-24 md:pb-12 flex-1">
-        <EstadoPwaBanner />
-
-        <BannerModoOffline
-          activo={estaOffline}
-          fechaDatoIso={infoRespaldoOffline?.fechaDatoIso}
-          avisoOffline={infoRespaldoOffline?.avisoOffline}
-          guardadoEnIso={infoRespaldoOffline?.guardadoEnIso}
-          onReintentar={() => cargarDatos()}
-        />
-
         <BannerModoSimulacion
           modalidad={modalidad}
           esSimulacion={modalidad === 'simulada'}
@@ -376,57 +485,6 @@ export default function InicioPage() {
           cargando={cargando || cargandoAccion}
           ocultarSelector={true}
         />
-
-        <AvisoCambioNivelInApp
-          cambioNivel={cambioNivelDetectado}
-          onCerrar={() => setCambioNivelDetectado(null)}
-        />
-
-        {mensajeExito && (
-          <div
-            role="status"
-            className="clay-card-sm border border-[#A7F3D0] bg-[#ECFDF5] p-4 text-base text-[#065F46] font-semibold flex items-center gap-2.5 animate-fade-up"
-          >
-            <span aria-hidden="true">✅</span>
-            <span>{mensajeExito}</span>
-          </div>
-        )}
-
-        {errorConexion && (
-          <div
-            role="alert"
-            className="clay-card-sm border border-[#FECACA] bg-[#FEE2E2] p-4 sm:p-5 text-base text-[#991B1B] space-y-3"
-          >
-            <p className="font-bold flex items-center gap-2">
-              <span aria-hidden="true">⚠️</span> Incidencia de comunicación con la API
-            </p>
-            <p className="leading-relaxed">{errorConexion}</p>
-            <button
-              type="button"
-              onClick={() => cargarDatos()}
-              className="clay-btn-danger clay-interactive min-h-[48px] px-5 py-2 text-sm font-bold cursor-pointer"
-            >
-              Reintentar consulta
-            </button>
-          </div>
-        )}
-
-        {/* HERO PRINCIPAL DESTACADO CON BOTÓN DISCRETO DE ACTUALIZACIÓN */}
-        <section aria-label="Nivel informativo vigente y escala">
-          <BannerNivelInformativo
-            estado={estado}
-            alActualizar={() => cargarDatos()}
-            cargando={cargando || cargandoAccion}
-            alInyectarPreset={(nivel, int, a24, a72) =>
-              handleInyectarEscenario({
-                intensidad_mm_h: int,
-                acum_24h_mm: a24,
-                acum_72h_mm: a72,
-                observado_en: new Date().toISOString(),
-              })
-            }
-          />
-        </section>
 
         {/* FILA DE 3 TARJETAS CLAVE DE LLUVIA */}
         <section id="telemetria" aria-label="Telemetría meteorológica">
