@@ -47,6 +47,9 @@
   --level-emergencia-border: #FECACA;
   --level-emergencia-ink: #991B1B;
   --level-emergencia-accent: #DC2626;
+
+  /* Curvas de animación Emil Kowalski */
+  --ease-out-expo: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html,
@@ -272,6 +275,315 @@ body {
   display: none;
 }
 
+/* Transiciones y feedback táctil para PanelAvisosPreventivos */
+.aviso-pressable {
+  transition:
+    transform 160ms var(--ease-out-expo),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.aviso-pressable:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .aviso-pressable:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.aviso-switch-thumb {
+  transition: transform 180ms var(--ease-out-expo);
+}
+
+.aviso-accordion-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 200ms var(--ease-out-expo),
+    opacity 180ms ease;
+}
+
+.aviso-accordion-grid[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.aviso-accordion-inner {
+  overflow: hidden;
+}
+
+@keyframes avisoWavePulse {
+  0%, 100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.aviso-wave-bar {
+  transform-origin: bottom;
+  animation: avisoWavePulse 680ms var(--ease-out-expo) infinite;
+}
+
+/* Pulso visual blanco <-> rojo para nivel EMERGENCIA (WCAG < 3 Hz, solo opacity GPU) */
+@keyframes emergenciaFondoPulso {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.emergencia-fondo-pulso {
+  background: linear-gradient(
+    180deg,
+    rgba(239, 68, 68, 0.36) 0%,
+    rgba(254, 202, 202, 0.58) 50%,
+    rgba(220, 38, 38, 0.34) 100%
+  );
+  animation: emergenciaFondoPulso 1.5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.emergencia-borde-pulso {
+  box-shadow: inset 0 0 80px 18px rgba(220, 38, 38, 0.42);
+  animation: emergenciaFondoPulso 1.5s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.emergencia-pulso-rapido {
+  animation-duration: 0.95s;
+}
+
+/* Animaciones orgánicas estilo Duolingo (Emil Kowalski) para Mascota Zorrito */
+@keyframes zorritoEntrada {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes zorritoSaludoDuolingo {
+  0% {
+    opacity: 0;
+    transform: translateY(115%) scale(0.84) rotate(0deg);
+  }
+  24% {
+    opacity: 1;
+    transform: translateY(-16px) scale(1.06, 0.95) rotate(-5deg);
+  }
+  42% {
+    transform: translateY(2px) scale(0.96, 1.05) rotate(6deg);
+  }
+  60% {
+    transform: translateY(-8px) scale(1.04, 0.97) rotate(-4deg);
+  }
+  78% {
+    transform: translateY(0) scale(0.98, 1.02) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes zorritoRegresoEsquina {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(34vw, 24px, 0) scale(0.52);
+  }
+}
+
+@keyframes zorritoAterrizaje {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9) translateY(-8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05, 0.95) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes zorritoSalirCuadro {
+  0% {
+    opacity: 0.7;
+    transform: translateY(16px) scale(0.84);
+  }
+  58% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.07, 0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zorritoPresentando {
+  0%, 100% {
+    transform: translateY(0) rotate(-1.5deg) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg) scale(1.03);
+  }
+}
+
+@keyframes zorritoAlertaLoco {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  15% {
+    transform: translate3d(-4px, -5px, 0) rotate(-6deg) scale(1.04, 0.95);
+  }
+  30% {
+    transform: translate3d(4px, 0, 0) rotate(7deg) scale(0.96, 1.05);
+  }
+  45% {
+    transform: translate3d(-4px, -6px, 0) rotate(-7deg) scale(1.05, 0.94);
+  }
+  60% {
+    transform: translate3d(4px, -2px, 0) rotate(6deg) scale(0.97, 1.04);
+  }
+  78% {
+    transform: translate3d(-2px, -3px, 0) rotate(-3deg) scale(1.02, 0.98);
+  }
+}
+
+@keyframes zorritoIdleDuolingo {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  45% {
+    transform: translateY(-3px) rotate(-1deg) scale(1.015);
+  }
+  68% {
+    transform: translateY(-7px) rotate(2.5deg) scale(0.98, 1.03);
+  }
+  82% {
+    transform: translateY(0) rotate(0deg) scale(1.02, 0.98);
+  }
+}
+
+@keyframes zorritoSpriteSwap {
+  from {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.zorrito-entrada {
+  animation: zorritoEntrada 260ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+.zorrito-saludo-duolingo {
+  animation:
+    zorritoSaludoDuolingo 1.15s cubic-bezier(0.22, 1.2, 0.36, 1) both,
+    zorritoIdleDuolingo 3.2s ease-in-out 1.15s infinite;
+  will-change: transform, opacity;
+}
+
+.zorrito-regreso-esquina {
+  animation: zorritoRegresoEsquina 680ms var(--ease-out-expo) forwards;
+  will-change: transform, opacity;
+}
+
+.zorrito-aterrizaje {
+  animation: zorritoAterrizaje 280ms cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+
+.zorrito-salir-cuadro {
+  animation: zorritoSalirCuadro 280ms cubic-bezier(0.22, 1.25, 0.36, 1) both;
+}
+
+.zorrito-presentando {
+  animation: zorritoPresentando 920ms var(--ease-out-expo) infinite;
+  will-change: transform;
+}
+
+.zorrito-alerta-loco {
+  animation: zorritoAlertaLoco 680ms ease-in-out infinite;
+  will-change: transform;
+}
+
+.zorrito-emergencia-loco {
+  animation-duration: 500ms;
+}
+
+.zorrito-idle-duolingo {
+  animation: zorritoIdleDuolingo 5.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+.zorrito-sprite-swap {
+  animation: zorritoSpriteSwap 200ms var(--ease-out-expo) both;
+}
+
+.zorrito-transparente-sombra {
+  filter:
+    drop-shadow(0 18px 24px rgba(17, 28, 45, 0.18))
+    drop-shadow(0 4px 8px rgba(17, 28, 45, 0.12));
+}
+
+.zorrito-sombra-suelo {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(17, 28, 45, 0.22) 0%,
+    rgba(17, 28, 45, 0) 72%
+  );
+}
+
+.zorrito-aura-alerta {
+  background: radial-gradient(
+    circle at center,
+    rgba(249, 115, 22, 0.32) 0%,
+    rgba(249, 115, 22, 0) 70%
+  );
+}
+
+.zorrito-aura-emergencia {
+  background: radial-gradient(
+    circle at center,
+    rgba(239, 68, 68, 0.38) 0%,
+    rgba(239, 68, 68, 0) 70%
+  );
+}
+
+.zorrito-squish {
+  transition: transform 150ms var(--ease-out-expo), box-shadow 150ms ease;
+}
+
+.zorrito-squish:active:not(:disabled) {
+  transform: scale(0.91, 0.87);
+}
+
+.zorrito-burbuja {
+  transform-origin: bottom right;
+  animation: zorritoEntrada 200ms var(--ease-out-expo) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html,
   body {
@@ -280,16 +592,42 @@ body {
 
   .animate-fade-up,
   .clay-beacon-pulse,
+  .aviso-wave-bar,
+  .emergencia-fondo-pulso,
+  .emergencia-borde-pulso,
+  .zorrito-entrada,
+  .zorrito-saludo-duolingo,
+  .zorrito-regreso-esquina,
+  .zorrito-aterrizaje,
+  .zorrito-salir-cuadro,
+  .zorrito-presentando,
+  .zorrito-alerta-loco,
+  .zorrito-emergencia-loco,
+  .zorrito-idle-duolingo,
+  .zorrito-sprite-swap,
+  .zorrito-burbuja,
   .animate-pulse,
   .animate-spin {
     animation: none !important;
+  }
+
+  .emergencia-fondo-pulso {
+    opacity: 0.55;
+  }
+
+  .emergencia-borde-pulso {
+    opacity: 0.65;
   }
 
   .clay-interactive,
   .clay-btn-primary,
   .clay-btn-secondary,
   .clay-btn-danger,
-  .clay-input {
+  .clay-input,
+  .aviso-pressable,
+  .aviso-switch-thumb,
+  .aviso-accordion-grid,
+  .zorrito-squish {
     transition: none !important;
     transform: none !important;
   }

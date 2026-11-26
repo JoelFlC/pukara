@@ -3,6 +3,8 @@ import {
   formatearFechaHoraLaPaz,
   formatearAntiguedad,
 } from '../utils/formatoTiempo';
+import BotonLeerVoz from './BotonLeerVoz';
+import { construirTextoLecturaEstado } from '../data/asistenteZorritoData';
 
 /**
  * Paleta Pastel Clay destacada para el Hero Banner según el nivel informativo vigente.
@@ -43,7 +45,7 @@ const ESTILOS_NIVEL = {
   },
   EMERGENCIA: {
     heroSurface:
-      'w-full bg-gradient-to-b from-[#FEE2E2] via-[#FEF2F2]/95 to-[#F7F9FF] border-b border-[#FECACA]/80',
+      'w-full bg-gradient-to-b from-[#FEE2E2]/70 via-[#FEF2F2]/45 to-transparent border-b border-[#FECACA]/80',
     pill: 'bg-white/95 text-[#991B1B] border border-[#F87171]',
     dot: 'bg-[#DC2626]',
     icono: '🔴',
@@ -127,6 +129,7 @@ export default function BannerNivelInformativo({
 
   const acum72h = Number(lectura?.acum_72h_mm || 0);
   const porcentajeSaturacion = Math.min(100, Math.round((acum72h / 60) * 100));
+  const textoLecturaEstado = construirTextoLecturaEstado(estado);
 
   const botonActualizarDiscreto = alActualizar ? (
     <button
@@ -244,6 +247,15 @@ export default function BannerNivelInformativo({
                 <span className="font-mono">Modalidad: {modalidad}</span>
                 <span className="font-mono">Versión de configuración: v{version_reglas?.version ?? 1}</span>
               </div>
+
+              <div className="pt-1">
+                <BotonLeerVoz
+                  idLectura="estado-nivel-vigente"
+                  texto={textoLecturaEstado}
+                  etiqueta="Escuchar estado"
+                  etiquetaDetener="Detener lectura"
+                />
+              </div>
             </div>
 
             <div className="lg:col-span-5 bg-white/95 rounded-3xl p-6 border border-[#FDE68A] space-y-3 shadow-sm">
@@ -348,6 +360,12 @@ export default function BannerNivelInformativo({
             <span className="clay-pill px-3 py-1 text-xs sm:text-sm font-bold bg-white/85 text-[#1E293B] border border-black/5">
               Antigüedad: {formatearAntiguedad(antiguedad_minutos)}
             </span>
+            <BotonLeerVoz
+              idLectura="estado-nivel-vigente"
+              texto={textoLecturaEstado}
+              etiqueta="Escuchar estado"
+              etiquetaDetener="Detener lectura"
+            />
           </div>
 
           {/* Detalles Técnicos Secundarios y Simulador Rápido agrupados limpiamente */}

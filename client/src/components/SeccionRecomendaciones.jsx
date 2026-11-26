@@ -1,4 +1,6 @@
 import React from 'react';
+import BotonLeerVoz from './BotonLeerVoz';
+import { construirTextoLecturaRecomendaciones } from '../data/asistenteZorritoData';
 
 const NIVELES_ORDEN = ['NORMAL', 'PRECAUCION', 'ALERTA', 'EMERGENCIA'];
 
@@ -114,13 +116,27 @@ export default function SeccionRecomendaciones({
           01 CAPÍTULO UNO — GUÍA PREVENTIVA
         </span>
 
-        <h2 className="headline-lg text-2xl sm:text-4xl font-extrabold text-[#111C2D] leading-tight break-words">
-          ¿Qué hacer según el nivel de lluvia?
-        </h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1.5">
+            <h2 className="headline-lg text-2xl sm:text-4xl font-extrabold text-[#111C2D] leading-tight break-words">
+              ¿Qué hacer según el nivel de lluvia?
+            </h2>
 
-        <p className="text-base text-[#464555] leading-relaxed">
-          Recomendaciones Preventivas para {nivelEfectivo}.
-        </p>
+            <p className="text-base text-[#464555] leading-relaxed">
+              Recomendaciones Preventivas para {nivelEfectivo}.
+            </p>
+          </div>
+
+          {tarjetas.length > 0 && (
+            <BotonLeerVoz
+              idLectura="recomendaciones-vigentes"
+              texto={construirTextoLecturaRecomendaciones(nivelEfectivo, tarjetas)}
+              etiqueta="Escuchar guía"
+              etiquetaDetener="Detener lectura"
+              className="self-start sm:self-center shrink-0"
+            />
+          )}
+        </div>
 
         {esDatosDesactualizados && (
           <p className="text-sm sm:text-base text-[#92400E] bg-[#FEF3C7] px-4 py-2.5 rounded-2xl border border-[#FDE68A]">

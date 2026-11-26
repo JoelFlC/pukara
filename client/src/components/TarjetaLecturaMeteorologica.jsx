@@ -3,6 +3,13 @@ import {
   formatearFechaHoraLaPaz,
   formatearAntiguedad,
 } from '../utils/formatoTiempo';
+import BotonLeerVoz from './BotonLeerVoz';
+import {
+  construirTextoLecturaLluvia1h,
+  construirTextoLecturaAcum24h,
+  construirTextoLecturaSaturacion72h,
+  construirTextoLecturaAmbiente,
+} from '../data/asistenteZorritoData';
 
 /**
  * Componente TarjetaLecturaMeteorologica
@@ -66,12 +73,20 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
               LLUVIA ACTUAL · 1 HORA
             </span>
-            <span
-              className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
-              aria-hidden="true"
-            >
-              ⚡
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <BotonLeerVoz
+                compacto={true}
+                idLectura="telemetria-lluvia-1h"
+                texto={construirTextoLecturaLluvia1h(lectura)}
+                ariaLabel="Escuchar lluvia actual de 1 hora"
+              />
+              <span
+                className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
+                aria-hidden="true"
+              >
+                ⚡
+              </span>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -104,12 +119,20 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
               LLUVIA ACUMULADA · 24 HORAS
             </span>
-            <span
-              className="w-9 h-9 rounded-full bg-[#ECFDF5] text-[#059669] flex items-center justify-center text-lg shrink-0"
-              aria-hidden="true"
-            >
-              ⏱️
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <BotonLeerVoz
+                compacto={true}
+                idLectura="telemetria-acum-24h"
+                texto={construirTextoLecturaAcum24h(lectura)}
+                ariaLabel="Escuchar lluvia acumulada de 24 horas"
+              />
+              <span
+                className="w-9 h-9 rounded-full bg-[#ECFDF5] text-[#059669] flex items-center justify-center text-lg shrink-0"
+                aria-hidden="true"
+              >
+                ⏱️
+              </span>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -141,12 +164,20 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
             <span className="text-xs sm:text-sm font-extrabold text-[#475569] uppercase tracking-wider">
               SATURACIÓN DE CUENCA · 72 HORAS
             </span>
-            <span
-              className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
-              aria-hidden="true"
-            >
-              🌊
-            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <BotonLeerVoz
+                compacto={true}
+                idLectura="telemetria-saturacion-72h"
+                texto={construirTextoLecturaSaturacion72h(lectura)}
+                ariaLabel="Escuchar saturación de cuenca de 72 horas"
+              />
+              <span
+                className="w-9 h-9 rounded-full bg-[#EEF2FF] text-[#3525CD] flex items-center justify-center text-lg shrink-0"
+                aria-hidden="true"
+              >
+                🌊
+              </span>
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -175,7 +206,7 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
 
       {/* 2. Barra Compacta de Variables Secundarias y Procedencia */}
       <div className="clay-card-sm bg-white/85 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-sm text-[#464555]">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 font-medium text-[#111C2D]">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 font-medium text-[#111C2D]">
           <span>
             🌡️ Temp: <strong>{lectura.temperatura !== null ? lectura.temperatura : 'N/D'} °C</strong>
           </span>
@@ -185,6 +216,12 @@ export default function TarjetaLecturaMeteorologica({ meteorologia }) {
           <span>
             💨 Viento: <strong>{lectura.viento !== null ? lectura.viento : 'N/D'} km/h</strong>
           </span>
+          <BotonLeerVoz
+            compacto={true}
+            idLectura="telemetria-ambiente"
+            texto={construirTextoLecturaAmbiente(lectura)}
+            ariaLabel="Escuchar temperatura, humedad y viento"
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#475569]">

@@ -18,6 +18,9 @@ import ResumenZonaPiloto from '../components/ResumenZonaPiloto';
 import MapaReferencial from '../components/MapaReferencial';
 import EstadoPwaBanner from '../components/EstadoPwaBanner';
 import BannerModoOffline from '../components/BannerModoOffline';
+import PulsoFondoEmergencia from '../components/PulsoFondoEmergencia';
+import MascotaZorrito from '../components/MascotaZorrito';
+import useAvisosNivel from '../hooks/useAvisosNivel';
 import {
   guardarUltimoEstadoLocal,
   obtenerUltimoEstadoLocal,
@@ -92,6 +95,16 @@ export default function InicioPage() {
   const [guiaPwaAbierta, setGuiaPwaAbierta] = useState(false);
   const ultimoNivelRef = useRef({ real: null, simulada: null });
   const inicializadoRef = useRef({ real: false, simulada: false });
+
+  const avisosNivel = useAvisosNivel({
+    nivelActual: estado?.nivel_vigente || null,
+    modalidad: estado?.modalidad || modalidad,
+    estadoCargado: Boolean(estado),
+    fechaHora:
+      estado?.lectura?.observado_en ||
+      estado?.meteorologia?.observado_en ||
+      null,
+  });
 
   const cargarDatos = useCallback(
     async (signal, modActual = modalidad) => {
@@ -281,6 +294,7 @@ export default function InicioPage() {
     try {
       setCargandoAccion(true);
       setErrorConexion(null);
+      avisosNivel.marcarModalidadInicializada('simulada');
       await enviarLecturaSimulada(payload);
       setMensajeExito('Escenario simulado inyectado y evaluado con éxito.');
       await cargarDatos(undefined, 'simulada');
@@ -321,13 +335,26 @@ export default function InicioPage() {
     progresoScroll
   );
 
+  const emergenciaActiva = estado?.nivel_vigente === 'EMERGENCIA';
+  const sonandoEmergencia = avisosNivel.reproduciendoNivel === 'EMERGENCIA';
+  const pulsoEmergenciaActivo = emergenciaActiva || sonandoEmergencia;
+
   return (
     <div
       id="monitoreo"
-      className="min-h-screen bg-gradient-to-b from-[#F7F9FF] via-[#F2F6FC] to-[#F5FAF8] text-[#111C2D] flex flex-col font-sans overflow-x-clip max-w-full"
+      className={`relative min-h-screen text-[#111C2D] flex flex-col font-sans overflow-x-clip max-w-full ${
+        pulsoEmergenciaActivo
+          ? 'bg-white'
+          : 'bg-gradient-to-b from-[#F7F9FF] via-[#F2F6FC] to-[#F5FAF8]'
+      }`}
     >
+      <PulsoFondoEmergencia
+        activo={pulsoEmergenciaActivo}
+        intenso={sonandoEmergencia}
+      />
+
       {/* 1. Cinta Superior Institucional Oscura */}
-      <div className="bg-[#111C2D] text-white text-[11px] font-bold tracking-wider uppercase py-1.5 px-4 text-center">
+      <div className="relative z-10 bg-[#111C2D] text-white text-[11px] font-bold tracking-wider uppercase py-1.5 px-4 text-center">
         • MONITOREO PREVENTIVO ACTIVO · SECTOR LLOJETA — COTAHUMA •
       </div>
 
@@ -547,22 +574,24 @@ export default function InicioPage() {
       )}
 
       {/* 4. HERO FULL-BLEED DE BORDE A BORDE */}
-      <BannerNivelInformativo
-        estado={estado}
-        alActualizar={() => cargarDatos()}
-        cargando={cargando || cargandoAccion}
-        alInyectarPreset={(nivel, int, a24, a72) =>
-          handleInyectarEscenario({
-            intensidad_mm_h: int,
-            acum_24h_mm: a24,
-            acum_72h_mm: a72,
-            observado_en: new Date().toISOString(),
-          })
-        }
-      />
+      <div className="relative z-10">
+        <BannerNivelInformativo
+          estado={estado}
+          alActualizar={() => cargarDatos()}
+          cargando={cargando || cargandoAccion}
+          alInyectarPreset={(nivel, int, a24, a72) =>
+            handleInyectarEscenario({
+              intensidad_mm_h: int,
+              acum_24h_mm: a24,
+              acum_72h_mm: a72,
+              observado_en: new Date().toISOString(),
+            })
+          }
+        />
+      </div>
 
       {/* 5. Contenedor Principal Amplio sobre Degradado Pastel Suave */}
-      <main className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-8 sm:space-y-12 pb-24 md:pb-12 flex-1">
+      <main className="relative z-10 max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-8 sm:space-y-12 pb-24 md:pb-12 flex-1">
         <BannerModoSimulacion
           modalidad={modalidad}
           esSimulacion={modalidad === 'simulada'}
@@ -650,7 +679,7 @@ export default function InicioPage() {
       </main>
 
       {/* 4. Pie de Página Institucional de 4 Columnas */}
-      <footer className="bg-white/90 border-t border-slate-200/80 py-10 pb-28 md:pb-12">
+      <footer className="relative z-10 bg-white/90 border-t border-slate-200/80 py-10 pb-28 md:pb-12">
         <div className="max-w-[1520px] w-[95%] mx-auto px-4 sm:px-6 lg:px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-[#464555]">
           <div className="space-y-2.5">
             <div className="flex items-center gap-3">
@@ -757,6 +786,18 @@ export default function InicioPage() {
           </Link>
         </div>
       </nav>
+
+      {/* 6. Asistente Preventivo Flotante "Zorrito" (100% offline-first) */}
+      <MascotaZorrito
+        nivelVigente={estado?.nivel_vigente || 'NORMAL'}
+        estadoSistema={estado?.estado_sistema || 'NORMAL'}
+        estaOffline={estaOffline}
+        esSimulacion={modalidad === 'simulada'}
+        recomendacionVigente={
+          estado?.recomendacion || estado?.recomendacion_vigente || null
+        }
+        avisosControlador={avisosNivel}
+      />
     </div>
   );
 }

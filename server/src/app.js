@@ -7,6 +7,7 @@ import { historialRouter } from './routes/historial.routes.js';
 import { simulacionRouter } from './routes/simulacion.routes.js';
 import { authRouter } from './routes/auth.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
+import { asistenteRouter } from './routes/asistente.js';
 
 dotenv.config();
 
@@ -86,6 +87,7 @@ app.use('/api/historial', historialRouter);
 app.use('/api/simulacion', simulacionRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/asistente', asistenteRouter);
 
 // Manejador para rutas no encontradas
 app.use((req, res) => {

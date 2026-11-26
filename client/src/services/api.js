@@ -143,10 +143,49 @@ export async function limpiarSimulacion({ signal } = {}) {
   return await res.json();
 }
 
+/**
+ * Envía una consulta ciudadana al Asistente Preventivo Híbrido "Zorrito" (POST /api/asistente).
+ *
+ * @param {string} mensaje Consulta del usuario
+ * @param {Object|null} [contextoSimulacion=null] Contexto opcional si está en modo simulación
+ * @param {Object} [opciones]
+ * @param {AbortSignal} [opciones.signal]
+ * @returns {Promise<{ respuesta: string, origen: string, bloqueada: boolean }>}
+ */
+export async function consultarAsistenteApi(
+  mensaje,
+  contextoSimulacion = null,
+  { signal } = {}
+) {
+  const url = construirUrlApi('/asistente');
+  const res = await fetch(url, {
+    method: 'POST',
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      mensaje,
+      contextoSimulacion,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.error || `Error del asistente (${res.status})`
+    );
+  }
+
+  return await res.json();
+}
+
 export default {
   obtenerEstadoSistema,
   consultarEstadoSistema,
   obtenerHistorialEvaluaciones,
   enviarLecturaSimulada,
   limpiarSimulacion,
+  consultarAsistenteApi,
 };
